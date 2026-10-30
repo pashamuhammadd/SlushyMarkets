@@ -1,0 +1,181 @@
+@import "tailwindcss";
+
+/*
+ * SlushyMarkets design tokens.
+ * Colors are sampled from the official LiquiditySlushy character sheet:
+ * deep navy night sky, icy cyan slush, electric blue, violet straw and magenta crown.
+ */
+@theme {
+  --color-navy-950: #050c1b;
+  --color-navy-900: #071124;
+  --color-navy-850: #0a1830;
+  --color-navy-800: #0e1d35;
+  --color-navy-700: #142745;
+  --color-navy-600: #1d355b;
+  --color-navy-500: #2a4673;
+
+  --color-cyan: #37d5fa;
+  --color-cyan-soft: #8ee8ff;
+  --color-icy: #75c9ff;
+  --color-electric: #2f7bff;
+  --color-violet: #8b5cf6;
+  --color-violet-soft: #b79bff;
+  --color-magenta: #f05deb;
+  --color-gold: #ffc53d;
+
+  --color-ink: #f0f7ff;
+  --color-muted: #a8bcd4;
+  --color-subtle: #7d93b2;
+
+  --color-success: #44d9a4;
+  --color-danger: #ff758a;
+
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fredoka), var(--font-geist), ui-rounded, system-ui, sans-serif;
+
+  --radius-card: 1.25rem;
+
+  --shadow-glow-cyan: 0 0 0 1px rgb(55 213 250 / 0.35), 0 10px 40px -10px rgb(55 213 250 / 0.55);
+  --shadow-glow-violet: 0 0 0 1px rgb(139 92 246 / 0.35), 0 10px 40px -12px rgb(139 92 246 / 0.6);
+  --shadow-card: 0 1px 0 0 rgb(255 255 255 / 0.04) inset, 0 20px 50px -24px rgb(0 0 0 / 0.7);
+
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-fade-up: fade-up 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-navy-900);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: rgb(55 213 250 / 0.35);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-cyan);
+    outline-offset: 3px;
+    border-radius: 0.5rem;
+  }
+}
+
+@layer components {
+  /* Page atmosphere: soft brand glows over deep navy. Decorative only. */
+  .bg-atmosphere {
+    background:
+      radial-gradient(60rem 40rem at 85% -10%, rgb(139 92 246 / 0.16), transparent 60%),
+      radial-gradient(50rem 36rem at -10% 10%, rgb(55 213 250 / 0.12), transparent 60%),
+      radial-gradient(40rem 30rem at 50% 110%, rgb(240 93 235 / 0.08), transparent 60%),
+      var(--color-navy-900);
+  }
+
+  .panel {
+    border-radius: var(--radius-card);
+    border: 1px solid rgb(117 201 255 / 0.14);
+    background: linear-gradient(180deg, rgb(20 39 69 / 0.72), rgb(14 29 53 / 0.82));
+    box-shadow: var(--shadow-card);
+  }
+
+  .panel-glow {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .panel-glow::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgb(55 213 250 / 0.55), rgb(139 92 246 / 0.25) 45%, rgb(240 93 235 / 0.5));
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .text-gradient-ice {
+    background: linear-gradient(100deg, var(--color-cyan-soft), var(--color-cyan) 40%, var(--color-icy));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .text-gradient-neon {
+    background: linear-gradient(100deg, var(--color-violet-soft), var(--color-magenta));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .grid-lines {
+    background-image:
+      linear-gradient(rgb(117 201 255 / 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(117 201 255 / 0.05) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
