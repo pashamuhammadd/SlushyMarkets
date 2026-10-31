@@ -9,8 +9,8 @@ Commissioned by Slushy, developed by Nimia Studio. Education only: no wallet con
 | Phase | Scope | Status |
 |---|---|---|
 | 1 | Foundation, design system, navigation, homepage, lesson directory | Done |
-| 2 | Full Candlesticks and Volume lesson with quiz | Next |
-| 3 | Three Trends, One Piano audio prototype, feedback form with Supabase | Planned |
+| 2 | Full Candlesticks and Volume lesson with quiz | Done |
+| 3 | Three Trends, One Piano audio prototype, feedback form with Supabase | Next |
 | 4 | Polish, QA, SEO, deployment | Planned |
 
 ## Run locally
@@ -54,15 +54,16 @@ src/
     audio/                  Three Trends tiles (illustrative, no sound yet)
     brand/                  Mascot and Logo
     layout/                 Header, footer, page header
-    lessons/                Candle chart, volume profile chart, playback controls, preview
+    lessons/                Candle chart, volume profile, volume buckets, playback controls, lesson player, quiz
     marketing/              Homepage sections
     ui/                     Button, Badge, Section, StatusNotice
   data/
     demo-trades.ts          Deterministic synthetic trade fixture
     lessons.ts              Lesson catalog with honest status labels
+    lessons/                Lesson content (chapters and quiz questions) kept as plain data
   lib/
     simulations/            Pure TypeScript engine: trades, OHLC, volume by price, tests
-    hooks/                  usePlayback (single simulation clock), useElementWidth
+    hooks/                  usePlayback (single simulation clock), useElementWidth, useDeviceProgress
 public/images/liquidity-slushy/   Mascot poses cropped from the official character sheet
 ```
 
@@ -71,7 +72,10 @@ public/images/liquidity-slushy/   Mascot poses cropped from the official charact
 - **Simulated data only.** `src/data/demo-trades.ts` generates 168 BTC-like trades from a fixed seed, so every build and every browser shows the same data. It is labeled "Simulated data" and "Not live market data" wherever it appears. The symbol is `SYN-BTC/USD` to avoid looking like a real market.
 - **One clock, many views.** `usePlayback` owns a single cursor (number of trades revealed). The candle chart and volume profile are pure functions of the same trade prefix, so they cannot drift apart. Pause freezes both, restart resets both.
 - **Deterministic math.** Trades are ordered by timestamp, then id. Quantities are summed as integer units of 0.0001 BTC to avoid floating point artifacts. Price bands include their lower edge. Empty time intervals produce no candle (shown as a gap). The point of control tie goes to the lower price band.
-- **Node labels.** In the preview, a high volume node is a band with at least 60% of the busiest band, a low volume node is a traded band at or under 15%. These simple rules will be explained in the Phase 2 lesson.
+- **Node labels.** A high volume node is a band with at least 60% of the busiest band, a low volume node is a traded band at or under 15% (`src/lib/simulations/nodes.ts`). The lesson explains these are teaching thresholds, not a trading rule, and reveals the labels step by step.
+- **Guided lesson.** Five chapters are defined by cursor ranges in `src/data/lessons/candlesticks-and-volume.ts`. "Play this step" plays only that range and pauses at its end. Narration, node labels and the mascot pose all follow the same cursor.
+- **Volume buckets.** The cups group the same trades into $50 ranges while the profile uses $25 bands. A test checks that both always hold the identical total.
+- **Quiz and progress.** Each question locks after the first answer and always shows the correct option with an explanation. Completion is stored only in the browser's localStorage, with a clear note and a button to clear it. If storage is blocked, the lesson still works and says the result was not saved.
 - **Charts are custom SVG** sized to their real pixel width, so labels stay readable on a 360px phone. No chart library was needed yet.
 - **Mascot assets** are crops of the supplied character sheet, with sheet labels removed. The hero image is the main illustration with the sheet title, tagline and color swatches cleaned off and edges faded. No character art was generated or redrawn.
 - **Navigation includes Explore** at the client's request. It hosts the working demo and a beginner glossary, so it is a real page.

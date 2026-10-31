@@ -64,3 +64,10 @@ export const DEMO_PRICE_RANGE = {
   minPriceUsd: Math.floor((Math.min(...prices) - DEMO_BAND_USD) / DEMO_BAND_USD) * DEMO_BAND_USD,
   maxPriceUsd: Math.ceil((Math.max(...prices) + DEMO_BAND_USD) / DEMO_BAND_USD) * DEMO_BAND_USD,
 } as const;
+
+/** Wider ranges for the "volume buckets" view. Same trades, coarser grouping. */
+export const DEMO_BUCKET_USD = 50;
+export const DEMO_BUCKET_RANGE = {
+  minPriceUsd: Math.floor(Math.min(...prices) / DEMO_BUCKET_USD) * DEMO_BUCKET_USD,
+  maxPriceUsd: Math.floor(Math.max(...prices) / DEMO_BUCKET_USD) * DEMO_BUCKET_USD + DEMO_BUCKET_USD - 1,
+} as const;

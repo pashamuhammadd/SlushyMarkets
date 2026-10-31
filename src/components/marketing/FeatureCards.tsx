@@ -43,7 +43,7 @@ export function FeatureCards() {
                     <span className="font-display text-lg font-semibold text-ink">{cardTitle[lesson.slug] ?? lesson.title}</span>
                   </span>
                   <span className="mt-0.5 block text-sm text-muted">{shortCopy[lesson.slug]}</span>
-                  {lesson.status !== "preview" ? (
+                  {lesson.status !== "available" && lesson.status !== "preview" ? (
                     <Badge tone={lesson.status === "planned" ? "neutral" : "violet"} className="mt-2">
                       {statusLabel[lesson.status]}
                     </Badge>

@@ -1,12 +1,13 @@
 import type { Route } from "next";
 
 /**
- * Honest status for every module. Only `preview` modules have something interactive today.
+ * Honest status for every module.
+ * - available: the full interactive lesson with quiz is live.
  * - preview: a working interactive preview exists; the full lesson is in development.
  * - in-development: being built now, nothing interactive yet.
  * - planned: on the roadmap, not started.
  */
-export type LessonStatus = "preview" | "in-development" | "planned";
+export type LessonStatus = "available" | "preview" | "in-development" | "planned";
 
 export type Lesson = {
   slug: string;
@@ -26,7 +27,7 @@ export const lessons: Lesson[] = [
     title: "Candlesticks and Volume",
     summary:
       "Watch every candle form from individual trades while volume stacks up at the prices where those trades happened.",
-    status: "preview",
+    status: "available",
     href: "/learn/candlesticks-and-volume",
     topics: ["Open, high, low, close", "Traded volume", "Volume by price"],
     minutes: 8,
@@ -37,7 +38,7 @@ export const lessons: Lesson[] = [
     title: "Volume Profile",
     summary:
       "See where the real trading happened. Spot high volume nodes, low volume nodes and the point of control, and learn what they do not tell you.",
-    status: "preview",
+    status: "available",
     href: "/learn/candlesticks-and-volume",
     topics: ["High volume node", "Low volume node", "Point of control"],
     minutes: 6,
@@ -65,6 +66,7 @@ export const lessons: Lesson[] = [
 ];
 
 export const statusLabel: Record<LessonStatus, string> = {
+  available: "Available now",
   preview: "Preview available",
   "in-development": "In development",
   planned: "Planned",

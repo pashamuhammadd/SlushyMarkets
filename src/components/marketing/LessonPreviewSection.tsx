@@ -17,7 +17,7 @@ export function LessonPreviewSection() {
             description="Press Play and watch candles form while volume builds at the prices where trades actually happened."
             action={
               <ButtonLink href="/learn/candlesticks-and-volume" variant="secondary" size="sm">
-                About this lesson
+                Open full lesson
                 <ArrowRight aria-hidden="true" className="size-4" />
               </ButtonLink>
             }

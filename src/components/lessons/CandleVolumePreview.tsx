@@ -18,7 +18,7 @@ import { buildCandles } from "@/lib/simulations/ohlc";
 import { buildVolumeProfile } from "@/lib/simulations/volume-profile";
 import { CandleChart } from "./CandleChart";
 import { PlaybackControls } from "./PlaybackControls";
-import { VolumeProfileChart } from "./VolumeProfileChart";
+import { NodeLegend, VolumeProfileChart } from "./VolumeProfileChart";
 
 const SLOT_COUNT = 12;
 const candleOptions = { candleMs: DEMO_CANDLE_MS, originMs: DEMO_ORIGIN_MS };
@@ -106,17 +106,7 @@ export function CandleVolumePreview() {
               label={`Volume profile with ${view.profile.totalVolumeBtc} BTC of simulated executed volume across ${DEMO_BAND_USD} dollar price bands.`}
             />
           </div>
-          <ul className="mt-1 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-muted" aria-label="Legend">
-            <li className="flex items-center gap-1.5">
-              <span aria-hidden="true" className="size-2.5 rounded-sm bg-gold" /> Point of control
-            </li>
-            <li className="flex items-center gap-1.5">
-              <span aria-hidden="true" className="size-2.5 rounded-sm bg-cyan" /> High volume node
-            </li>
-            <li className="flex items-center gap-1.5">
-              <span aria-hidden="true" className="size-2.5 rounded-sm bg-[#3D6FD8]" /> Low volume node
-            </li>
-          </ul>
+          <NodeLegend />
         </figure>
       </div>
 

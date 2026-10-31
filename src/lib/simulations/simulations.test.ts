@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { DEMO_BAND_USD, DEMO_CANDLE_MS, DEMO_ORIGIN_MS, DEMO_PRICE_RANGE, DEMO_TRADES } from "@/data/demo-trades";
+import {
+  DEMO_BAND_USD,
+  DEMO_BUCKET_RANGE,
+  DEMO_BUCKET_USD,
+  DEMO_CANDLE_MS,
+  DEMO_ORIGIN_MS,
+  DEMO_PRICE_RANGE,
+  DEMO_TRADES,
+} from "@/data/demo-trades";
+import { classifyVolumeNodes } from "./nodes";
 import { buildCandles } from "./ohlc";
 import { compareTrades, createRng } from "./trades";
 import type { Trade } from "./types";
@@ -115,6 +124,45 @@ describe("demo fixture", () => {
       const profile = buildVolumeProfile(prefix, { bandUsd: DEMO_BAND_USD, ...DEMO_PRICE_RANGE });
       expect(candles.reduce((s, c) => s + c.tradeCount, 0)).toBe(n);
       expect(profile.bands.reduce((s, b) => s + b.tradeCount, 0)).toBe(n);
+    }
+  });
+});
+
+describe("classifyVolumeNodes", () => {
+  const profile = buildVolumeProfile(
+    [t("1", 0, 105, 1), t("2", 1, 115, 0.1), t("3", 2, 125, 0.7), t("4", 3, 145, 0.5)],
+    { bandUsd: 10, minPriceUsd: 90, maxPriceUsd: 169 },
+  );
+
+  it("labels poc, high, low, normal and empty bands", () => {
+    expect(classifyVolumeNodes(profile)).toEqual([
+      "empty", // 90
+      "poc", // 100
+      "low", // 110: 0.1 is 10% of the busiest band
+      "high", // 120: 0.7 is 70%
+      "low", // 130: traded range gap with no volume
+      "normal", // 140: 0.5 is 50%
+      "empty", // 150
+      "empty", // 160
+    ]);
+  });
+
+  it("returns only empty bands before any trade", () => {
+    const empty = buildVolumeProfile([], { bandUsd: 10, minPriceUsd: 0, maxPriceUsd: 29 });
+    expect(classifyVolumeNodes(empty)).toEqual(["empty", "empty", "empty"]);
+  });
+});
+
+describe("demo buckets", () => {
+  it("hold exactly the same total volume as the finer profile", () => {
+    const fine = buildVolumeProfile(DEMO_TRADES, { bandUsd: DEMO_BAND_USD, ...DEMO_PRICE_RANGE });
+    const buckets = buildVolumeProfile(DEMO_TRADES, { bandUsd: DEMO_BUCKET_USD, ...DEMO_BUCKET_RANGE });
+    expect(buckets.totalVolumeBtc).toBe(fine.totalVolumeBtc);
+    expect(buckets.bands.reduce((s, b) => s + b.tradeCount, 0)).toBe(DEMO_TRADES.length);
+    // no trade was clamped: every trade sits inside the bucket range
+    for (const trade of DEMO_TRADES) {
+      expect(trade.priceUsd).toBeGreaterThanOrEqual(DEMO_BUCKET_RANGE.minPriceUsd);
+      expect(trade.priceUsd).toBeLessThanOrEqual(DEMO_BUCKET_RANGE.maxPriceUsd);
     }
   });
 });

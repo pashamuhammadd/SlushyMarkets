@@ -13,6 +13,7 @@ export const metadata: Metadata = {
 };
 
 const statusTone: Record<LessonStatus, BadgeTone> = {
+  available: "success",
   preview: "cyan",
   "in-development": "violet",
   planned: "neutral",
@@ -54,7 +55,7 @@ export default function LearnPage() {
                 <span className="flex items-center gap-1.5 text-xs text-subtle">
                   {lesson.minutes ? (
                     <>
-                      <Clock aria-hidden="true" className="size-3.5" /> About {lesson.minutes} minutes when complete
+                      <Clock aria-hidden="true" className="size-3.5" /> About {lesson.minutes} minutes
                     </>
                   ) : (
                     "Timing to be decided"
@@ -65,7 +66,7 @@ export default function LearnPage() {
                     href={lesson.href}
                     className="inline-flex items-center gap-1.5 text-sm font-semibold text-cyan hover:underline"
                   >
-                    {lesson.status === "preview" ? "Open preview" : "Learn more"}
+                    {lesson.status === "available" ? "Start lesson" : lesson.status === "preview" ? "Open preview" : "Learn more"}
                     <ArrowRight aria-hidden="true" className="size-4" />
                   </Link>
                 ) : (

@@ -34,6 +34,7 @@ export const COLORS = {
   down: "#FF758A",
   cyan: "#37D5FA",
   icy: "#75C9FF",
+  electric: "#2F7BFF",
   violet: "#8B5CF6",
   magenta: "#F05DEB",
   gold: "#FFC53D",

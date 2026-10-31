@@ -23,20 +23,22 @@ export function usePlayback({ total, initialCursor = total, eventsPerSecond = 12
   const [cursor, setCursor] = useState(() => clamp(initialCursor, 0, total));
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState<PlaybackSpeed>(1);
+  /** Playback pauses automatically when the cursor reaches this point. */
+  const [stopAt, setStopAt] = useState(total);
 
-  // Reaching the end stops playback (state adjustment during render, no extra effect needed).
-  if (playing && cursor >= total) {
+  // Reaching the stop point ends playback (state adjustment during render, no extra effect needed).
+  if (playing && cursor >= stopAt) {
     setPlaying(false);
   }
 
   useEffect(() => {
     if (!playing) return;
     const id = window.setInterval(
-      () => setCursor((c) => (c >= total ? c : c + 1)),
+      () => setCursor((c) => (c >= stopAt ? c : c + 1)),
       1000 / (eventsPerSecond * speed),
     );
     return () => window.clearInterval(id);
-  }, [playing, speed, total, eventsPerSecond]);
+  }, [playing, speed, stopAt, eventsPerSecond]);
 
   // Pause when the tab is hidden so the lesson does not run away in the background.
   useEffect(() => {
@@ -48,10 +50,23 @@ export function usePlayback({ total, initialCursor = total, eventsPerSecond = 12
     return () => document.removeEventListener("visibilitychange", onVisibility);
   }, [playing]);
 
+  /** Play to the end. From the end, starts again from the first trade. */
   const play = useCallback(() => {
+    setStopAt(total);
     setCursor((c) => (c >= total ? 0 : c));
     setPlaying(true);
   }, [total]);
+
+  /** Play from `from` (or the current position) and pause at `target`. */
+  const playRange = useCallback(
+    (target: number, from?: number) => {
+      const end = clamp(target, 0, total);
+      setStopAt(end);
+      setCursor((c) => clamp(from ?? c, 0, end));
+      setPlaying(true);
+    },
+    [total],
+  );
 
   const pause = useCallback(() => setPlaying(false), []);
   const toggle = useCallback(() => (playing ? pause() : play()), [playing, pause, play]);
@@ -79,7 +94,7 @@ export function usePlayback({ total, initialCursor = total, eventsPerSecond = 12
     setCursor(0);
   }, []);
 
-  return { cursor, total, playing, speed, setSpeed, play, pause, toggle, seek, stepForward, stepBack, restart };
+  return { cursor, total, playing, speed, setSpeed, play, playRange, pause, toggle, seek, stepForward, stepBack, restart };
 }
 
 export type Playback = ReturnType<typeof usePlayback>;
