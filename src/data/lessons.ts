@@ -58,7 +58,7 @@ export const lessons: Lesson[] = [
     title: "Learn With Sound",
     summary:
       "Three Trends, One Piano turns daily, 4 hour and 15 minute trends into one piece of music so you can hear structure.",
-    status: "in-development",
+    status: "preview",
     href: "/audio-lab",
     topics: ["Timeframes", "Trend direction", "Listening practice"],
     icon: "sound",

@@ -1,35 +1,22 @@
 import type { Metadata } from "next";
-import { Headphones, Piano, VolumeX } from "lucide-react";
-import { TrendTiles } from "@/components/audio/TrendTiles";
+import { Ear, Info, Music } from "lucide-react";
+import { ListenExercise } from "@/components/audio/ListenExercise";
+import { TrendPiano } from "@/components/audio/TrendPiano";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
-import { Container } from "@/components/ui/Section";
+import { Container, SectionHeading } from "@/components/ui/Section";
 import { StatusNotice } from "@/components/ui/StatusNotice";
+import { STEP_SECONDS, TIMEFRAMES } from "@/lib/audio/trend-scenario";
 
 export const metadata: Metadata = {
   title: "Audio Lab",
   description:
-    "Three Trends, One Piano: an experiment that turns daily, 4 hour and 15 minute trends into music. Prototype in development.",
+    "Three Trends, One Piano: hear daily, 4 hour and 15 minute trends as one piece of music. A synthetic learning demo with provisional sound mapping.",
 };
 
-const plan = [
-  {
-    icon: Piano,
-    title: "Three registers, one piano",
-    body: "Daily in a low register, 4 hour in the middle and 15 minute up high, so each timeframe has its own voice.",
-  },
-  {
-    icon: Headphones,
-    title: "Listen and identify",
-    body: "Solo each timeframe or hear all three together, then try a short exercise: which trend just turned?",
-  },
-  {
-    icon: VolumeX,
-    title: "You stay in control",
-    body: "No autoplay. Sound starts only when you press Play, with mute, volume and stop always in reach.",
-  },
-];
+const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+const noteName = (midi: number) => `${NOTE_NAMES[midi % 12]}${Math.floor(midi / 12) - 1}`;
 
 export default function AudioLabPage() {
   return (
@@ -39,47 +26,104 @@ export default function AudioLabPage() {
         title="Three Trends, One Piano"
         description="Hear market structure. Each timeframe plays in its own piano register, so you can notice when trends agree and when they clash."
         pose="excited"
-      />
-      <Container className="space-y-8">
-        <StatusNotice title="The playable prototype is in development">
+      >
+        <div className="flex flex-wrap gap-2">
+          <Badge tone="violet">Synthetic learning demo</Badge>
+          <Badge tone="magenta">Provisional sound mapping</Badge>
+          <Badge tone="neutral">Not a live signal</Badge>
+        </div>
+      </PageHeader>
+
+      <Container className="space-y-12">
+        <StatusNotice title="Prototype: the sound mapping is not final">
           <p>
-            No sound plays on this page yet. The first version will use original synthetic tones and clearly labeled demo
-            data, never live market signals.
+            The three registers (Daily low, 4H middle, 15m high) follow Slushy&apos;s earlier demo. The scale, rhythm and
+            trend story here are placeholders until Slushy approves the final mapping. All tones are original and generated in
+            your browser. The trend lines are invented, not market data.
           </p>
-          <p>
-            The exact way trends become notes is a provisional concept until Slushy approves the final mapping.
-          </p>
+          <p>Sound only starts when you press Play. Use Mute or Stop at any time.</p>
         </StatusNotice>
 
-        <section aria-labelledby="concept-title" className="panel p-4 sm:p-6">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-            <h2 id="concept-title" className="text-xl font-semibold text-ink">
-              The concept at a glance
-            </h2>
-            <Badge tone="violet">Illustrative lines, not market data</Badge>
+        <section aria-labelledby="player-title" className="panel panel-glow p-4 sm:p-6">
+          <SectionHeading
+            id="player-title"
+            icon={<Music className="size-5" />}
+            title="Listen to three trends at once"
+            description="Press Play, then try each timeframe on its own. Watch the badges change when a trend turns."
+          />
+          <div className="mt-5">
+            <TrendPiano />
           </div>
-          <TrendTiles />
         </section>
 
-        <section aria-labelledby="plan-title">
-          <h2 id="plan-title" className="text-2xl font-semibold text-ink">
-            What the prototype will let you do
-          </h2>
+        <section aria-labelledby="exercise-title" className="panel p-4 sm:p-6">
+          <SectionHeading
+            id="exercise-title"
+            icon={<Ear className="size-5" />}
+            title="Listen and identify"
+            description="Three short clips. Is each trend rising, flat or falling? Headphones help."
+          />
+          <div className="mt-5">
+            <ListenExercise />
+          </div>
+        </section>
+
+        <section aria-labelledby="mapping-title">
+          <SectionHeading
+            id="mapping-title"
+            icon={<Info className="size-5" />}
+            title="How the sound is mapped (provisional)"
+            description="Simple rules so you can connect what you hear with what you see."
+          />
+          <div className="mt-5 overflow-x-auto rounded-2xl ring-1 ring-white/10">
+            <table className="w-full min-w-[34rem] text-left text-sm">
+              <thead className="bg-navy-800/80 text-xs uppercase tracking-wider text-subtle">
+                <tr>
+                  <th scope="col" className="px-4 py-3">Timeframe</th>
+                  <th scope="col" className="px-4 py-3">Register</th>
+                  <th scope="col" className="px-4 py-3">Notes</th>
+                  <th scope="col" className="px-4 py-3">Rhythm</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5 bg-navy-900/60 text-muted">
+                {TIMEFRAMES.map((tf) => (
+                  <tr key={tf.id}>
+                    <th scope="row" className="px-4 py-3 font-semibold text-ink">
+                      <span className="mr-2 inline-block size-2.5 rounded-full" style={{ backgroundColor: tf.color }} />
+                      {tf.short}
+                    </th>
+                    <td className="px-4 py-3">{tf.register}</td>
+                    <td className="px-4 py-3 tabular-nums">
+                      {noteName(tf.baseMidi)} to {noteName(tf.baseMidi + 12)}
+                    </td>
+                    <td className="px-4 py-3">
+                      One note every {(tf.everySteps * STEP_SECONDS).toFixed(1)}s
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           <ul className="mt-4 grid gap-3 md:grid-cols-3">
-            {plan.map(({ icon: Icon, title, body }) => (
-              <li key={title} className="panel p-5">
-                <Icon aria-hidden="true" className="size-6 text-magenta" />
-                <h3 className="mt-3 text-lg font-semibold text-ink">{title}</h3>
-                <p className="mt-1 text-sm text-muted">{body}</p>
-              </li>
-            ))}
+            <li className="panel p-4 text-sm text-muted">
+              <span className="font-semibold text-ink">Pitch follows price.</span> Higher on the trend line means a higher note
+              inside that register.
+            </li>
+            <li className="panel p-4 text-sm text-muted">
+              <span className="font-semibold text-ink">Slower timeframe, longer notes.</span> Daily moves slowly, 15m reacts
+              quickly.
+            </li>
+            <li className="panel p-4 text-sm text-muted">
+              <span className="font-semibold text-ink">One friendly scale.</span> A major pentatonic scale keeps all three parts
+              pleasant together.
+            </li>
           </ul>
         </section>
 
         <div className="flex flex-wrap gap-3">
-          <ButtonLink href="/explore">Try the visual demo</ButtonLink>
-          <ButtonLink href="/feedback" variant="secondary">
-            Suggest a sound idea
+          <ButtonLink href="/feedback">Share feedback on the sound</ButtonLink>
+          <ButtonLink href="/learn" variant="secondary">
+            Back to lessons
           </ButtonLink>
         </div>
       </Container>

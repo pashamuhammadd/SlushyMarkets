@@ -35,12 +35,12 @@ export function ThreeTrendsSection() {
                 <p className="flex gap-2.5 text-sm text-muted">
                   <Info aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-violet-soft" />
                   <span>
-                    Illustrative trend lines, not market data. The playable prototype with original synthetic tones is being
-                    built for the Audio Lab. Sound will only start when you press Play.
+                    Synthetic trend lines, not market data. The Audio Lab prototype plays them with original piano-like tones.
+                    Sound only starts when you press Play.
                   </span>
                 </p>
                 <ButtonLink href="/audio-lab" variant="secondary" size="sm" className="self-start sm:self-auto">
-                  Visit the Audio Lab
+                  Try the prototype
                   <ArrowRight aria-hidden="true" className="size-4" />
                 </ButtonLink>
               </div>
