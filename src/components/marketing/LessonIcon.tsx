@@ -35,6 +35,19 @@ export function LessonIcon({ kind }: { kind: Lesson["icon"] }) {
           <path d="M6 50 C 20 48, 28 34, 38 32 S 52 30, 58 24" stroke="#2F7BFF" />
         </g>
       ) : null}
+      {kind === "renko" ? (
+        <g>
+          {[
+            [8, 40, "#44D9A4"],
+            [18, 32, "#44D9A4"],
+            [28, 24, "#44D9A4"],
+            [38, 32, "#FF758A"],
+            [48, 40, "#FF758A"],
+          ].map(([x, y, color]) => (
+            <rect key={x} x={x} y={y} width="9" height="8" rx="1.5" fill={color as string} />
+          ))}
+        </g>
+      ) : null}
       {kind === "sound" ? (
         <g>
           <path d="M24 44 V16 L50 10 V38" fill="none" stroke="#B79BFF" strokeWidth="3.5" strokeLinejoin="round" />

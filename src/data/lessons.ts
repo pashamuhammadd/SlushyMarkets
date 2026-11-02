@@ -18,7 +18,7 @@ export type Lesson = {
   href?: Route;
   topics: string[];
   minutes?: number;
-  icon: "candles" | "profile" | "averages" | "sound";
+  icon: "candles" | "profile" | "averages" | "renko" | "sound";
 };
 
 export const lessons: Lesson[] = [
@@ -54,6 +54,17 @@ export const lessons: Lesson[] = [
     topics: ["Equal weights", "Smoothing factor", "Lag"],
     minutes: 7,
     icon: "averages",
+  },
+  {
+    slug: "renko-bricks",
+    title: "Renko Bricks",
+    summary:
+      "Build a chart from equal bricks that only cares how far price moved, and see how box size and reversals change the picture.",
+    status: "available",
+    href: "/learn/renko-bricks",
+    topics: ["Box size", "Two box reversal", "Price, not time"],
+    minutes: 7,
+    icon: "renko",
   },
   {
     slug: "three-trends-one-piano",
