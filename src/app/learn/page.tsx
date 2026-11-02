@@ -6,11 +6,14 @@ import { LessonIcon } from "@/components/marketing/LessonIcon";
 import { Badge, type BadgeTone } from "@/components/ui/Badge";
 import { Container } from "@/components/ui/Section";
 import { lessons, statusLabel, type LessonStatus } from "@/data/lessons";
+import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Learn",
-  description: "Short, visual trading lessons for beginners. See which lessons are ready to preview and which are coming next.",
-};
+  description:
+    "Short, visual trading lessons for beginners. See which lessons are ready to preview and which are coming next.",
+  path: "/learn",
+});
 
 const statusTone: Record<LessonStatus, BadgeTone> = {
   available: "success",

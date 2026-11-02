@@ -11,7 +11,8 @@ Commissioned by Slushy, developed by Nimia Studio. Education only: no wallet con
 | 1 | Foundation, design system, navigation, homepage, lesson directory | Done |
 | 2 | Full Candlesticks and Volume lesson with quiz | Done |
 | 3 | Three Trends, One Piano audio prototype, feedback form with Supabase | Done |
-| 4 | Polish, QA, SEO, deployment | Next |
+| 4 | Polish, QA, SEO, deployment | Done |
+| Next | SMA vs EMA lesson, approved audio mapping, community link | After Slushy's answers |
 
 ## Run locally
 
@@ -40,19 +41,47 @@ Open http://localhost:3000. Everything works without environment variables, exce
 
 1. Create a project at https://supabase.com (the free plan is enough).
 2. In the Supabase dashboard open **SQL Editor > New query**, paste the contents of `supabase/migrations/0001_feedback.sql` and press **Run**. This creates the `feedback` table with Row Level Security on and no public access.
-3. In **Project Settings > API** copy the **Project URL** and the **service_role** secret key.
+3. Copy two values:
+   - **Project URL**: `https://<project-ref>.supabase.co`. The project ref is the id in the dashboard address `supabase.com/dashboard/project/<project-ref>`.
+   - **Secret key**: in **Project Settings > API Keys**, under **Secret keys**, reveal and copy the key that starts with `sb_secret_`. (Older projects may show a legacy `service_role` key starting with `eyJ`; both work.) Never use the `sb_publishable_` key here.
 4. In Vercel open **Project > Settings > Environment Variables** and add, for Production and Preview:
    - `SUPABASE_URL` = the Project URL
-   - `SUPABASE_SERVICE_ROLE_KEY` = the service_role key
+   - `SUPABASE_SERVICE_ROLE_KEY` = the secret key (`sb_secret_...`)
 5. Redeploy (Deployments > latest > Redeploy). The feedback page reads the configuration at build time.
 6. Send a test message on `/feedback`, then check **Table Editor > feedback** in Supabase.
 
 For local testing, put the same two variables in a `.env.local` file (ignored by git) and restart `npm run dev`.
 
 Security notes:
-- The service role key is only read in `src/lib/server/feedback-store.ts`, which is marked `server-only`. Never prefix it with `NEXT_PUBLIC_`.
+- New `sb_secret_` keys are sent only in the `apikey` header (they are not JWTs). Legacy `eyJ` keys are also sent as `Authorization: Bearer`.
+- The secret key is only read in `src/lib/server/feedback-store.ts`, which is marked `server-only`. Never prefix it with `NEXT_PUBLIC_`.
 - The browser never talks to Supabase directly. It posts to `/api/feedback`, which validates on the server and inserts through the Supabase REST API.
 - Read submissions in the Supabase dashboard. There is no public admin page.
+
+## Launch checklist
+
+Before announcing slushymarkets.com publicly:
+
+- [ ] Latest `main` is deployed on Vercel and the build is green
+- [ ] `slushymarkets.com` is the primary domain, `www` redirects to it, HTTPS works
+- [ ] Supabase table created from `supabase/migrations/0001_feedback.sql`
+- [ ] `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` set in Vercel (Production and Preview), then redeployed
+- [ ] A test message on `/feedback` appears in Supabase Table Editor, then delete the test row
+- [ ] The Supabase secret key has never been committed (GitHub push protection will block it). Rotate it if it was ever pasted anywhere public
+- [ ] Share a link in X, Telegram or Discord and check the preview card shows the mascot image
+- [ ] Submit `https://slushymarkets.com/sitemap.xml` in Google Search Console (optional)
+- [ ] Slushy has reviewed the copy, the mascot usage and the provisional audio label
+- [ ] Quick manual pass on a real phone: lesson playback, Audio Lab sound with Mute, feedback form
+
+## Quality checks done in Phase 4
+
+- Automated accessibility audit (axe-core, WCAG 2.1 AA rules) on every page at 360px and 1280px: no violations
+- Keyboard: skip link, visible focus ring on every control, mobile menu opens with Enter and closes with Escape and on navigation
+- `prefers-reduced-motion` turns off page animations and smooth scrolling
+- No horizontal scrolling at 360, 768, 1024 and 1280px on any page
+- Error boundary tested with a forced error: friendly page with Try again, header stays usable
+- Social preview, canonical URL, sitemap, robots and manifest verified in the built HTML
+- JavaScript sent per page is about 195 KB gzipped, most of it React and Next.js; local LCP under 0.4s
 
 ## Stack
 
@@ -122,6 +151,10 @@ public/images/liquidity-slushy/   Mascot poses cropped from the official charact
 
 ### General
 
+- **SEO:** every page has its own title, description, canonical URL and social preview. The preview image (`public/images/og-slushymarkets.jpg`) is built from the official hero artwork. `/api/` is excluded in robots.txt and the 404 page is `noindex`.
+- **Security headers:** HSTS, nosniff, frame denial, strict referrer policy and a restrictive permissions policy (`next.config.ts`). A Content Security Policy is not set yet because it needs per request nonces; consider it once analytics or third party scripts are added.
+- **Error handling:** `src/app/error.tsx` for page level errors and `src/app/global-error.tsx` as a last resort.
+- **Navigation:** the full menu shows from 1024px; smaller screens use the menu button.
 - **Mascot assets** are crops of the supplied character sheet, with sheet labels removed. No character art was generated or redrawn.
 - **Navigation includes Explore** at the client's request. It hosts the working demo and a beginner glossary.
 - **Mockup features left out on purpose:** Connect Wallet (replaced by Start Learning), "Live Demo" label, timeframe switcher, invented track list, lesson progress counters, giveaway and PSG1 card, community join link.

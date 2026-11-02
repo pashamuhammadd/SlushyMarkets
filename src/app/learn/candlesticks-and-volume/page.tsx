@@ -8,12 +8,14 @@ import { Badge } from "@/components/ui/Badge";
 import { Container, SectionHeading } from "@/components/ui/Section";
 import { DEMO_BAND_USD, DEMO_BUCKET_USD } from "@/data/demo-trades";
 import { LESSON_ID, QUIZ } from "@/data/lessons/candlesticks-and-volume";
+import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Candlesticks and Volume",
   description:
     "Interactive lesson: watch candlesticks, a volume profile and volume buckets form from the same simulated trades, then check your understanding.",
-};
+  path: "/learn/candlesticks-and-volume",
+});
 
 const ideas = [
   {

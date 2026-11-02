@@ -4,11 +4,14 @@ import { ArrowRight } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { CandleVolumePreview } from "@/components/lessons/CandleVolumePreview";
 import { Container } from "@/components/ui/Section";
+import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Explore Demo",
-  description: "Play with a working candlestick and volume by price demo built from simulated trades, plus a beginner glossary.",
-};
+  description:
+    "Play with a working candlestick and volume by price demo built from simulated trades, plus a beginner glossary.",
+  path: "/explore",
+});
 
 const glossary = [
   { term: "Trade", definition: "One completed exchange between a buyer and a seller at a single price and quantity." },

@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import { Mascot } from "@/components/brand/Mascot";
 import { ButtonLink } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Section";
+
+export const metadata: Metadata = {
+  title: "Page not found",
+  robots: { index: false },
+};
 
 export default function NotFound() {
   return (

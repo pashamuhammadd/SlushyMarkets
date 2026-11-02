@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
-import { site } from "@/lib/site";
+import { site, socialImage } from "@/lib/site";
 import { fontDisplay, fontSans } from "./fonts";
 import "./globals.css";
 
@@ -13,17 +13,20 @@ export const metadata: Metadata = {
   },
   description: site.description,
   applicationName: site.name,
+  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     siteName: site.name,
     title: `${site.name} | Learn trading through visuals and sound`,
     description: site.description,
     url: site.url,
+    images: [socialImage],
   },
   twitter: {
     card: "summary_large_image",
     title: `${site.name} | Learn trading through visuals and sound`,
     description: site.description,
+    images: [socialImage],
   },
 };
 

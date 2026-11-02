@@ -7,11 +7,14 @@ import { Container } from "@/components/ui/Section";
 import { StatusNotice } from "@/components/ui/StatusNotice";
 import { isFeedbackConfigured } from "@/lib/server/feedback-store";
 import { FEEDBACK_TOPICS } from "@/lib/validation/feedback";
+import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Feedback",
-  description: "Help shape SlushyMarkets. Tell us what clicked, what confused you and which lesson should come next.",
-};
+  description:
+    "Help shape SlushyMarkets. Tell us what clicked, what confused you and which lesson should come next.",
+  path: "/feedback",
+});
 
 export default function FeedbackPage() {
   // Read on the server at build time. After adding the Supabase variables in Vercel, redeploy.

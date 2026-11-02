@@ -44,7 +44,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:h-18 lg:px-8">
         <Logo />
 
-        <nav aria-label="Main" className="hidden md:block">
+        <nav aria-label="Main" className="hidden lg:block">
           <ul className="flex items-center gap-1">
             {mainNav.map((item) => {
               const active = isActive(pathname, item.href);
@@ -54,7 +54,7 @@ export function SiteHeader() {
                     href={item.href}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "relative rounded-full px-3.5 py-2 text-sm font-medium transition lg:px-4",
+                      "relative whitespace-nowrap rounded-full px-3.5 py-2 text-sm font-medium transition xl:px-4",
                       active ? "text-cyan" : "text-muted hover:text-ink",
                     )}
                   >
@@ -81,7 +81,7 @@ export function SiteHeader() {
           </div>
           <button
             type="button"
-            className="grid size-11 place-items-center rounded-full text-ink ring-1 ring-white/10 transition hover:bg-white/5 md:hidden"
+            className="grid size-11 place-items-center rounded-full text-ink ring-1 ring-white/10 transition hover:bg-white/5 lg:hidden"
             aria-expanded={open}
             aria-controls={menuId}
             aria-label={open ? "Close menu" : "Open menu"}
@@ -95,7 +95,7 @@ export function SiteHeader() {
         </div>
       </div>
 
-      <div id={menuId} hidden={!open} className="border-t border-white/5 bg-navy-900/95 md:hidden">
+      <div id={menuId} hidden={!open} className="border-t border-white/5 bg-navy-900/95 lg:hidden">
         <nav aria-label="Mobile" className="mx-auto max-w-7xl px-4 py-3 sm:px-6">
           <ul className="flex flex-col gap-1">
             {mainNav.map((item) => {

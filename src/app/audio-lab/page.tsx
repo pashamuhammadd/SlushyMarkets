@@ -8,12 +8,14 @@ import { ButtonLink } from "@/components/ui/Button";
 import { Container, SectionHeading } from "@/components/ui/Section";
 import { StatusNotice } from "@/components/ui/StatusNotice";
 import { STEP_SECONDS, TIMEFRAMES } from "@/lib/audio/trend-scenario";
+import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Audio Lab",
   description:
     "Three Trends, One Piano: hear daily, 4 hour and 15 minute trends as one piece of music. A synthetic learning demo with provisional sound mapping.",
-};
+  path: "/audio-lab",
+});
 
 const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 const noteName = (midi: number) => `${NOTE_NAMES[midi % 12]}${Math.floor(midi / 12) - 1}`;
@@ -75,7 +77,12 @@ export default function AudioLabPage() {
             title="How the sound is mapped (provisional)"
             description="Simple rules so you can connect what you hear with what you see."
           />
-          <div className="mt-5 overflow-x-auto rounded-2xl ring-1 ring-white/10">
+          <div
+            role="region"
+            aria-label="Sound mapping table, scroll sideways on small screens"
+            tabIndex={0}
+            className="mt-5 overflow-x-auto rounded-2xl ring-1 ring-white/10"
+          >
             <table className="w-full min-w-[34rem] text-left text-sm">
               <thead className="bg-navy-800/80 text-xs uppercase tracking-wider text-subtle">
                 <tr>
