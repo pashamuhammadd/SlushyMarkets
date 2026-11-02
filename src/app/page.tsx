@@ -6,11 +6,13 @@ import { HowItWorks } from "@/components/marketing/HowItWorks";
 import { LearningPath } from "@/components/marketing/LearningPath";
 import { LessonPreviewSection } from "@/components/marketing/LessonPreviewSection";
 import { ThreeTrendsSection } from "@/components/marketing/ThreeTrendsSection";
+import { defaultOpenGraph } from "@/lib/site";
 
 // The homepage keeps the default title from the root layout and declares its own canonical URL.
+// openGraph is passed in full because Next.js replaces, not merges, the parent's openGraph object.
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
-  openGraph: { url: "/" },
+  openGraph: defaultOpenGraph("/"),
 };
 
 export default function HomePage() {

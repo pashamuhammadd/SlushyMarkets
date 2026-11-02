@@ -37,6 +37,26 @@ export const socialImage = {
   alt: "LiquiditySlushy, the Slushy Markets mascot, sitting on a rock with a phone next to the headline Learn trading through visuals and sound.",
 };
 
+/** Default title used by the homepage and as the fallback for every page. */
+export const defaultTitle = `${site.fullName} | Learn trading through visuals and sound`;
+
+/**
+ * Complete Open Graph object for the homepage and the root layout.
+ * Next.js does not deep merge metadata: a page that sets openGraph replaces the parent's object,
+ * so every override must carry the image, site name and type again.
+ */
+export function defaultOpenGraph(url?: string) {
+  return {
+    type: "website" as const,
+    siteName: site.fullName,
+    locale: "en_US",
+    title: defaultTitle,
+    description: site.description,
+    images: [socialImage],
+    ...(url ? { url } : {}),
+  };
+}
+
 /** Absolute URL for a site path. Used where a full URL is required (sitemap, JSON-LD). */
 export function absoluteUrl(path: string = "/") {
   return path === "/" || path === "" ? site.url : `${site.url}${path}`;
@@ -49,7 +69,7 @@ export function pageMetadata({ title, description, path }: { title: string; desc
     title,
     description,
     alternates: { canonical: path },
-    openGraph: { type: "website" as const, siteName: site.fullName, title: fullTitle, description, url: path, images: [socialImage] },
+    openGraph: { type: "website" as const, siteName: site.fullName, locale: "en_US", title: fullTitle, description, url: path, images: [socialImage] },
     twitter: { card: "summary_large_image" as const, title: fullTitle, description, images: [socialImage] },
   };
 }

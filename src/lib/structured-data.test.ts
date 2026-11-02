@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { absoluteUrl, pageMetadata, site } from "./site";
+import { absoluteUrl, defaultOpenGraph, pageMetadata, site, socialImage } from "./site";
 import { breadcrumbGraph, learningResourceGraph, siteGraph } from "./structured-data";
 
 describe("brand", () => {
@@ -15,6 +15,17 @@ describe("brand", () => {
     const meta = pageMetadata({ title: "Lessons", description: "d", path: "/learn" });
     expect(meta.openGraph.title).toBe("Lessons | Slushy Markets");
     expect(meta.alternates.canonical).toBe("/learn");
+  });
+});
+
+describe("open graph", () => {
+  it("keeps the social image, site name and type when the homepage sets its url", () => {
+    const og = defaultOpenGraph("/");
+    expect(og).toMatchObject({ url: "/", type: "website", siteName: site.fullName, images: [socialImage] });
+  });
+
+  it("gives every page override the social image", () => {
+    expect(pageMetadata({ title: "T", description: "d", path: "/x" }).openGraph.images).toEqual([socialImage]);
   });
 });
 

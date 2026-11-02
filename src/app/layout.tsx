@@ -2,12 +2,10 @@ import type { Metadata, Viewport } from "next";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { site, socialImage } from "@/lib/site";
+import { defaultOpenGraph, defaultTitle, site, socialImage } from "@/lib/site";
 import { siteGraph } from "@/lib/structured-data";
 import { fontDisplay, fontSans } from "./fonts";
 import "./globals.css";
-
-const defaultTitle = `${site.fullName} | Learn trading through visuals and sound`;
 
 // No canonical here on purpose: each page sets its own, so error and 404 pages never point at the homepage.
 export const metadata: Metadata = {
@@ -21,14 +19,7 @@ export const metadata: Metadata = {
   authors: [{ name: site.studio }],
   creator: site.studio,
   publisher: site.fullName,
-  openGraph: {
-    type: "website",
-    siteName: site.fullName,
-    locale: "en_US",
-    title: defaultTitle,
-    description: site.description,
-    images: [socialImage],
-  },
+  openGraph: defaultOpenGraph(),
   twitter: {
     card: "summary_large_image",
     title: defaultTitle,
