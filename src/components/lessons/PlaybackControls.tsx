@@ -31,7 +31,7 @@ export function PlaybackControls({ playback, eventLabel = "Trade" }: { playback:
         <button type="button" onClick={stepForward} disabled={atEnd} className={iconButton} aria-label={`Step forward one ${eventLabel.toLowerCase()}`}>
           <StepForward aria-hidden="true" className="size-4" />
         </button>
-        <button type="button" onClick={restart} disabled={cursor === 0 && !playing} className={iconButton} aria-label="Restart from the first trade">
+        <button type="button" onClick={restart} disabled={cursor === 0 && !playing} className={iconButton} aria-label={`Restart from the first ${eventLabel.toLowerCase()}`}>
           <RotateCcw aria-hidden="true" className="size-4" />
         </button>
 

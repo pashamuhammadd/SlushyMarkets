@@ -1,6 +1,9 @@
 import type { MascotPose } from "@/components/brand/Mascot";
 import type { NodeVisibility } from "@/components/lessons/VolumeProfileChart";
 import { DEMO_TRADES, DEMO_TRADES_PER_CANDLE } from "@/data/demo-trades";
+import type { QuizQuestion } from "./types";
+
+export type { QuizQuestion } from "./types";
 
 export const LESSON_ID = "candlesticks-and-volume";
 
@@ -87,14 +90,6 @@ export function chapterIndexFor(cursor: number): number {
 export function chapterStart(index: number): number {
   return index === 0 ? 0 : CHAPTERS[index - 1].end;
 }
-
-export type QuizQuestion = {
-  id: string;
-  prompt: string;
-  options: { id: string; text: string }[];
-  correct: string;
-  explanation: string;
-};
 
 export const QUIZ: QuizQuestion[] = [
   {

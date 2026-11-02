@@ -49,8 +49,10 @@ export const lessons: Lesson[] = [
     title: "SMA vs EMA",
     summary:
       "Compare the two most common moving averages step by step and see why one reacts faster to recent prices.",
-    status: "planned",
+    status: "available",
+    href: "/learn/sma-vs-ema",
     topics: ["Equal weights", "Smoothing factor", "Lag"],
+    minutes: 7,
     icon: "averages",
   },
   {

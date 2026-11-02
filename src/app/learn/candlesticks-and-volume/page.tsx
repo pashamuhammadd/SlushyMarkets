@@ -117,6 +117,16 @@ export default function CandlesticksAndVolumePage() {
 
         <section className="panel flex flex-col items-start justify-between gap-4 p-6 sm:flex-row sm:items-center">
           <div>
+            <h2 className="text-xl font-semibold text-ink">Next lesson: SMA vs EMA</h2>
+            <p className="mt-1 text-sm text-muted">Turn closing prices into moving averages and see why one reacts faster.</p>
+          </div>
+          <Link href="/learn/sma-vs-ema" className="inline-flex items-center gap-1.5 text-sm font-semibold text-cyan hover:underline">
+            Start lesson 2 <ArrowRight aria-hidden="true" className="size-4" />
+          </Link>
+        </section>
+
+        <section className="panel flex flex-col items-start justify-between gap-4 p-6 sm:flex-row sm:items-center">
+          <div>
             <h2 className="text-xl font-semibold text-ink">Was this lesson clear?</h2>
             <p className="mt-1 text-sm text-muted">Tell us what clicked and what did not. It shapes the next lessons.</p>
           </div>

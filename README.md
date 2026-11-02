@@ -12,8 +12,9 @@ Commissioned by Slushy, developed by Nimia Studio. Education only: no wallet con
 | 2 | Full Candlesticks and Volume lesson with quiz | Done |
 | 3 | Three Trends, One Piano audio prototype, feedback form with Supabase | Done |
 | 4 | Polish, QA, SEO, deployment | Done |
-| P0 | Security review, production readiness, official branding, technical SEO | In progress |
-| P1 | SMA vs EMA, Renko Bricks, lesson improvements from feedback | Next |
+| P0 | Security review, production readiness, official branding, technical SEO | Done |
+| P1 | SMA vs EMA lesson | In review |
+| P1 | Renko Bricks, lesson improvements from feedback | Next |
 
 ## Run locally
 
@@ -137,6 +138,14 @@ public/images/liquidity-slushy/   Mascot poses cropped from the official charact
 - **Quiz and progress.** Each question locks after the first answer and shows the correct option with an explanation. Completion is stored only in localStorage, with a note and a clear button.
 - **Charts are custom SVG** sized to their real pixel width, so labels stay readable on a 360px phone.
 
+### SMA vs EMA lesson
+
+- **Pure math** in `src/lib/simulations/moving-averages.ts`: `sma`, `ema` (seeded with the SMA of the first N closes, alpha = 2 / (N + 1)), `smaWeights`, `emaWeights`, `firstTurnDown`, `directionChanges`.
+- **Weights panel** unrolls the EMA recursion into one share per close. Tests check the shares sum to 1 and reproduce both averages exactly.
+- **Synthetic story** in `src/data/ma-demo.ts`: 48 seeded hourly candles (climb, sharp reversal after candle 21, sideways chop from candle 30). Tests check the EMA turns before the SMA for periods 5, 10 and 20, and changes direction more in the range for periods 10 and 20. For period 5 they are equal, so the lesson shows live counts instead of a fixed claim.
+- **One timeline:** `usePlayback` with one candle per event drives the chart, both lines, the weights panel, readouts and step narration. Period and line toggles recompute from the same data.
+- **Accessibility:** the SMA is dashed and hatched, the EMA solid, so the lines differ by more than color.
+
 ### Audio Lab (provisional)
 
 - **Only the registers come from Slushy's demo:** Daily low (C2 to C3), 4H middle (C4 to C5), 15m high (C6 to C7). Everything else is a placeholder isolated in `src/lib/audio/trend-scenario.ts` so it can be swapped once Slushy approves the real mapping.
@@ -166,9 +175,8 @@ public/images/liquidity-slushy/   Mascot poses cropped from the official charact
 
 1. Sir, should the first lessons keep the synthetic BTC-like example, or switch to SOL/USD or a fictional ticker?
 2. Sir, can you share the approved audio, composition or exact mapping rules for Daily, 4H and 15m? The current Audio Lab uses provisional rules.
-3. Sir, would you like SMA vs EMA at the initial launch, or in the following update?
-4. Sir, is there an official community link (Discord, X or Telegram) we may link from the site?
-5. Sir, are there statements, logos or promotions you want reviewed before public launch?
+3. Sir, is there an official community link (Discord, X or Telegram) we may link from the site?
+4. Sir, are there statements, logos or promotions you want reviewed before public launch?
 
 ## Environment variables
 

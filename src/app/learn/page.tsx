@@ -13,7 +13,7 @@ import { breadcrumbGraph } from "@/lib/structured-data";
 export const metadata: Metadata = pageMetadata({
   title: "Free Interactive Trading Lessons for Beginners",
   description:
-    "Short, visual trading lessons for beginners: candlesticks, volume by price and learning with sound. See which lessons are ready and which are coming next.",
+    "Short, visual trading lessons for beginners: candlesticks, volume by price, SMA vs EMA moving averages and learning with sound.",
   path: "/learn",
 });
 
