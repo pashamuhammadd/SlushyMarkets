@@ -5,7 +5,7 @@ import { CheckCircle2, RotateCcw, XCircle, Trophy } from "lucide-react";
 import { Mascot } from "@/components/brand/Mascot";
 import { cn } from "@/lib/cn";
 import { useDeviceProgress } from "@/lib/hooks/use-device-progress";
-import type { QuizQuestion } from "@/data/lessons/candlesticks-and-volume";
+import type { QuizQuestion } from "@/data/lessons/types";
 
 type LessonQuizProps = {
   lessonId: string;
