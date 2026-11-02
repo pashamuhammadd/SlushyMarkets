@@ -10,6 +10,7 @@ const routes: { path: string; priority: number; changeFrequency: "weekly" | "mon
   { path: "/learn", priority: 0.9, changeFrequency: "weekly" },
   { path: "/learn/candlesticks-and-volume", priority: 0.9, changeFrequency: "monthly" },
   { path: "/learn/sma-vs-ema", priority: 0.9, changeFrequency: "monthly" },
+  { path: "/learn/renko-bricks", priority: 0.9, changeFrequency: "monthly" },
   { path: "/audio-lab", priority: 0.8, changeFrequency: "monthly" },
   { path: "/explore", priority: 0.7, changeFrequency: "monthly" },
   { path: "/feedback", priority: 0.5, changeFrequency: "monthly" },

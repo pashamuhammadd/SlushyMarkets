@@ -128,7 +128,16 @@ export default function SmaVsEmaPage() {
           </div>
         </section>
 
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="grid gap-3 md:grid-cols-3">
+          <section className="panel flex flex-col items-start justify-between gap-4 p-6">
+            <div>
+              <h2 className="text-xl font-semibold text-ink">Next lesson: Renko Bricks</h2>
+              <p className="mt-1 text-sm text-muted">A chart that ignores time and only draws a brick when price moves a full box.</p>
+            </div>
+            <Link href="/learn/renko-bricks" className="inline-flex items-center gap-1.5 text-sm font-semibold text-cyan hover:underline">
+              Start lesson 3 <ArrowRight aria-hidden="true" className="size-4" />
+            </Link>
+          </section>
           <section className="panel flex flex-col items-start justify-between gap-4 p-6">
             <div>
               <h2 className="text-xl font-semibold text-ink">New to candles?</h2>

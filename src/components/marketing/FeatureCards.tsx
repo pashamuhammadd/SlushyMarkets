@@ -10,6 +10,7 @@ const shortCopy: Record<string, string> = {
   "candlesticks-and-volume": "Understand price action in a simple, visual way.",
   "volume-profile": "See where the real trading happened.",
   "sma-vs-ema": "Compare the most common moving averages.",
+  "renko-bricks": "Charts built from price moves, not time.",
   "three-trends-one-piano": "Turn market structure into music.",
 };
 
@@ -28,7 +29,7 @@ export function FeatureCards() {
         <h2 id="features-title" className="sr-only">
           What you can learn
         </h2>
-        <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {lessons.map((lesson) => (
             <li key={lesson.slug}>
               <Link

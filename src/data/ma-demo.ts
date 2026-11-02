@@ -1,4 +1,4 @@
-import { createRng } from "@/lib/simulations/trades";
+import { paddedPriceRange, syntheticCandles } from "@/lib/simulations/synthetic-candles";
 import type { Candle } from "@/lib/simulations/types";
 
 /**
@@ -38,37 +38,10 @@ const TARGETS: number[] = [
   62_890, 63_130, 62_920, 63_070, 62_900, 63_110, 63_000,
 ];
 
-function generate(): Candle[] {
-  const rng = createRng(MA_DEMO_SEED);
-  const candles: Candle[] = [];
-  let previousClose = TARGETS[0] - 40;
-  TARGETS.forEach((target, index) => {
-    const open = previousClose;
-    const close = Math.round(target + (rng() - 0.5) * 30);
-    const high = Math.round(Math.max(open, close) + 15 + rng() * 55);
-    const low = Math.round(Math.min(open, close) - 15 - rng() * 55);
-    const startMs = MA_DEMO_ORIGIN_MS + index * MA_DEMO_CANDLE_MS;
-    candles.push({
-      index,
-      startMs,
-      endMs: startMs + MA_DEMO_CANDLE_MS,
-      open,
-      high,
-      low,
-      close,
-      volumeBtc: 0,
-      tradeCount: 0,
-    });
-    previousClose = close;
-  });
-  return candles;
-}
-
-export const MA_DEMO_CANDLES: readonly Candle[] = Object.freeze(generate());
+export const MA_DEMO_CANDLES: readonly Candle[] = Object.freeze(
+  syntheticCandles(TARGETS, { seed: MA_DEMO_SEED, originMs: MA_DEMO_ORIGIN_MS, candleMs: MA_DEMO_CANDLE_MS, closeNoise: 30 }),
+);
 export const MA_DEMO_CLOSES: readonly number[] = Object.freeze(MA_DEMO_CANDLES.map((c) => c.close));
 
 /** Fixed price window padded to round $250 levels so the axis never jumps during playback. */
-export const MA_DEMO_PRICE_RANGE = {
-  minPriceUsd: Math.floor((Math.min(...MA_DEMO_CANDLES.map((c) => c.low)) - 50) / 250) * 250,
-  maxPriceUsd: Math.ceil((Math.max(...MA_DEMO_CANDLES.map((c) => c.high)) + 50) / 250) * 250,
-} as const;
+export const MA_DEMO_PRICE_RANGE = paddedPriceRange(MA_DEMO_CANDLES);

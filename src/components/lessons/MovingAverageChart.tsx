@@ -18,16 +18,20 @@ type MovingAverageChartProps = {
   originMs: number;
   candleMs: number;
   range: PriceRange;
-  /** Full series, one value per candle. Only the revealed part is drawn. */
-  smaSeries: Series;
-  emaSeries: Series;
-  showSma: boolean;
-  showEma: boolean;
+  /** Full series, one value per candle. Only the revealed part is drawn. Optional, so the chart also works for candles only. */
+  smaSeries?: Series;
+  emaSeries?: Series;
+  showSma?: boolean;
+  showEma?: boolean;
   /** Candle index of the price peak, drawn when turn markers are on. */
   peakIndex?: number;
   turns?: { sma: number | null; ema: number | null };
-  /** First candle of the shaded sideways range. */
+  /** First candle of the shaded sideways range. Shorthand for a zone labelled "Sideways range". */
   rangeStart?: number;
+  /** A shaded, labelled span of candles (end exclusive, defaults to the last revealed candle). */
+  zone?: { start: number; end?: number; label: string };
+  /** Candle to outline, for example the one that completed the latest Renko brick. */
+  highlightIndex?: number | null;
   label: string;
 };
 
@@ -43,13 +47,15 @@ export function MovingAverageChart({
   originMs,
   candleMs,
   range,
-  smaSeries,
-  emaSeries,
-  showSma,
-  showEma,
+  smaSeries = [],
+  emaSeries = [],
+  showSma = false,
+  showEma = false,
   peakIndex,
   turns,
   rangeStart,
+  zone,
+  highlightIndex = null,
   label,
 }: MovingAverageChartProps) {
   const plotLeft = 6;
@@ -77,25 +83,27 @@ export function MovingAverageChart({
     return d;
   }
 
-  const showRange = rangeStart !== undefined && revealed > rangeStart;
+  const shaded = zone ?? (rangeStart !== undefined ? { start: rangeStart, label: "Sideways range" } : undefined);
+  const showZone = shaded !== undefined && revealed > shaded.start;
+  const zoneEnd = shaded ? Math.min(shaded.end ?? revealed, revealed, slotCount) : 0;
   const showPeak = peakIndex !== undefined && revealed > peakIndex;
 
   return (
     <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={label} className="block">
-      {showRange ? (
+      {showZone && shaded ? (
         <g>
           <rect
-            x={plotLeft + slotWidth * rangeStart}
+            x={plotLeft + slotWidth * shaded.start}
             y={TOP - 14}
-            width={slotWidth * (Math.min(revealed, slotCount) - rangeStart)}
+            width={slotWidth * (zoneEnd - shaded.start)}
             height={bottom - TOP + 14}
             rx={8}
             fill="rgba(139, 92, 246, 0.09)"
             stroke="rgba(139, 92, 246, 0.35)"
             strokeDasharray="3 4"
           />
-          <text x={plotLeft + slotWidth * rangeStart + 8} y={TOP - 2} fontSize={10.5} fill={COLORS.violet} fontFamily="var(--font-geist)">
-            Sideways range
+          <text x={plotLeft + slotWidth * shaded.start + 8} y={TOP - 2} fontSize={10.5} fill={COLORS.violet} fontFamily="var(--font-geist)">
+            {shaded.label}
           </text>
         </g>
       ) : null}
@@ -132,6 +140,19 @@ export function MovingAverageChart({
             Peak
           </text>
         </g>
+      ) : null}
+
+      {highlightIndex !== null && highlightIndex < revealed ? (
+        <rect
+          x={plotLeft + slotWidth * highlightIndex + 0.5}
+          y={TOP - 4}
+          width={Math.max(slotWidth - 1, 3)}
+          height={bottom - TOP + 4}
+          rx={4}
+          fill="rgba(55, 213, 250, 0.08)"
+          stroke="rgba(55, 213, 250, 0.55)"
+          strokeDasharray="3 3"
+        />
       ) : null}
 
       {candles.map((c) => {

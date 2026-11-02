@@ -13,8 +13,9 @@ Commissioned by Slushy, developed by Nimia Studio. Education only: no wallet con
 | 3 | Three Trends, One Piano audio prototype, feedback form with Supabase | Done |
 | 4 | Polish, QA, SEO, deployment | Done |
 | P0 | Security review, production readiness, official branding, technical SEO | Done |
-| P1 | SMA vs EMA lesson | In review |
-| P1 | Renko Bricks, lesson improvements from feedback | Next |
+| P1 | SMA vs EMA lesson | Done |
+| P1 | Renko Bricks lesson | In review |
+| P1 | Lesson improvements from feedback | Next |
 
 ## Run locally
 
@@ -145,6 +146,14 @@ public/images/liquidity-slushy/   Mascot poses cropped from the official charact
 - **Synthetic story** in `src/data/ma-demo.ts`: 48 seeded hourly candles (climb, sharp reversal after candle 21, sideways chop from candle 30). Tests check the EMA turns before the SMA for periods 5, 10 and 20, and changes direction more in the range for periods 10 and 20. For period 5 they are equal, so the lesson shows live counts instead of a fixed claim.
 - **One timeline:** `usePlayback` with one candle per event drives the chart, both lines, the weights panel, readouts and step narration. Period and line toggles recompute from the same data.
 - **Accessibility:** the SMA is dashed and hatched, the EMA solid, so the lines differ by more than color.
+
+### Renko Bricks lesson
+
+- **Pure math** in `src/lib/simulations/renko.ts`: classic close based Renko. The grid is anchored at the first close rounded down to the box size. The next up brick needs one box above the last brick's top, the next down brick one box below its bottom, so a reversal automatically needs two boxes. One close can complete several bricks.
+- **Shared generator** `src/lib/simulations/synthetic-candles.ts` builds seeded candles from target closes. The SMA vs EMA data was moved onto it with byte identical output.
+- **Synthetic story** in `src/data/renko-demo.ts`: 58 hourly candles in five phases (climb, 16 quiet hours, 2 hour spike, slide, choppy finish). Tests check: no $100 or $200 bricks in the quiet range, several bricks from one spike candle, the first down brick only after a two box drop, and many $50 reversals but no new $100 or $200 bricks in the choppy finish.
+- **Two charts, one timeline:** the candle chart (reusing the SMA vs EMA chart without lines) and the brick chart share the price scale. The candle that completed the newest brick is outlined. Brick slots are fixed per box size so nothing rescales during playback.
+- **Accessibility:** up bricks are solid, down bricks hatched; the box size comparison is a real table.
 
 ### Audio Lab (provisional)
 

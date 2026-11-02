@@ -27,9 +27,9 @@ const stages: Stage[] = [
   },
   {
     step: 2,
-    title: "Indicators",
-    body: "Moving averages, starting with SMA vs EMA.",
-    status: "SMA vs EMA available",
+    title: "Indicators and chart types",
+    body: "Moving averages with SMA vs EMA, and price based Renko bricks.",
+    status: "2 lessons available",
     tone: "success",
     pose: "thinking",
     accent: "from-electric/30",
