@@ -6,12 +6,14 @@ import { LessonIcon } from "@/components/marketing/LessonIcon";
 import { Badge, type BadgeTone } from "@/components/ui/Badge";
 import { Container } from "@/components/ui/Section";
 import { lessons, statusLabel, type LessonStatus } from "@/data/lessons";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { pageMetadata } from "@/lib/site";
+import { breadcrumbGraph } from "@/lib/structured-data";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Learn",
+  title: "Free Interactive Trading Lessons for Beginners",
   description:
-    "Short, visual trading lessons for beginners. See which lessons are ready to preview and which are coming next.",
+    "Short, visual trading lessons for beginners: candlesticks, volume by price and learning with sound. See which lessons are ready and which are coming next.",
   path: "/learn",
 });
 
@@ -25,9 +27,10 @@ const statusTone: Record<LessonStatus, BadgeTone> = {
 export default function LearnPage() {
   return (
     <>
+      <JsonLd data={breadcrumbGraph([{ name: "Home", path: "/" }, { name: "Learn", path: "/learn" }])} />
       <PageHeader
         eyebrow="Learn"
-        title="Lessons"
+        title="Trading lessons"
         description="Short lessons that show how charts and indicators are built, not just what they look like. Every module is labeled honestly so you know what is ready today."
         pose="thinking"
       />

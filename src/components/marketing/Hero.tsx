@@ -17,6 +17,11 @@ export function Hero() {
       <div aria-hidden="true" className="grid-lines pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" />
       <Container className="relative grid items-center gap-8 pb-10 pt-10 sm:pt-14 lg:grid-cols-[1.05fr_1fr] lg:gap-6 lg:pb-16 lg:pt-16">
         <div className="animate-fade-up">
+          <p className="mb-4 font-display text-lg font-semibold tracking-tight sm:text-xl">
+            <span className="text-gradient-ice">Slushy Markets</span>
+            <span className="text-subtle"> - </span>
+            <span className="text-gradient-neon">a Liquidity joke</span>
+          </p>
           <Badge tone="cyan" className="mb-5">
             <span aria-hidden="true" className="size-1.5 rounded-full bg-cyan" />
             Early preview · Free to explore

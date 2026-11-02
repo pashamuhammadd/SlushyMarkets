@@ -7,12 +7,14 @@ import { Container } from "@/components/ui/Section";
 import { StatusNotice } from "@/components/ui/StatusNotice";
 import { isFeedbackConfigured } from "@/lib/server/feedback-store";
 import { FEEDBACK_TOPICS } from "@/lib/validation/feedback";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { pageMetadata } from "@/lib/site";
+import { breadcrumbGraph } from "@/lib/structured-data";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Feedback",
+  title: "Share Feedback on Lessons and the Audio Lab",
   description:
-    "Help shape SlushyMarkets. Tell us what clicked, what confused you and which lesson should come next.",
+    "Help shape Slushy Markets. Tell us what clicked, what confused you and which trading lesson or audio experiment should come next.",
   path: "/feedback",
 });
 
@@ -22,9 +24,10 @@ export default function FeedbackPage() {
 
   return (
     <>
+      <JsonLd data={breadcrumbGraph([{ name: "Home", path: "/" }, { name: "Feedback", path: "/feedback" }])} />
       <PageHeader
         eyebrow="Feedback"
-        title="Help shape SlushyMarkets"
+        title="Help shape Slushy Markets"
         description="Your feedback decides which lessons come next and how they should feel."
         pose="cool"
       />
@@ -68,7 +71,7 @@ export default function FeedbackPage() {
             <ul className="mt-3 space-y-2 text-sm text-muted">
               <li>We store your topic, rating, message and, only if you add it, your email.</li>
               <li>We also store which page you came from and your browser type, to help fix bugs.</li>
-              <li>Only the SlushyMarkets team can read submissions. They are never public.</li>
+              <li>Only the Slushy Markets team can read submissions. They are never public.</li>
               <li>Your email is used only to reply, never for marketing.</li>
             </ul>
             <p className="mt-4 flex items-center gap-2 text-xs text-subtle">

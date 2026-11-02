@@ -17,7 +17,7 @@ export function CommunitySection() {
               Community and feedback
             </p>
             <h2 id="community-title" className="text-2xl font-semibold text-ink sm:text-3xl">
-              Help shape SlushyMarkets
+              Help shape Slushy Markets
             </h2>
             <p className="mt-2 max-w-lg text-muted">
               Tell us what clicked, what confused you and which lesson you want next. Real feedback from learners decides
@@ -38,7 +38,7 @@ export function CommunitySection() {
             <ShieldCheck aria-hidden="true" className="size-5 text-success" />
             Education first
           </h2>
-          <p className="mt-2 text-sm text-muted">SlushyMarkets teaches how charts work. It is not an exchange or a signal service.</p>
+          <p className="mt-2 text-sm text-muted">Slushy Markets teaches how charts work. It is not an exchange or a signal service.</p>
           <ul className="mt-4 space-y-2.5">
             {promises.map((item) => (
               <li key={item} className="flex items-center gap-2.5 text-sm text-ink">

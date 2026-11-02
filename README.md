@@ -1,6 +1,6 @@
-# SlushyMarkets
+# Slushy Markets - a Liquidity joke
 
-Interactive trading education website for beginners. Learn how charts form through visuals, sound and short exercises, guided by the official LiquiditySlushy mascot.
+Interactive trading education website for beginners. Learn how charts form through visuals, sound and short exercises, guided by the official LiquiditySlushy mascot. Short name: Slushy Markets. Live at https://slushymarkets.com.
 
 Commissioned by Slushy, developed by Nimia Studio. Education only: no wallet connection, tokens, signals or trading advice.
 
@@ -12,7 +12,8 @@ Commissioned by Slushy, developed by Nimia Studio. Education only: no wallet con
 | 2 | Full Candlesticks and Volume lesson with quiz | Done |
 | 3 | Three Trends, One Piano audio prototype, feedback form with Supabase | Done |
 | 4 | Polish, QA, SEO, deployment | Done |
-| Next | SMA vs EMA lesson, approved audio mapping, community link | After Slushy's answers |
+| P0 | Security review, production readiness, official branding, technical SEO | In progress |
+| P1 | SMA vs EMA, Renko Bricks, lesson improvements from feedback | Next |
 
 ## Run locally
 
@@ -53,7 +54,7 @@ Open http://localhost:3000. Everything works without environment variables, exce
 For local testing, put the same two variables in a `.env.local` file (ignored by git) and restart `npm run dev`.
 
 Security notes:
-- New `sb_secret_` keys are sent only in the `apikey` header (they are not JWTs). Legacy `eyJ` keys are also sent as `Authorization: Bearer`.
+- New `sb_secret_` keys are sent only in the `apikey` header (they are not JWTs). Legacy `eyJ` keys are also sent as `Authorization: Bearer`. See `src/lib/server/supabase-headers.ts` and its test.
 - The secret key is only read in `src/lib/server/feedback-store.ts`, which is marked `server-only`. Never prefix it with `NEXT_PUBLIC_`.
 - The browser never talks to Supabase directly. It posts to `/api/feedback`, which validates on the server and inserts through the Supabase REST API.
 - Read submissions in the Supabase dashboard. There is no public admin page.
@@ -69,7 +70,8 @@ Before announcing slushymarkets.com publicly:
 - [ ] A test message on `/feedback` appears in Supabase Table Editor, then delete the test row
 - [ ] The Supabase secret key has never been committed (GitHub push protection will block it). Rotate it if it was ever pasted anywhere public
 - [ ] Share a link in X, Telegram or Discord and check the preview card shows the mascot image
-- [ ] Submit `https://slushymarkets.com/sitemap.xml` in Google Search Console (optional)
+- [ ] Google Search Console: add a Domain property for `slushymarkets.com` (DNS TXT record), or a URL prefix property with the HTML tag method by setting `GOOGLE_SITE_VERIFICATION` in Vercel and redeploying
+- [ ] Submit `https://slushymarkets.com/sitemap.xml` in Search Console and inspect the homepage URL
 - [ ] Slushy has reviewed the copy, the mascot usage and the provisional audio label
 - [ ] Quick manual pass on a real phone: lesson playback, Audio Lab sound with Mute, feedback form
 
@@ -151,8 +153,9 @@ public/images/liquidity-slushy/   Mascot poses cropped from the official charact
 
 ### General
 
-- **SEO:** every page has its own title, description, canonical URL and social preview. The preview image (`public/images/og-slushymarkets.jpg`) is built from the official hero artwork. `/api/` is excluded in robots.txt and the 404 page is `noindex`.
-- **Security headers:** HSTS, nosniff, frame denial, strict referrer policy and a restrictive permissions policy (`next.config.ts`). A Content Security Policy is not set yet because it needs per request nonces; consider it once analytics or third party scripts are added.
+- **Branding:** the official name is "Slushy Markets - a Liquidity joke" (`site.fullName`). The short name "Slushy Markets" (`site.name`) is used in the navbar, title suffixes and tight spaces. Both live in `src/lib/site.ts`.
+- **SEO:** every page has its own title, description, canonical URL and social preview. The root layout sets no canonical, so the 404 page never points at the homepage. JSON-LD (`src/lib/structured-data.ts`): EducationalOrganization and WebSite on every page, LearningResource on the lesson, demo and Audio Lab, BreadcrumbList on section pages. The preview image (`public/images/og-slushy-markets.jpg`) is built from the official hero artwork. `/api/` is excluded in robots.txt and the 404 page is `noindex`.
+- **Security headers:** HSTS, nosniff, frame denial, strict referrer policy and a restrictive permissions policy (`next.config.ts`). A partial Content Security Policy (`base-uri`, `form-action`, `frame-ancestors`, `object-src`, `upgrade-insecure-requests`) is set because it needs no nonces. A `script-src` policy is not set yet because it needs per request nonces; consider it once analytics or third party scripts are added. Cross-Origin-Opener-Policy is `same-origin`.
 - **Error handling:** `src/app/error.tsx` for page level errors and `src/app/global-error.tsx` as a last resort.
 - **Navigation:** the full menu shows from 1024px; smaller screens use the menu button.
 - **Mascot assets** are crops of the supplied character sheet, with sheet labels removed. No character art was generated or redrawn.
@@ -173,5 +176,6 @@ public/images/liquidity-slushy/   Mascot poses cropped from the official charact
 |---|---|---|
 | `SUPABASE_URL` | Server only | Supabase project URL for feedback storage |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server only, secret | Lets the server insert feedback. Never expose to the browser. |
+| `GOOGLE_SITE_VERIFICATION` | Optional, not secret | Search Console HTML tag token. Renders `<meta name="google-site-verification">` |
 
 See `.env.example`.

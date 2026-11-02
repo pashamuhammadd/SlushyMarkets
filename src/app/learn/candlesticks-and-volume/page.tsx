@@ -8,12 +8,14 @@ import { Badge } from "@/components/ui/Badge";
 import { Container, SectionHeading } from "@/components/ui/Section";
 import { DEMO_BAND_USD, DEMO_BUCKET_USD } from "@/data/demo-trades";
 import { LESSON_ID, QUIZ } from "@/data/lessons/candlesticks-and-volume";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { pageMetadata } from "@/lib/site";
+import { learningResourceGraph } from "@/lib/structured-data";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Candlesticks and Volume",
+  title: "Candlesticks and Volume: How Charts Form",
   description:
-    "Interactive lesson: watch candlesticks, a volume profile and volume buckets form from the same simulated trades, then check your understanding.",
+    "Interactive lesson: watch candlesticks, a volume profile and volume buckets form from the same simulated trades, then check your understanding with a quiz.",
   path: "/learn/candlesticks-and-volume",
 });
 
@@ -35,6 +37,21 @@ const ideas = [
 export default function CandlesticksAndVolumePage() {
   return (
     <>
+      <JsonLd
+        data={learningResourceGraph({
+          name: "Candlesticks and Volume",
+          description: metadata.description as string,
+          path: "/learn/candlesticks-and-volume",
+          crumbs: [
+            { name: "Home", path: "/" },
+            { name: "Learn", path: "/learn" },
+            { name: "Candlesticks and Volume", path: "/learn/candlesticks-and-volume" },
+          ],
+          teaches: ["Candlesticks", "Open, high, low, close", "Traded volume", "Volume by price", "Point of control"],
+          minutes: 8,
+          resourceType: "Interactive lesson",
+        })}
+      />
       <PageHeader
         eyebrow="Lesson 1"
         title="Candlesticks and Volume"

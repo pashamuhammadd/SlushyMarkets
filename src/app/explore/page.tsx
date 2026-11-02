@@ -4,12 +4,14 @@ import { ArrowRight } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { CandleVolumePreview } from "@/components/lessons/CandleVolumePreview";
 import { Container } from "@/components/ui/Section";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { pageMetadata } from "@/lib/site";
+import { learningResourceGraph } from "@/lib/structured-data";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Explore Demo",
+  title: "Candlestick and Volume Profile Demo",
   description:
-    "Play with a working candlestick and volume by price demo built from simulated trades, plus a beginner glossary.",
+    "Play, pause and scrub a candlestick and volume by price demo built from simulated trades, then read a plain English glossary of trading terms.",
   path: "/explore",
 });
 
@@ -28,6 +30,19 @@ const glossary = [
 export default function ExplorePage() {
   return (
     <>
+      <JsonLd
+        data={learningResourceGraph({
+          name: "Candlestick and volume profile demo",
+          description: metadata.description as string,
+          path: "/explore",
+          crumbs: [
+            { name: "Home", path: "/" },
+            { name: "Explore", path: "/explore" },
+          ],
+          teaches: ["Candlesticks", "OHLC", "Volume profile", "Point of control"],
+          resourceType: "Interactive simulation",
+        })}
+      />
       <PageHeader
         eyebrow="Explore"
         title="Explore the demo"

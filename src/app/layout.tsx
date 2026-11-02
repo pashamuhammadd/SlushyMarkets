@@ -1,33 +1,42 @@
 import type { Metadata, Viewport } from "next";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { site, socialImage } from "@/lib/site";
+import { siteGraph } from "@/lib/structured-data";
 import { fontDisplay, fontSans } from "./fonts";
 import "./globals.css";
 
+const defaultTitle = `${site.fullName} | Learn trading through visuals and sound`;
+
+// No canonical here on purpose: each page sets its own, so error and 404 pages never point at the homepage.
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} | Learn trading through visuals and sound`,
+    default: defaultTitle,
     template: `%s | ${site.name}`,
   },
   description: site.description,
   applicationName: site.name,
-  alternates: { canonical: "/" },
+  authors: [{ name: site.studio }],
+  creator: site.studio,
+  publisher: site.fullName,
   openGraph: {
     type: "website",
-    siteName: site.name,
-    title: `${site.name} | Learn trading through visuals and sound`,
+    siteName: site.fullName,
+    locale: "en_US",
+    title: defaultTitle,
     description: site.description,
-    url: site.url,
     images: [socialImage],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${site.name} | Learn trading through visuals and sound`,
+    title: defaultTitle,
     description: site.description,
     images: [socialImage],
   },
+  // Filled from an environment variable so the Search Console token never needs a code change.
+  verification: process.env.GOOGLE_SITE_VERIFICATION ? { google: process.env.GOOGLE_SITE_VERIFICATION } : undefined,
 };
 
 export const viewport: Viewport = {
@@ -39,6 +48,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${fontSans.variable} ${fontDisplay.variable} h-full antialiased`}>
       <body className="bg-atmosphere flex min-h-full flex-col">
+        <JsonLd data={siteGraph()} />
         <SiteHeader />
         <main id="main" className="flex-1">
           {children}

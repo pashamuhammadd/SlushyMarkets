@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { CommunitySection } from "@/components/marketing/CommunitySection";
 import { FeatureCards } from "@/components/marketing/FeatureCards";
 import { Hero } from "@/components/marketing/Hero";
@@ -5,6 +6,12 @@ import { HowItWorks } from "@/components/marketing/HowItWorks";
 import { LearningPath } from "@/components/marketing/LearningPath";
 import { LessonPreviewSection } from "@/components/marketing/LessonPreviewSection";
 import { ThreeTrendsSection } from "@/components/marketing/ThreeTrendsSection";
+
+// The homepage keeps the default title from the root layout and declares its own canonical URL.
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+  openGraph: { url: "/" },
+};
 
 export default function HomePage() {
   return (

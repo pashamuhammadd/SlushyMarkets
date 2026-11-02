@@ -84,7 +84,7 @@ export function FeedbackForm() {
           <CheckCircle2 aria-hidden="true" className="size-6 text-success" /> Thank you, it is saved
         </p>
         <p className="max-w-md text-sm text-muted">
-          Your feedback reached the SlushyMarkets team. {email ? "If we reply, it will be to the email you gave." : ""}
+          Your feedback reached the Slushy Markets team. {email ? "If we reply, it will be to the email you gave." : ""}
         </p>
         <button
           type="button"
@@ -226,7 +226,7 @@ export function FeedbackForm() {
               className="mt-0.5 size-5 shrink-0 accent-cyan"
             />
             <span>
-              SlushyMarkets may use this email only to reply to this feedback. It is never shared or used for marketing.
+              Slushy Markets may use this email only to reply to this feedback. It is never shared or used for marketing.
             </span>
           </label>
         ) : null}
