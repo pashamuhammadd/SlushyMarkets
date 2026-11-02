@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, BookOpen, Clock, GraduationCap } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { CandleVolumeLesson } from "@/components/lessons/CandleVolumeLesson";
+import { GlossaryLink } from "@/components/lessons/GlossaryLink";
 import { LessonQuiz } from "@/components/lessons/LessonQuiz";
 import { Badge } from "@/components/ui/Badge";
 import { Container, SectionHeading } from "@/components/ui/Section";
@@ -101,6 +102,7 @@ export default function CandlesticksAndVolumePage() {
               </li>
             </ul>
           </details>
+          <GlossaryLink section="candles-and-volume" />
         </section>
 
         <section id="quiz" aria-labelledby="quiz-title" className="scroll-mt-24">

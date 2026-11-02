@@ -177,7 +177,8 @@ public/images/liquidity-slushy/   Mascot poses cropped from the official charact
 - **Error handling:** `src/app/error.tsx` for page level errors and `src/app/global-error.tsx` as a last resort.
 - **Navigation:** the full menu shows from 1024px; smaller screens use the menu button.
 - **Mascot assets** are crops of the supplied character sheet, with sheet labels removed. No character art was generated or redrawn.
-- **Navigation includes Explore** at the client's request. It hosts the working demo and a beginner glossary.
+- **Navigation includes Explore** at the client's request. It hosts the working demo, links to every lesson and a beginner glossary.
+- **Glossary** lives in `src/data/glossary.ts`, grouped by lesson. Every term has a stable anchor (for example `/explore#renko-brick`), each lesson links to its section, and the page publishes a schema.org `DefinedTermSet`. A test checks anchors are unique and lesson links exist.
 - **Mockup features left out on purpose:** Connect Wallet (replaced by Start Learning), "Live Demo" label, timeframe switcher, invented track list, lesson progress counters, giveaway and PSG1 card, community join link.
 
 ## Pending decisions for Slushy
