@@ -8,10 +8,12 @@ import { ButtonLink } from "@/components/ui/Button";
 import { Container, SectionHeading } from "@/components/ui/Section";
 import { StatusNotice } from "@/components/ui/StatusNotice";
 import { STEP_SECONDS, TIMEFRAMES } from "@/lib/audio/trend-scenario";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { pageMetadata } from "@/lib/site";
+import { learningResourceGraph } from "@/lib/structured-data";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Audio Lab",
+  title: "Audio Lab: Hear Market Trends as Music",
   description:
     "Three Trends, One Piano: hear daily, 4 hour and 15 minute trends as one piece of music. A synthetic learning demo with provisional sound mapping.",
   path: "/audio-lab",
@@ -23,6 +25,19 @@ const noteName = (midi: number) => `${NOTE_NAMES[midi % 12]}${Math.floor(midi / 
 export default function AudioLabPage() {
   return (
     <>
+      <JsonLd
+        data={learningResourceGraph({
+          name: "Three Trends, One Piano",
+          description: metadata.description as string,
+          path: "/audio-lab",
+          crumbs: [
+            { name: "Home", path: "/" },
+            { name: "Audio Lab", path: "/audio-lab" },
+          ],
+          teaches: ["Trend direction", "Multiple timeframes", "Market sonification"],
+          resourceType: "Interactive audio exercise",
+        })}
+      />
       <PageHeader
         eyebrow="Audio Lab"
         title="Three Trends, One Piano"

@@ -1,5 +1,6 @@
 import "server-only";
 import type { FeedbackInput } from "@/lib/validation/feedback";
+import { supabaseAuthHeaders } from "./supabase-headers";
 
 /**
  * Feedback storage in Supabase through its REST API (PostgREST). No client library needed.
@@ -42,12 +43,7 @@ export async function storeFeedback(input: FeedbackInput, meta: { userAgent: str
   try {
     const response = await fetch(`${config.url}/rest/v1/feedback`, {
       method: "POST",
-      headers: {
-        apikey: config.serviceKey,
-        Authorization: `Bearer ${config.serviceKey}`,
-        "Content-Type": "application/json",
-        Prefer: "return=minimal",
-      },
+      headers: supabaseAuthHeaders(config.serviceKey),
       body: JSON.stringify(row),
       cache: "no-store",
       signal: AbortSignal.timeout(8000),

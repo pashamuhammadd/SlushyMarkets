@@ -1,7 +1,10 @@
 import type { MetadataRoute } from "next";
-import { site } from "@/lib/site";
+import { absoluteUrl } from "@/lib/site";
 
-/** Only routes that really exist and work. Planned lessons are not listed until they ship. */
+/**
+ * Only indexable routes that really exist and work. Planned lessons are not listed until they ship.
+ * URLs use the same form as the canonical tags (no trailing slash, homepage without a path).
+ */
 const routes: { path: string; priority: number; changeFrequency: "weekly" | "monthly" }[] = [
   { path: "", priority: 1, changeFrequency: "weekly" },
   { path: "/learn", priority: 0.9, changeFrequency: "weekly" },
@@ -13,7 +16,7 @@ const routes: { path: string; priority: number; changeFrequency: "weekly" | "mon
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return routes.map((route) => ({
-    url: `${site.url}${route.path}`,
+    url: absoluteUrl(route.path),
     changeFrequency: route.changeFrequency,
     priority: route.priority,
   }));

@@ -20,12 +20,20 @@ export async function POST(request: Request) {
     return json({ ok: false, error: "unsupported_type", message: "Send JSON." }, 415);
   }
 
-  const text = await request.text();
-  if (text.length > MAX_BODY_BYTES) {
+  // Reject oversized bodies from the declared length before reading them into memory.
+  const declared = Number(request.headers.get("content-length") ?? 0);
+  if (declared > MAX_BODY_BYTES) {
     return json({ ok: false, error: "too_large", message: "That message is too long." }, 413);
   }
 
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "unknown";
+  const text = await request.text();
+  if (new TextEncoder().encode(text).length > MAX_BODY_BYTES) {
+    return json({ ok: false, error: "too_large", message: "That message is too long." }, 413);
+  }
+
+  // On Vercel, x-real-ip is set by the platform. x-forwarded-for is the fallback for other hosts.
+  const ip =
+    request.headers.get("x-real-ip")?.trim() || request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
   const limit = rateLimit(ip);
   if (!limit.allowed) {
     return json(
