@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Ear, Info, Music } from "lucide-react";
 import { ListenExercise } from "@/components/audio/ListenExercise";
+import { GlossaryLink } from "@/components/lessons/GlossaryLink";
 import { TrendPiano } from "@/components/audio/TrendPiano";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Badge } from "@/components/ui/Badge";
@@ -140,6 +141,7 @@ export default function AudioLabPage() {
               pleasant together.
             </li>
           </ul>
+          <GlossaryLink section="timeframes-and-sound" />
         </section>
 
         <div className="flex flex-wrap gap-3">

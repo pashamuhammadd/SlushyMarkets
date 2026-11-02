@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, BookOpen, Clock, GraduationCap } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { GlossaryLink } from "@/components/lessons/GlossaryLink";
 import { LessonQuiz } from "@/components/lessons/LessonQuiz";
 import { MovingAverageLesson } from "@/components/lessons/MovingAverageLesson";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -114,6 +115,7 @@ export default function SmaVsEmaPage() {
               </li>
             </ul>
           </details>
+          <GlossaryLink section="moving-averages" />
         </section>
 
         <section id="quiz" aria-labelledby="ma-quiz-title" className="scroll-mt-24">

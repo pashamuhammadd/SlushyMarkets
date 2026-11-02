@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, BookOpen, Clock, GraduationCap } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
+import { GlossaryLink } from "@/components/lessons/GlossaryLink";
 import { LessonQuiz } from "@/components/lessons/LessonQuiz";
 import { RenkoLesson } from "@/components/lessons/RenkoLesson";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -110,6 +111,7 @@ export default function RenkoBricksPage() {
               <li>A direction change is any switch between up and down bricks. It is a teaching measure, not a trading rule.</li>
             </ul>
           </details>
+          <GlossaryLink section="renko" />
         </section>
 
         <section id="quiz" aria-labelledby="renko-quiz-title" className="scroll-mt-24">
