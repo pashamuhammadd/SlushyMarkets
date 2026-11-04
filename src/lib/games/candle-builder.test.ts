@@ -77,6 +77,6 @@ describe("game and scoring", () => {
   });
 
   it("explains every role without em or en dashes", () => {
-    for (const role of CANDLE_ROLES) expect(explainRole(role)).not.toMatch(/[–—]/);
+    for (const role of CANDLE_ROLES) expect(explainRole(role)).not.toMatch(/[\u2013\u2014]/);
   });
 });
