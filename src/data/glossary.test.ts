@@ -16,7 +16,7 @@ describe("glossary", () => {
 
   it("uses no em or en dashes and keeps definitions short", () => {
     for (const t of GLOSSARY_TERMS) {
-      expect(`${t.term} ${t.definition}`).not.toMatch(/[–—]/);
+      expect(`${t.term} ${t.definition}`).not.toMatch(/[\u2013\u2014]/);
       expect(t.definition.length).toBeLessThanOrEqual(160);
     }
   });
