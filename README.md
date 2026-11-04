@@ -14,7 +14,8 @@ Commissioned by Slushy, developed by Nimia Studio. Education only: no wallet con
 | 4 | Polish, QA, SEO, deployment | Done |
 | P0 | Security review, production readiness, official branding, technical SEO | Done |
 | P1 | SMA vs EMA lesson | Done |
-| P1 | Renko Bricks lesson | In review |
+| P1 | Renko Bricks lesson | Done |
+| P3 | Games hub and Candle Builder | In review |
 | P1 | Lesson improvements from feedback | Next |
 
 ## Run locally
@@ -154,6 +155,12 @@ public/images/liquidity-slushy/   Mascot poses cropped from the official charact
 - **Synthetic story** in `src/data/renko-demo.ts`: 58 hourly candles in five phases (climb, 16 quiet hours, 2 hour spike, slide, choppy finish). Tests check: no $100 or $200 bricks in the quiet range, several bricks from one spike candle, the first down brick only after a two box drop, and many $50 reversals but no new $100 or $200 bricks in the choppy finish.
 - **Two charts, one timeline:** the candle chart (reusing the SMA vs EMA chart without lines) and the brick chart share the price scale. The candle that completed the newest brick is outlined. Brick slots are fixed per box size so nothing rescales during playback.
 - **Accessibility:** up bricks are solid, down bricks hatched; the box size comparison is a real table.
+
+### Games
+
+- **`/games`** lists practice games from `src/data/games.ts`, with an education only notice (simulated data, no money, no wallet, no prizes).
+- **Candle Builder** (`/games/candle-builder`): five rounds of 5 to 9 shuffled synthetic trades from one minute. The player picks the trades that set the open, high, low and close. Answers come from `buildCandles`, so the game always agrees with lesson 1. Logic in `src/lib/games/candle-builder.ts`; tests check 1,500 generated rounds have exactly one answer per role and never show trades already in time order.
+- **Best score** is stored only in this browser (`src/lib/hooks/use-local-best.ts`). No leaderboard or accounts.
 
 ### Audio Lab (provisional)
 

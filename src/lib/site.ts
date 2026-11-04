@@ -26,6 +26,7 @@ export const mainNav: NavItem[] = [
   { label: "Learn", href: "/learn" },
   { label: "Explore", href: "/explore" },
   { label: "Audio Lab", href: "/audio-lab" },
+  { label: "Games", href: "/games" },
   { label: "Feedback", href: "/feedback" },
 ];
 

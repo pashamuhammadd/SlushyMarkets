@@ -119,6 +119,16 @@ export default function CandlesticksAndVolumePage() {
 
         <section className="panel flex flex-col items-start justify-between gap-4 p-6 sm:flex-row sm:items-center">
           <div>
+            <h2 className="text-xl font-semibold text-ink">Practice: Candle Builder</h2>
+            <p className="mt-1 text-sm text-muted">Build candles from raw trades in a quick five round game.</p>
+          </div>
+          <Link href="/games/candle-builder" className="inline-flex items-center gap-1.5 text-sm font-semibold text-cyan hover:underline">
+            Play the game <ArrowRight aria-hidden="true" className="size-4" />
+          </Link>
+        </section>
+
+        <section className="panel flex flex-col items-start justify-between gap-4 p-6 sm:flex-row sm:items-center">
+          <div>
             <h2 className="text-xl font-semibold text-ink">Next lesson: SMA vs EMA</h2>
             <p className="mt-1 text-sm text-muted">Turn closing prices into moving averages and see why one reacts faster.</p>
           </div>
