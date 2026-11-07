@@ -125,6 +125,16 @@ export const GLOSSARY: GlossarySection[] = [
         term: "Register",
         definition: "A range of notes on the piano, from low to high. Each timeframe plays in its own register in the Audio Lab.",
       },
+      {
+        id: "average-range",
+        term: "ATR (average range)",
+        definition: "The typical size of recent bars. The Sound Playground smooths each bar's high minus low over 7 bars.",
+      },
+      {
+        id: "sonar-cue",
+        term: "Sonar cue",
+        definition: "A repeating tone that gets louder as price gets closer to a line, like a sonar ping. Used by EMA Sonar.",
+      },
     ],
   },
 ];
