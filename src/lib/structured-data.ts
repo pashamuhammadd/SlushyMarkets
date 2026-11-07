@@ -11,8 +11,8 @@ export function siteGraph() {
       {
         "@type": "EducationalOrganization",
         "@id": ORGANIZATION_ID,
-        name: site.fullName,
-        alternateName: [site.name, "SlushyMarkets"],
+        name: site.name,
+        alternateName: [site.legacyName],
         url: site.url,
         logo: absoluteUrl("/icon.png"),
         image: absoluteUrl(socialImage.url),
@@ -21,8 +21,8 @@ export function siteGraph() {
       {
         "@type": "WebSite",
         "@id": WEBSITE_ID,
-        name: site.fullName,
-        alternateName: [site.name, "SlushyMarkets"],
+        name: site.name,
+        alternateName: [site.legacyName],
         url: site.url,
         inLanguage: "en",
         publisher: { "@id": ORGANIZATION_ID },

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Ear, Info, Music } from "lucide-react";
+import { Ear, Info, Music, Radar } from "lucide-react";
 import { ListenExercise } from "@/components/audio/ListenExercise";
 import { GlossaryLink } from "@/components/lessons/GlossaryLink";
 import { TrendPiano } from "@/components/audio/TrendPiano";
@@ -61,6 +61,30 @@ export default function AudioLabPage() {
           </p>
           <p>Sound only starts when you press Play. Use Mute or Stop at any time.</p>
         </StatusNotice>
+
+        <section aria-labelledby="playground-link-title" className="panel flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <div className="flex items-start gap-3.5">
+            <span
+              aria-hidden="true"
+              className="mt-1 grid size-11 shrink-0 place-items-center rounded-2xl bg-linear-to-br from-cyan/25 to-violet/25 text-cyan ring-1 ring-cyan/30"
+            >
+              <Radar className="size-5" />
+            </span>
+            <div>
+              <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-cyan">New experiment</p>
+              <h2 id="playground-link-title" className="text-2xl font-semibold text-ink">
+                Sound Playground: EMA Sonar
+              </h2>
+              <p className="mt-1.5 max-w-2xl text-sm text-muted sm:text-base">
+                Hear how close price is to the 7, 20 and 50 EMAs. Choose instruments, pulse speeds and timeframes, then mute
+                or solo each layer.
+              </p>
+            </div>
+          </div>
+          <ButtonLink href="/audio-lab/playground" className="shrink-0">
+            Open the playground
+          </ButtonLink>
+        </section>
 
         <section aria-labelledby="player-title" className="panel panel-glow p-4 sm:p-6">
           <SectionHeading

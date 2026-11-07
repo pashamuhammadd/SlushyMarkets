@@ -7,7 +7,7 @@ export function SiteFooter() {
     <footer className="mt-24 border-t border-white/5 bg-navy-950/60">
       <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.4fr_1fr_1.4fr] lg:px-8">
         <div className="space-y-4">
-          <Logo withTagline />
+          <Logo />
           <p className="max-w-sm text-sm text-muted">
             Learn how charts form, one trade at a time. Visual lessons, sound experiments and short exercises for curious
             beginners.
@@ -46,7 +46,7 @@ export function SiteFooter() {
       <div className="border-t border-white/5">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-2 px-4 py-5 text-xs text-subtle sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
           <p>
-            © 2026 {site.fullName}. Built by {site.studio} with {site.owner}.
+            © 2026 {site.name}. Built by {site.studio} with {site.owner}.
           </p>
           <p>{site.mascot} is the official {site.name} mascot.</p>
         </div>

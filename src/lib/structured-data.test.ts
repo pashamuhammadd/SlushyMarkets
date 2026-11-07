@@ -1,19 +1,19 @@
 import { describe, expect, it } from "vitest";
-import { absoluteUrl, defaultOpenGraph, pageMetadata, site, socialImage } from "./site";
+import { absoluteUrl, defaultOpenGraph, defaultTitle, pageMetadata, site, socialImage } from "./site";
 import { breadcrumbGraph, learningResourceGraph, siteGraph } from "./structured-data";
 
 describe("brand", () => {
-  it("uses the official full and short names without em or en dashes", () => {
-    expect(site.fullName).toBe("Slushy Markets - a Liquidity joke");
-    expect(site.name).toBe("Slushy Markets");
-    for (const value of [site.fullName, site.description, site.tagline]) {
+  it("uses the official one word brand name without em or en dashes", () => {
+    expect(site.name).toBe("SlushyMarkets");
+    expect(site.name).not.toMatch(/liquidity joke/i);
+    for (const value of [site.name, site.description, site.tagline, defaultTitle]) {
       expect(value).not.toMatch(/[\u2013\u2014]/);
     }
   });
 
   it("suffixes page titles with the short name and sets a canonical path", () => {
     const meta = pageMetadata({ title: "Lessons", description: "d", path: "/learn" });
-    expect(meta.openGraph.title).toBe("Lessons | Slushy Markets");
+    expect(meta.openGraph.title).toBe("Lessons | SlushyMarkets");
     expect(meta.alternates.canonical).toBe("/learn");
   });
 });
@@ -21,7 +21,7 @@ describe("brand", () => {
 describe("open graph", () => {
   it("keeps the social image, site name and type when the homepage sets its url", () => {
     const og = defaultOpenGraph("/");
-    expect(og).toMatchObject({ url: "/", type: "website", siteName: site.fullName, images: [socialImage] });
+    expect(og).toMatchObject({ url: "/", type: "website", siteName: site.name, images: [socialImage] });
   });
 
   it("gives every page override the social image", () => {
@@ -37,10 +37,11 @@ describe("absoluteUrl", () => {
 });
 
 describe("structured data", () => {
-  it("describes the site and organization with the full brand name", () => {
+  it("describes the site and organization with the official brand name", () => {
     const graph = siteGraph()["@graph"];
     expect(graph.map((node) => node["@type"])).toEqual(["EducationalOrganization", "WebSite"]);
-    expect(graph.every((node) => node.name === site.fullName)).toBe(true);
+    expect(graph.every((node) => node.name === "SlushyMarkets")).toBe(true);
+    expect(JSON.stringify(graph)).not.toMatch(/liquidity joke/i);
   });
 
   it("numbers breadcrumbs from 1 with absolute URLs", () => {

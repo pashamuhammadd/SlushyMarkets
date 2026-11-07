@@ -1,12 +1,10 @@
 import type { Route } from "next";
 
 export const site = {
-  /** Short brand name for the navbar, page title suffixes and tight spaces. */
-  name: "Slushy Markets",
-  /** Official full brand name. Use on the homepage and in primary brand identity. */
-  fullName: "Slushy Markets - a Liquidity joke",
-  /** The brand tagline on its own, for lockups that set it under the short name. */
-  brandTagline: "a Liquidity joke",
+  /** Official brand name, written as one word. Used everywhere: navbar, titles, metadata and structured data. */
+  name: "SlushyMarkets",
+  /** Earlier spelling, kept only as a search alias in structured data. Never shown as the brand. */
+  legacyName: "SlushyMarkets",
   url: "https://slushymarkets.com",
   tagline: "Learn trading through visuals and sound.",
   description:
@@ -32,14 +30,14 @@ export const mainNav: NavItem[] = [
 
 /** Social preview image (1200 x 630) built from the official mascot artwork. */
 export const socialImage = {
-  url: "/images/og-slushy-markets.jpg",
+  url: "/images/og-slushymarkets.jpg",
   width: 1200,
   height: 630,
-  alt: "LiquiditySlushy, the Slushy Markets mascot, sitting on a rock with a phone next to the headline Learn trading through visuals and sound.",
+  alt: "LiquiditySlushy, the SlushyMarkets mascot, sitting on a rock with a phone next to the headline Learn trading through visuals and sound.",
 };
 
 /** Default title used by the homepage and as the fallback for every page. */
-export const defaultTitle = `${site.fullName} | Learn trading through visuals and sound`;
+export const defaultTitle = `${site.name} | Learn trading through visuals and sound`;
 
 /**
  * Complete Open Graph object for the homepage and the root layout.
@@ -49,7 +47,7 @@ export const defaultTitle = `${site.fullName} | Learn trading through visuals an
 export function defaultOpenGraph(url?: string) {
   return {
     type: "website" as const,
-    siteName: site.fullName,
+    siteName: site.name,
     locale: "en_US",
     title: defaultTitle,
     description: site.description,
@@ -70,7 +68,7 @@ export function pageMetadata({ title, description, path }: { title: string; desc
     title,
     description,
     alternates: { canonical: path },
-    openGraph: { type: "website" as const, siteName: site.fullName, locale: "en_US", title: fullTitle, description, url: path, images: [socialImage] },
+    openGraph: { type: "website" as const, siteName: site.name, locale: "en_US", title: fullTitle, description, url: path, images: [socialImage] },
     twitter: { card: "summary_large_image" as const, title: fullTitle, description, images: [socialImage] },
   };
 }
