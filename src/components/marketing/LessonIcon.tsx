@@ -48,6 +48,14 @@ export function LessonIcon({ kind }: { kind: Lesson["icon"] }) {
           ))}
         </g>
       ) : null}
+      {kind === "onchain" ? (
+        <g>
+          <path d="M8 18 H28 L25 52 H11 Z" fill="none" stroke="#B79BFF" strokeWidth="2.5" strokeLinejoin="round" />
+          <path d="M10.5 34 H25.5 L24.2 50 H11.8 Z" fill="#8B5CF6" />
+          <path d="M36 12 H56 L53 52 H39 Z" fill="none" stroke="#75C9FF" strokeWidth="2.5" strokeLinejoin="round" />
+          <path d="M37.4 22 H54.6 L52.2 50 H39.8 Z" fill="#37D5FA" />
+        </g>
+      ) : null}
       {kind === "sound" ? (
         <g>
           <path d="M24 44 V16 L50 10 V38" fill="none" stroke="#B79BFF" strokeWidth="3.5" strokeLinejoin="round" />

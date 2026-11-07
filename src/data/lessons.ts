@@ -18,7 +18,7 @@ export type Lesson = {
   href?: Route;
   topics: string[];
   minutes?: number;
-  icon: "candles" | "profile" | "averages" | "renko" | "sound";
+  icon: "candles" | "profile" | "averages" | "renko" | "sound" | "onchain";
 };
 
 export const lessons: Lesson[] = [
@@ -65,6 +65,17 @@ export const lessons: Lesson[] = [
     topics: ["Box size", "Two box reversal", "Price, not time"],
     minutes: 7,
     icon: "renko",
+  },
+  {
+    slug: "on-chain-metrics",
+    title: "On-Chain Metrics",
+    summary:
+      "Learn SOPR and MVRV with a tiny Bitcoin world of two coins: compare what coins were worth when they moved with what they are worth today.",
+    status: "available",
+    href: "/learn/on-chain-metrics",
+    topics: ["SOPR", "MVRV", "Realized value"],
+    minutes: 12,
+    icon: "onchain",
   },
   {
     slug: "three-trends-one-piano",

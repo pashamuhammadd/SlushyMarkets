@@ -17,8 +17,9 @@ Commissioned by Slushy, developed by Nimia Studio. Education only: no wallet con
 | P1 | Renko Bricks lesson | Done |
 | P3 | Games hub and Candle Builder | Done |
 | Brand | Official name changed to SlushyMarkets (one word) | Done |
-| P2 | Sound Playground foundation with EMA Sonar (`/audio-lab/playground`) | In review |
-| P2 | More sonar modes, On-Chain Basics (SOPR, MVRV) | Next |
+| P2 | Sound Playground foundation with EMA Sonar (`/audio-lab/playground`) | Done |
+| P2 | On-Chain Basics: SOPR and MVRV lessons (`/learn/on-chain-metrics`) | In review |
+| P2 | More sonar modes, experiment platform design | Next |
 
 ## Run locally
 
@@ -181,6 +182,14 @@ public/images/liquidity-slushy/   Mascot poses cropped from the official charact
 - **Indicator variants, stated on purpose:** "ATR(7)" smooths the plain high minus low range (Wilder style, seeded with the first range), as in the prototype, not the classic true range. EMAs reuse `src/lib/simulations/moving-averages.ts` (SMA seeded); the prototype seeded with the first price, which makes no visible difference after the warm up. `efficiencyRatio` (Kaufman ER without smoothing, period 7 = seven changes) is implemented and tested for the next modes.
 - **Controls:** presets, instrument and pulse speed per layer, layer volume, Mute, Solo, Preview, master volume and mute, Play, Pause, Resume, Stop, Replay, timeframe, New chart, Reset to preset. Mute, Solo and volume act instantly through layer gain buses; instrument and speed changes apply from the next bar. Changing the chart or timeframe stops and rewinds, so sound never follows a different chart than the one drawn.
 - **Safety:** no autoplay, capped master gain plus a compressor against clipping, mono output (same on one speaker or headphones), sound stops when leaving the page.
+
+### On-Chain Metrics (`/learn/on-chain-metrics`, `/sopr`, `/mvrv`)
+
+- **Source:** Slushy's On-Chain Basics and SOPR Bucket Lesson prototypes. Same two coin story (Coin A last moved at $40,000, Coin B at $60,000, 1 BTC each), same price slider ($25,000 to $100,000 in $5,000 steps) and the same three bucket rounds.
+- **Math** in `src/lib/onchain/metrics.ts`: SOPR = total value when spent / total value when created (aggregate, not an average of ratios); market value = coins x today's price; realized value = coins x last moved price; MVRV = market / realized; moving a coin resets its last moved price. Tested in `metrics.test.ts`.
+- **SOPR lesson:** one coin explorer with two sliders and a log scale gauge centered on 1.0, the bucket guessing game with an optional listen first mode, and an invented 60 day SOPR timeline (seeded mean reverting walk) on the shared playback controls.
+- **Sound:** `useCueAudio` reuses the Sound Playground engine. Value notes map dollars to pitch (higher value, higher note). Crossing 1.0 plays the breakout chimes from Slushy's sonar prototypes (up 880 then 1174.66 Hz, down 660 then 440 Hz). Chimes are off until the learner turns them on.
+- **Honesty:** every number is an invented example and labeled as such; each lesson lists the limits of the metric (own wallet transfers, exchange movements, lost coins, no fixed thresholds, no timing). The Advanced On-Chain Metrics section stays "Planned" until Slushy confirms the custom metric's name and formula.
 
 ### Feedback
 
