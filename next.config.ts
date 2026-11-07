@@ -18,8 +18,8 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      // The social image was renamed with the official branding. Older shared links keep a preview.
-      { source: "/images/og-slushymarkets.jpg", destination: "/images/og-slushy-markets.jpg", permanent: true },
+      // The social image follows the official SlushyMarkets branding. Older shared links keep a preview.
+      { source: "/images/og-slushy-markets.jpg", destination: "/images/og-slushymarkets.jpg", permanent: true },
     ];
   },
   async headers() {

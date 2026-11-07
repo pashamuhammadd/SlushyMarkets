@@ -1,6 +1,6 @@
-# Slushy Markets - a Liquidity joke
+# SlushyMarkets
 
-Interactive trading education website for beginners. Learn how charts form through visuals, sound and short exercises, guided by the official LiquiditySlushy mascot. Short name: Slushy Markets. Live at https://slushymarkets.com.
+Interactive trading education website for beginners. Learn how charts form through visuals, sound and short exercises, guided by the official LiquiditySlushy mascot. Live at https://slushymarkets.com.
 
 Commissioned by Slushy, developed by Nimia Studio. Education only: no wallet connection, tokens, signals or trading advice.
 
@@ -15,8 +15,10 @@ Commissioned by Slushy, developed by Nimia Studio. Education only: no wallet con
 | P0 | Security review, production readiness, official branding, technical SEO | Done |
 | P1 | SMA vs EMA lesson | Done |
 | P1 | Renko Bricks lesson | Done |
-| P3 | Games hub and Candle Builder | In review |
-| P1 | Lesson improvements from feedback | Next |
+| P3 | Games hub and Candle Builder | Done |
+| Brand | Official name changed to SlushyMarkets (one word) | Done |
+| P2 | Sound Playground foundation with EMA Sonar (`/audio-lab/playground`) | In review |
+| P2 | More sonar modes, On-Chain Basics (SOPR, MVRV) | Next |
 
 ## Run locally
 
@@ -170,6 +172,16 @@ public/images/liquidity-slushy/   Mascot poses cropped from the official charact
 - **Safety:** no autoplay, the AudioContext is created on the first Play click, master gain is capped, a compressor prevents peaks, Mute and Stop are always visible, sound stops when the tab is hidden or the page is left.
 - **Accurate timing:** a look ahead scheduler queues notes on the AudioContext clock and moves the playhead with them.
 
+### Sound Playground (`/audio-lab/playground`)
+
+- **Source:** Slushy's Sound Playground and EMA Sonar prototypes. EMA Sonar is the first mode ported; the other prototype modes (Sonar Bands, ER drums, buyer and seller volume, multi timeframe, fractals) are listed as planned in `src/lib/sonification/modes/index.ts` and are not playable yet.
+- **Pipeline:** market bars (`src/lib/sonification/market.ts`) -> indicators (`indicators.ts`) -> mode mapping (`modes/ema-sonar.ts`) -> pulse rate and mute/solo (`mixer.ts`) -> look ahead scheduler (`src/lib/hooks/use-sonar-player.ts`) -> Web Audio engine (`src/lib/audio/sonar-engine.ts`) -> controls (`src/components/audio/playground/`). A new mode only needs a new `SonificationMode`; the engine, scheduler and controls stay the same.
+- **Data:** a seeded copy of the prototype's regime switching random walk, built as 15 minute bars. 1h and 4h bars are true aggregations of the same walk, so every timeframe ends on the same bar. 150 warm up bars are computed before the 60 visible bars so the 50 EMA has settled. Same seed, same chart, so replays are comparable.
+- **EMA Sonar mapping (provisional, from Slushy's prototype):** each line has one fixed pitch (7 EMA 495 Hz, 20 EMA 330 Hz, 50 EMA 165 Hz). Loudness = (1 - distance / (fade x ATR7)) ^ curve, silent at 2 ATR for the 7 EMA (curve 2.5) and 3 ATR for the 20 and 50 EMA (curve 1.5). Pulse speeds 1, 2 or 4 notes per second. All parameters live in `EMA_SONAR_LAYERS`.
+- **Indicator variants, stated on purpose:** "ATR(7)" smooths the plain high minus low range (Wilder style, seeded with the first range), as in the prototype, not the classic true range. EMAs reuse `src/lib/simulations/moving-averages.ts` (SMA seeded); the prototype seeded with the first price, which makes no visible difference after the warm up. `efficiencyRatio` (Kaufman ER without smoothing, period 7 = seven changes) is implemented and tested for the next modes.
+- **Controls:** presets, instrument and pulse speed per layer, layer volume, Mute, Solo, Preview, master volume and mute, Play, Pause, Resume, Stop, Replay, timeframe, New chart, Reset to preset. Mute, Solo and volume act instantly through layer gain buses; instrument and speed changes apply from the next bar. Changing the chart or timeframe stops and rewinds, so sound never follows a different chart than the one drawn.
+- **Safety:** no autoplay, capped master gain plus a compressor against clipping, mono output (same on one speaker or headphones), sound stops when leaving the page.
+
 ### Feedback
 
 - **Never fake success.** The form shows "saved" only when the API answers 201 after Supabase stored the row. Not configured returns 503, storage errors return 502, and the person keeps their text.
@@ -178,8 +190,8 @@ public/images/liquidity-slushy/   Mascot poses cropped from the official charact
 
 ### General
 
-- **Branding:** the official name is "Slushy Markets - a Liquidity joke" (`site.fullName`). The short name "Slushy Markets" (`site.name`) is used in the navbar, title suffixes and tight spaces. Both live in `src/lib/site.ts`.
-- **SEO:** every page has its own title, description, canonical URL and social preview. The root layout sets no canonical, so the 404 page never points at the homepage. JSON-LD (`src/lib/structured-data.ts`): EducationalOrganization and WebSite on every page, LearningResource on the lesson, demo and Audio Lab, BreadcrumbList on section pages. The preview image (`public/images/og-slushy-markets.jpg`) is built from the official hero artwork. `/api/` is excluded in robots.txt and the 404 page is `noindex`.
+- **Branding:** the official name is "SlushyMarkets", one word (`site.name` in `src/lib/site.ts`), used in the navbar, titles, metadata, manifest and structured data. The earlier "Slushy Markets" spelling is kept only as a schema.org `alternateName`. The mascot stays LiquiditySlushy.
+- **SEO:** every page has its own title, description, canonical URL and social preview. The root layout sets no canonical, so the 404 page never points at the homepage. JSON-LD (`src/lib/structured-data.ts`): EducationalOrganization and WebSite on every page, LearningResource on the lesson, demo and Audio Lab, BreadcrumbList on section pages. The preview image (`public/images/og-slushymarkets.jpg`) is built from the official hero artwork; the older `og-slushy-markets.jpg` URL redirects to it. `/api/` is excluded in robots.txt and the 404 page is `noindex`.
 - **Security headers:** HSTS, nosniff, frame denial, strict referrer policy and a restrictive permissions policy (`next.config.ts`). A partial Content Security Policy (`base-uri`, `form-action`, `frame-ancestors`, `object-src`, `upgrade-insecure-requests`) is set because it needs no nonces. A `script-src` policy is not set yet because it needs per request nonces; consider it once analytics or third party scripts are added. Cross-Origin-Opener-Policy is `same-origin`.
 - **Error handling:** `src/app/error.tsx` for page level errors and `src/app/global-error.tsx` as a last resort.
 - **Navigation:** the full menu shows from 1024px; smaller screens use the menu button.
@@ -194,6 +206,7 @@ public/images/liquidity-slushy/   Mascot poses cropped from the official charact
 2. Sir, can you share the approved audio, composition or exact mapping rules for Daily, 4H and 15m? The current Audio Lab uses provisional rules.
 3. Sir, is there an official community link (Discord, X or Telegram) we may link from the site?
 4. Sir, are there statements, logos or promotions you want reviewed before public launch?
+5. Sir, is the EMA Sonar mapping in the Sound Playground (pitches, fade distances, pulse speeds) the one you want to keep, and which sonar mode should come next?
 
 ## Environment variables
 

@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   applicationName: site.name,
   authors: [{ name: site.studio }],
   creator: site.studio,
-  publisher: site.fullName,
+  publisher: site.name,
   openGraph: defaultOpenGraph(),
   twitter: {
     card: "summary_large_image",
