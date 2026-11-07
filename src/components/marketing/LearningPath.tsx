@@ -37,8 +37,8 @@ const stages: Stage[] = [
   {
     step: 3,
     title: "Timeframes and sound",
-    body: "How daily, 4 hour and 15 minute trends relate.",
-    status: "Audio prototype live",
+    body: "How daily, 4 hour and 15 minute trends relate, and how to hear price near moving averages.",
+    status: "Audio Lab and Sound Playground live",
     tone: "violet",
     pose: "cool",
     accent: "from-violet/30",

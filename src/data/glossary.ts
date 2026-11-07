@@ -110,6 +110,30 @@ export const GLOSSARY: GlossarySection[] = [
     ],
   },
   {
+    id: "on-chain",
+    title: "On-chain metrics",
+    lesson: { label: "On-Chain Metrics", href: "/learn/on-chain-metrics" },
+    terms: [
+      {
+        id: "output",
+        term: "Output",
+        definition: "A chunk of bitcoin recorded on the blockchain. It is created when coins arrive and spent when they move again.",
+      },
+      {
+        id: "sopr",
+        term: "SOPR",
+        definition: "Spent Output Profit Ratio: value of moved coins when spent divided by their value when created. 1.0 is break even.",
+      },
+      { id: "market-value", term: "Market value", definition: "Every coin priced at today's price." },
+      {
+        id: "realized-value",
+        term: "Realized value",
+        definition: "Every coin priced at the price when it last moved on chain. It only changes when coins move.",
+      },
+      { id: "mvrv", term: "MVRV", definition: "Market value divided by realized value. Above 1, coins are worth more today than when they last moved." },
+    ],
+  },
+  {
     id: "timeframes-and-sound",
     title: "Timeframes and sound",
     lesson: { label: "Audio Lab", href: "/audio-lab" },

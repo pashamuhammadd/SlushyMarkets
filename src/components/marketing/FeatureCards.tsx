@@ -11,6 +11,7 @@ const shortCopy: Record<string, string> = {
   "volume-profile": "See where the real trading happened.",
   "sma-vs-ema": "Compare the most common moving averages.",
   "renko-bricks": "Charts built from price moves, not time.",
+  "on-chain-metrics": "SOPR and MVRV with a two coin story.",
   "three-trends-one-piano": "Turn market structure into music.",
 };
 
