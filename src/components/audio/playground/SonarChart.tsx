@@ -71,6 +71,19 @@ export function SonarChart({ model, revealTo, cursor, timeframeLabel }: SonarCha
           Simulated price units · {timeframeLabel} bars
         </text>
 
+        {(model.zones ?? [])
+          .filter((z) => z.from <= last)
+          .map((z) => (
+            <rect
+              key={`z${z.from}`}
+              x={x(z.from) - step / 2}
+              y={PAD.top}
+              width={(Math.min(z.to, last) - z.from + 1) * step}
+              height={plotH}
+              fill={z.color}
+            />
+          ))}
+
         {bars.map((b, i) => {
           if (i > last) return null;
           const up = b.close >= b.open;

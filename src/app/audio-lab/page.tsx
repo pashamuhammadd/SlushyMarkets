@@ -76,8 +76,8 @@ export default function AudioLabPage() {
                 Sound Playground
               </h2>
               <p className="mt-1.5 max-w-2xl text-sm text-muted sm:text-base">
-                Two sonar modes based on Slushy&apos;s prototypes: EMA Sonar for the 7, 20 and 50 EMAs, and Sonar Bands for a
-                price channel with breakout chimes. Mix instruments, mute or solo each layer.
+                Three sonar modes based on Slushy&apos;s prototypes: EMA Sonar for the 7, 20 and 50 EMAs, Sonar Bands for a price
+                channel with breakout chimes, and ER drums for choppy markets. Mix instruments, mute or solo each layer.
               </p>
             </div>
           </div>

@@ -90,10 +90,18 @@ export type ChartMarker = {
   kind: "up" | "down" | "return";
 };
 
+/** A shaded stretch of bars, for example where a condition holds. Inclusive indexes. */
+export type ChartZone = {
+  from: number;
+  to: number;
+  color: string;
+};
+
 export type ChartModel = {
   bars: Bar[];
   lines: ChartLine[];
   markers: ChartMarker[];
+  zones?: ChartZone[];
   /** Screen reader description of what the chart shows. */
   description: string;
 };

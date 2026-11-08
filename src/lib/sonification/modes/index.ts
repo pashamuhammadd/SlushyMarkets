@@ -3,14 +3,14 @@
  * The others are Slushy's prototype ideas that will be ported one at a time, after each is
  * reviewed and tested.
  */
-export type PlayableModeId = "ema-sonar" | "sonar-bands";
+export type PlayableModeId = "ema-sonar" | "sonar-bands" | "sonar-er-drums";
 
 export type ModeListing = {
   id: string;
   title: string;
   summary: string;
   status: "live" | "planned";
-  href?: "/audio-lab/playground" | "/audio-lab/playground/sonar-bands";
+  href?: "/audio-lab/playground" | "/audio-lab/playground/sonar-bands" | "/audio-lab/playground/er-drums";
 };
 
 export const MODE_LISTINGS: readonly ModeListing[] = [
@@ -31,8 +31,9 @@ export const MODE_LISTINGS: readonly ModeListing[] = [
   {
     id: "sonar-er-drums",
     title: "Sonar Channels and ER drums",
-    summary: "Drums when the Efficiency Ratio is low, tones when price moves efficiently.",
-    status: "planned",
+    summary: "The Sonar Bands channel plus drums whenever the Efficiency Ratio shows a choppy market.",
+    status: "live",
+    href: "/audio-lab/playground/er-drums",
   },
   {
     id: "sonar-volume",
