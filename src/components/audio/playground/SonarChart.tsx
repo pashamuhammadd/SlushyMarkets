@@ -2,10 +2,10 @@
 
 import { COLORS } from "@/components/lessons/chart-geometry";
 import { useElementWidth } from "@/lib/hooks/use-element-width";
-import { EMA_SONAR_LAYERS, type EmaSonarAnalysis } from "@/lib/sonification/modes/ema-sonar";
+import type { ChartModel } from "@/lib/sonification/types";
 
 type SonarChartProps = {
-  analysis: EmaSonarAnalysis;
+  model: ChartModel;
   /** Last bar drawn while a piece is playing or paused. `null` shows the whole chart. */
   revealTo: number | null;
   cursor: number | null;
@@ -15,16 +15,18 @@ type SonarChartProps = {
 const HEIGHT = 300;
 const PAD = { top: 16, right: 12, bottom: 28, left: 46 };
 
+const MARKER_COLORS = { up: "#44D9A4", down: "#FF6B8B", return: "#B79BFF" } as const;
+
 /**
- * Candles plus the three EMA lines, drawn from the same analysis the sound is built from.
- * While playing, candles appear bar by bar under the cursor, like in Slushy's prototype.
+ * Candles plus the lines of the current mode, drawn from the same analysis the sound is built
+ * from. While playing, candles, lines and markers appear bar by bar under the cursor.
  */
-export function SonarChart({ analysis, revealTo, cursor, timeframeLabel }: SonarChartProps) {
+export function SonarChart({ model, revealTo, cursor, timeframeLabel }: SonarChartProps) {
   const [ref, width] = useElementWidth<HTMLDivElement>(720);
-  const { bars, emas } = analysis;
+  const { bars, lines, markers } = model;
   const last = revealTo === null ? bars.length - 1 : revealTo;
 
-  const values = bars.flatMap((b, i) => [b.high, b.low, ...EMA_SONAR_LAYERS.map((l) => emas[l.id][i])]);
+  const values = bars.flatMap((b) => [b.high, b.low]).concat(lines.flatMap((l) => l.values));
   const min = Math.min(...values);
   const max = Math.max(...values);
   const span = max - min || 1;
@@ -52,8 +54,8 @@ export function SonarChart({ analysis, revealTo, cursor, timeframeLabel }: Sonar
         height={HEIGHT}
         viewBox={`0 0 ${width} ${HEIGHT}`}
         role="img"
-        aria-label={`Simulated ${timeframeLabel} candles with the 7 EMA in violet, the 20 EMA in pink and the 50 EMA in mint. ${
-          revealTo === null ? "All 60 bars shown." : `Showing bar ${last + 1} of 60.`
+        aria-label={`${model.description} ${timeframeLabel} bars. ${
+          revealTo === null ? `All ${bars.length} bars shown.` : `Showing bar ${last + 1} of ${bars.length}.`
         }`}
         className="block"
       >
@@ -83,9 +85,44 @@ export function SonarChart({ analysis, revealTo, cursor, timeframeLabel }: Sonar
           );
         })}
 
-        {EMA_SONAR_LAYERS.map((l) => (
-          <path key={l.id} d={linePath(emas[l.id])} fill="none" stroke={l.color} strokeWidth={2.25} strokeLinejoin="round" />
+        {lines.map((l) => (
+          <path
+            key={l.id}
+            d={linePath(l.values)}
+            fill="none"
+            stroke={l.color}
+            strokeWidth={l.dashed ? 1.5 : 2.25}
+            strokeDasharray={l.dashed ? "6 5" : undefined}
+            strokeLinejoin="round"
+          />
         ))}
+
+        {markers
+          .filter((m) => m.index <= last)
+          .map((m) =>
+            m.kind === "return" ? (
+              <rect
+                key={`r${m.index}`}
+                x={x(m.index) - 4}
+                y={y(m.price) - 4}
+                width={8}
+                height={8}
+                fill={MARKER_COLORS.return}
+                stroke="#0B1020"
+                strokeWidth={1}
+              />
+            ) : (
+              <circle
+                key={`b${m.index}`}
+                cx={x(m.index)}
+                cy={y(m.price)}
+                r={5.5}
+                fill="none"
+                stroke={MARKER_COLORS[m.kind]}
+                strokeWidth={2.25}
+              />
+            ),
+          )}
 
         {cursor !== null ? (
           <line x1={x(cursor)} x2={x(cursor)} y1={PAD.top} y2={PAD.top + plotH} stroke="#E3CBFF" strokeWidth={1.5} />

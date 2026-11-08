@@ -1,7 +1,7 @@
 import { ema } from "@/lib/simulations/moving-averages";
 import { averageRange, proximity } from "../indicators";
 import { VISIBLE_BARS, type Bar } from "../market";
-import type { LayerSettings, Preset, SonicEvent, SonificationMode } from "../types";
+import type { ChartModel, LayerSettings, Preset, ReadoutItem, SonicEvent, SonificationMode } from "../types";
 import type { VoiceId } from "../voices";
 
 /**
@@ -149,6 +149,29 @@ export const EMA_SONAR_PRESETS: readonly Preset[] = [
   },
 ];
 
+export function emaSonarChart(analysis: EmaSonarAnalysis): ChartModel {
+  return {
+    bars: analysis.bars,
+    lines: EMA_SONAR_LAYERS.map((l) => ({ id: l.id, label: l.label, color: l.color, values: analysis.emas[l.id] })),
+    markers: [],
+    description: "Simulated candles with the 7 EMA in violet, the 20 EMA in pink and the 50 EMA in mint.",
+  };
+}
+
+export function emaSonarReadout(index: number, analysis: EmaSonarAnalysis): ReadoutItem[] {
+  return EMA_SONAR_LAYERS.map((l) => {
+    const r = describeEmaRelation(l.id, index, analysis);
+    const where = r.side === "on" ? "right on the line" : `${Math.abs(r.distanceAtr).toFixed(1)} ATR ${r.side}`;
+    return {
+      id: l.id,
+      label: l.label,
+      color: l.color,
+      loudness: r.loudness,
+      text: `Price is ${where}${r.motion === "steady" ? "" : `, ${r.motion}`}.`,
+    };
+  });
+}
+
 export const emaSonarMode: SonificationMode<EmaSonarAnalysis> = {
   id: "ema-sonar",
   title: "EMA Sonar: 7, 20 and 50",
@@ -157,8 +180,14 @@ export const emaSonarMode: SonificationMode<EmaSonarAnalysis> = {
     label: l.label,
     color: l.color,
     describes: `Louder when price is close to the ${l.label} (${l.colorName} line). Silent at ${l.fadeAtr} average ranges away.`,
+    detail: `${l.hz} Hz tone`,
+    previewHz: l.hz,
+    kind: "continuous" as const,
   })),
   presets: EMA_SONAR_PRESETS,
+  toggles: [],
   analyze: analyzeEmaSonar,
   events: emaSonarEvents,
+  chart: emaSonarChart,
+  readout: emaSonarReadout,
 };

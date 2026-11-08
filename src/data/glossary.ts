@@ -157,7 +157,17 @@ export const GLOSSARY: GlossarySection[] = [
       {
         id: "sonar-cue",
         term: "Sonar cue",
-        definition: "A repeating tone that gets louder as price gets closer to a line, like a sonar ping. Used by EMA Sonar.",
+        definition: "A repeating tone that gets louder as price gets closer to a line, like a sonar ping. Used by EMA Sonar and Sonar Bands.",
+      },
+      {
+        id: "price-channel",
+        term: "Price channel",
+        definition: "A band above and a band below a moving average. Sonar Bands sets them 1.7 average ranges from a 10 bar EMA.",
+      },
+      {
+        id: "breakout",
+        term: "Breakout",
+        definition: "A close outside a channel or level. On SlushyMarkets it is a description of what happened, not a signal.",
       },
     ],
   },

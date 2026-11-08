@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getSonarEngine, type SonarEngine } from "@/lib/audio/sonar-engine";
 import { buildMarket, VISIBLE_BARS, type TimeframeId } from "@/lib/sonification/market";
-import { applyPulseRate, audibleGain, BAR_SECONDS, hasSolo } from "@/lib/sonification/mixer";
-import type { LayerSettings, Preset, SonificationMode } from "@/lib/sonification/types";
+import { audibleGain, BAR_SECONDS, hasSolo, notesForBar } from "@/lib/sonification/mixer";
+import { resolveOptions, type LayerSettings, type ModeOptions, type Preset, type SonificationMode } from "@/lib/sonification/types";
 
 const LOOKAHEAD_SEC = 0.15;
 const TICK_MS = 25;
@@ -18,8 +18,8 @@ function clonePreset(preset: Preset): Record<string, LayerSettings> {
 /**
  * Sequencer for the Sound Playground. A look ahead scheduler queues each bar's notes on the
  * AudioContext clock and moves the chart cursor in step with them, so sound and picture stay
- * together. Mute, solo and volume act instantly through layer buses; instrument and pulse
- * speed changes apply from the next bar. Changing the chart or timeframe stops playback and
+ * together. Mute, solo and volume act instantly through layer buses; instrument, pulse
+ * speed and mode toggle changes apply from the next bar. Changing the chart or timeframe stops playback and
  * rewinds, so audio never plays one chart while another is drawn. No sound before Play.
  */
 export function useSonarPlayer<A>(mode: SonificationMode<A>, initialSeed: number) {
@@ -27,6 +27,7 @@ export function useSonarPlayer<A>(mode: SonificationMode<A>, initialSeed: number
   const [timeframe, setTimeframeState] = useState<TimeframeId>("15m");
   const [presetId, setPresetId] = useState(mode.presets[0].id);
   const [layers, setLayers] = useState<Record<string, LayerSettings>>(() => clonePreset(mode.presets[0]));
+  const [options, setOptions] = useState<ModeOptions>(() => resolveOptions(mode.toggles, mode.presets[0]));
   const [cursor, setCursor] = useState(0);
   const [status, setStatus] = useState<PlayerStatus>("idle");
   const [volume, setVolumeState] = useState(0.7);
@@ -41,11 +42,16 @@ export function useSonarPlayer<A>(mode: SonificationMode<A>, initialSeed: number
   const nextBarRef = useRef(0);
   const nextTimeRef = useRef(0);
   const layersRef = useRef(layers);
+  const optionsRef = useRef(options);
   const analysisRef = useRef(analysis);
 
   useEffect(() => {
     analysisRef.current = analysis;
   }, [analysis]);
+
+  useEffect(() => {
+    optionsRef.current = options;
+  }, [options]);
 
   const syncGains = useCallback((next: Record<string, LayerSettings>) => {
     const engine = engineRef.current;
@@ -116,7 +122,8 @@ export function useSonarPlayer<A>(mode: SonificationMode<A>, initialSeed: number
             for (const layer of mode.layers) {
               const settings = layersRef.current[layer.id];
               if (!settings) continue;
-              const notes = applyPulseRate(mode.events(layer.id, bar, analysisRef.current), settings.rate, bar);
+              const events = mode.events(layer.id, bar, analysisRef.current, optionsRef.current);
+              const notes = notesForBar(layer, settings, events, bar);
               for (const note of notes) {
                 engine.playTone(layer.id, settings.voice, when + note.offsetSec, note.hz, note.amp, note.durationSec);
               }
@@ -164,11 +171,16 @@ export function useSonarPlayer<A>(mode: SonificationMode<A>, initialSeed: number
       if (!preset) return;
       setPresetId(id);
       setLayers(clonePreset(preset));
+      setOptions(resolveOptions(mode.toggles, preset));
     },
     [mode],
   );
 
   const resetToPreset = useCallback(() => applyPreset(presetId), [applyPreset, presetId]);
+
+  const setOption = useCallback((id: string, value: boolean) => {
+    setOptions((prev) => ({ ...prev, [id]: value }));
+  }, []);
 
   const updateLayer = useCallback((id: string, patch: Partial<LayerSettings>) => {
     setLayers((prev) => ({ ...prev, [id]: { ...prev[id], ...patch } }));
@@ -176,7 +188,8 @@ export function useSonarPlayer<A>(mode: SonificationMode<A>, initialSeed: number
 
   /** Three short notes of one layer's instrument, outside the piece. Stops the piece first. */
   const previewLayer = useCallback(
-    async (id: string, hz: number) => {
+    async (id: string) => {
+      const hz = mode.layers.find((l) => l.id === id)?.previewHz ?? 440;
       try {
         halt(status === "playing" ? "paused" : status, false);
         const engine = engineRef.current ?? getSonarEngine();
@@ -193,7 +206,7 @@ export function useSonarPlayer<A>(mode: SonificationMode<A>, initialSeed: number
         setError("Sound could not start in this browser.");
       }
     },
-    [halt, muted, status, volume],
+    [halt, mode, muted, status, volume],
   );
 
   const setVolume = useCallback((v: number) => {
@@ -212,6 +225,7 @@ export function useSonarPlayer<A>(mode: SonificationMode<A>, initialSeed: number
     timeframe,
     presetId,
     layers,
+    options,
     cursor,
     status,
     volume,
@@ -226,6 +240,7 @@ export function useSonarPlayer<A>(mode: SonificationMode<A>, initialSeed: number
     applyPreset,
     resetToPreset,
     updateLayer,
+    setOption,
     previewLayer,
     setVolume,
     setMuted,

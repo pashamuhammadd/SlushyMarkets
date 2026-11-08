@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { ema } from "@/lib/simulations/moving-averages";
 import { averageRange, efficiencyRatio, proximity } from "./indicators";
 import { aggregateBars, buildMarket, generateBaseBars, TIMEFRAME_OPTIONS, VISIBLE_BARS, WARMUP_BARS, type Bar } from "./market";
-import { applyPulseRate, audibleGain, BAR_SECONDS, hasSolo } from "./mixer";
+import { applyPulseRate, audibleGain, BAR_SECONDS, hasSolo, notesForBar } from "./mixer";
 import {
   analyzeEmaSonar,
   describeEmaRelation,
@@ -13,7 +13,20 @@ import {
   emaSonarMode,
 } from "./modes/ema-sonar";
 import { MODE_LISTINGS } from "./modes";
-import type { LayerSettings, SonicEvent } from "./types";
+import {
+  analyzeSonarBands,
+  BAND_ATR_MULTIPLIER,
+  bandLoudness,
+  bandState,
+  midlineHz,
+  OUTSIDE_LOUDNESS,
+  sonarBandsChart,
+  sonarBandsEvents,
+  sonarBandsMode,
+  sonarBandsReadout,
+  type SonarBandsAnalysis,
+} from "./modes/sonar-bands";
+import { resolveOptions, type LayerDefinition, type LayerSettings, type SonicEvent } from "./types";
 import { VOICE_IDS } from "./voices";
 
 const flat = (price: number, range = 1): Bar => ({ open: price, close: price, high: price + range / 2, low: price - range / 2 });
@@ -154,8 +167,16 @@ describe("EMA Sonar", () => {
     }
   });
 
-  it("lists exactly one live mode, the one that is implemented", () => {
-    expect(MODE_LISTINGS.filter((m) => m.status === "live").map((m) => m.id)).toEqual([emaSonarMode.id]);
+  it("lists exactly the implemented modes as live, each with a page", () => {
+    const live = MODE_LISTINGS.filter((m) => m.status === "live");
+    expect(live.map((m) => m.id)).toEqual([emaSonarMode.id, sonarBandsMode.id]);
+    expect(live.every((m) => m.href)).toBe(true);
+  });
+
+  it("describes every layer in the readout and chart", () => {
+    const items = emaSonarMode.readout(10, analysis, {});
+    expect(items.map((i) => i.id)).toEqual(["ema7", "ema20", "ema50"]);
+    expect(emaSonarMode.chart(analysis).lines).toHaveLength(3);
   });
 });
 
@@ -181,5 +202,130 @@ describe("mixer", () => {
     expect(audibleGain(layer({ solo: true, mute: true }), true)).toBe(0);
     expect(audibleGain(layer({ gain: 3 }), false)).toBe(1);
     expect(hasSolo({ a: layer({}), b: layer({ solo: true }) })).toBe(true);
+  });
+});
+
+/** Small hand made channel: midline 100, ATR 1, bands at 98.3 and 101.7. */
+function fakeBands(closes: number[]): SonarBandsAnalysis {
+  const lower = closes.map(() => 100 - BAND_ATR_MULTIPLIER);
+  const upper = closes.map(() => 100 + BAND_ATR_MULTIPLIER);
+  const state = closes.map((c, i) => bandState(c, lower[i], upper[i]));
+  const prev = (i: number) => (i > 0 ? i - 1 : i);
+  return {
+    bars: closes.map((c) => flat(c)),
+    atr: closes.map(() => 1),
+    mid: closes.map(() => 100),
+    upper,
+    lower,
+    state,
+    breakout: state.map((v, i) => (v !== 0 && v !== state[prev(i)] ? v : 0)),
+    returned: state.map((v, i) => (v === 0 && state[prev(i)] !== 0 ? state[prev(i)] : 0)),
+    motion: {
+      lower: closes.map((c, i) => Math.abs(c - lower[i]) - Math.abs(closes[prev(i)] - lower[prev(i)])),
+      upper: closes.map((c, i) => Math.abs(c - upper[i]) - Math.abs(closes[prev(i)] - upper[prev(i)])),
+    },
+    low: Math.min(...lower) - 1,
+    high: Math.max(...upper) + 1,
+  };
+}
+
+describe("Sonar Bands", () => {
+  const series = buildMarket(20261108, "15m");
+  const analysis = analyzeSonarBands(series);
+
+  it("builds the channel as EMA(10) plus or minus 1.7 x ATR(7) from the full series", () => {
+    const mid = ema(series.map((b) => b.close), 10);
+    const atr = averageRange(series, 7);
+    const i = series.length - 1;
+    expect(analysis.mid[VISIBLE_BARS - 1]).toBe(mid[i]);
+    expect(analysis.upper[VISIBLE_BARS - 1]).toBeCloseTo((mid[i] as number) + 1.7 * atr[i], 10);
+    expect(analysis.lower[VISIBLE_BARS - 1]).toBeCloseTo((mid[i] as number) - 1.7 * atr[i], 10);
+    expect(analysis.bars).toHaveLength(VISIBLE_BARS);
+  });
+
+  it("detects breakouts and returns only on the first bar of each change", () => {
+    const a = analyzeSonarBands(series);
+    a.state.forEach((s, i) => {
+      if (a.breakout[i] !== 0) expect(a.breakout[i]).toBe(s);
+      if (a.returned[i] !== 0) expect(s).toBe(0);
+      if (i > 0 && s === a.state[i - 1]) {
+        expect(a.breakout[i]).toBe(0);
+        expect(a.returned[i]).toBe(0);
+      }
+    });
+  });
+
+  it("plays the prototype loudness: squared fade inside, extra loud outside", () => {
+    const a = fakeBands([100, 101.2, 102, 101]);
+    expect(bandLoudness("upper", 0, a)).toBe(0);
+    expect(bandLoudness("upper", 1, a)).toBeCloseTo(0.5 ** 2, 10);
+    expect(bandLoudness("upper", 2, a)).toBe(OUTSIDE_LOUDNESS);
+    expect(bandLoudness("lower", 2, a)).toBe(0);
+  });
+
+  it("uses rising pairs when approaching and falling pairs when moving away", () => {
+    const a = fakeBands([100.9, 101.4, 100.9]);
+    const approach = sonarBandsEvents("upper", 1, a, { motion: true });
+    expect(approach).toHaveLength(2);
+    expect(approach[1].hz).toBeGreaterThan(approach[0].hz);
+    const away = sonarBandsEvents("upper", 2, a, { motion: true });
+    expect(away[1].hz).toBeLessThan(away[0].hz);
+    expect(sonarBandsEvents("upper", 1, a, { motion: false })).toHaveLength(1);
+  });
+
+  it("chimes on breakouts and knocks on returns, in the right direction", () => {
+    const a = fakeBands([100, 102, 102.5, 100, 98, 100]);
+    expect(sonarBandsEvents("breakout", 1, a, {}).map((e) => e.hz)).toEqual([880, 1174.66]);
+    expect(sonarBandsEvents("breakout", 2, a, {})).toEqual([]);
+    expect(sonarBandsEvents("return", 3, a, {})).toHaveLength(2);
+    expect(sonarBandsEvents("breakout", 4, a, {}).map((e) => e.hz)).toEqual([660, 440]);
+    expect(sonarBandsEvents("return", 5, a, {})).toHaveLength(2);
+    expect(sonarBandsChart(a).markers.map((m) => m.kind)).toEqual(["up", "return", "down", "return"]);
+    expect(sonarBandsReadout(1, a)[2].text).toMatch(/Breakout above/);
+  });
+
+  it("keeps the midline pitch inside two octaves", () => {
+    expect(midlineHz(0, 0, 10)).toBe(220);
+    expect(midlineHz(10, 0, 10)).toBe(880);
+    expect(midlineHz(99, 0, 10)).toBe(880);
+    expect(midlineHz(5, 5, 5)).toBeCloseTo(440, 10);
+  });
+
+  it("produces finite notes for every layer on generated charts", () => {
+    for (const seed of [1, 2, 3]) {
+      const a = analyzeSonarBands(buildMarket(seed, "1h"));
+      for (const layer of sonarBandsMode.layers) {
+        for (let i = 0; i < VISIBLE_BARS; i += 1) {
+          for (const e of sonarBandsEvents(layer.id, i, a, { motion: true })) {
+            expect(Number.isFinite(e.hz) && e.hz > 0).toBe(true);
+            expect(e.amp).toBeGreaterThanOrEqual(0);
+            expect(e.amp).toBeLessThanOrEqual(OUTSIDE_LOUDNESS);
+            expect(e.offsetSec + e.durationSec).toBeLessThan(BAR_SECONDS);
+          }
+        }
+      }
+    }
+    expect(() => sonarBandsEvents("nope", 0, analysis, {})).toThrow();
+  });
+
+  it("has presets for every layer and sets the motion switch", () => {
+    for (const preset of sonarBandsMode.presets) {
+      expect(Object.keys(preset.layers).sort()).toEqual(sonarBandsMode.layers.map((l) => l.id).sort());
+      expect(resolveOptions(sonarBandsMode.toggles, preset)).toHaveProperty("motion");
+    }
+    expect(resolveOptions(sonarBandsMode.toggles, sonarBandsMode.presets[1])).toEqual({ motion: false });
+    expect(resolveOptions(sonarBandsMode.toggles)).toEqual({ motion: true });
+  });
+});
+
+describe("event layers", () => {
+  const note: SonicEvent = { offsetSec: 0, hz: 880, amp: 1, durationSec: 0.16 };
+  const slow: LayerSettings = { voice: "chime", rate: 1, gain: 0.7, mute: false, solo: false };
+  const layer = (kind: LayerDefinition["kind"]): LayerDefinition => ({ id: "x", label: "X", color: "#fff", describes: "", detail: "", previewHz: 880, kind });
+
+  it("never drops an event because of a slow pulse speed", () => {
+    expect(notesForBar(layer("event"), slow, [note], 3)).toEqual([note]);
+    expect(notesForBar(layer("continuous"), slow, [note], 3)).toEqual([]);
+    expect(notesForBar(layer("event"), { ...slow, rate: 4 }, [note], 2)).toEqual([note]);
   });
 });

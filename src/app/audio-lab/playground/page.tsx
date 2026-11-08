@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Headphones, Info, ListChecks, SlidersHorizontal } from "lucide-react";
+import { Headphones, Info, SlidersHorizontal } from "lucide-react";
+import { PlaygroundModeNav, PlaygroundModesList } from "@/components/audio/playground/PlaygroundModes";
 import { SoundPlayground } from "@/components/audio/playground/SoundPlayground";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { GlossaryLink } from "@/components/lessons/GlossaryLink";
@@ -9,7 +10,6 @@ import { ButtonLink } from "@/components/ui/Button";
 import { Container, SectionHeading } from "@/components/ui/Section";
 import { StatusNotice } from "@/components/ui/StatusNotice";
 import { ATR_PERIOD, EMA_SONAR_LAYERS } from "@/lib/sonification/modes/ema-sonar";
-import { MODE_LISTINGS } from "@/lib/sonification/modes";
 import { VOICES } from "@/lib/sonification/voices";
 import { EMA_SONAR_PRESETS } from "@/lib/sonification/modes/ema-sonar";
 import { pageMetadata } from "@/lib/site";
@@ -57,6 +57,8 @@ export default function SoundPlaygroundPage() {
       </PageHeader>
 
       <Container className="space-y-12">
+        <PlaygroundModeNav current="ema-sonar" />
+
         <StatusNotice title="Experiment in progress">
           <p>
             This mode is based on Slushy&apos;s EMA Sonar prototype. The pitches, fade distances and pulse speeds are
@@ -74,7 +76,7 @@ export default function SoundPlaygroundPage() {
             description="Pick a preset, press Play and watch the cursor. Then mute, solo or swap instruments and replay the same chart."
           />
           <div className="mt-5">
-            <SoundPlayground />
+            <SoundPlayground modeId="ema-sonar" />
           </div>
         </section>
 
@@ -157,25 +159,7 @@ export default function SoundPlaygroundPage() {
           </ol>
         </section>
 
-        <section aria-labelledby="modes-title">
-          <SectionHeading
-            id="modes-title"
-            icon={<ListChecks className="size-5" />}
-            title="More sonar modes are coming"
-            description="Slushy has prototyped several other ways to listen to a chart. They will be added one at a time, once each one is tested."
-          />
-          <ul className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-            {MODE_LISTINGS.map((m) => (
-              <li key={m.id} className="panel p-4">
-                <div className="flex items-center justify-between gap-2">
-                  <h3 className="font-sans text-sm font-semibold text-ink">{m.title}</h3>
-                  <Badge tone={m.status === "live" ? "success" : "neutral"}>{m.status === "live" ? "Live here" : "Planned"}</Badge>
-                </div>
-                <p className="mt-2 text-sm text-muted">{m.summary}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <PlaygroundModesList />
 
         <div className="flex flex-wrap gap-3">
           <ButtonLink href="/feedback">Tell us how the sonar sounds</ButtonLink>
