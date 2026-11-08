@@ -23,6 +23,14 @@ export const games: Game[] = [
     practices: "Candlesticks and Volume",
   },
   {
+    slug: "practice",
+    title: "Three Charts. One Minute Each.",
+    summary: "Virtual trading on three simulated charts, with or without sound. Long, short, fees and an honest results screen.",
+    status: "available",
+    href: "/games/practice",
+    practices: "Audio Lab",
+  },
+  {
     slug: "market-music",
     title: "Market Music",
     summary: "A listening game built on the Audio Lab. It waits for the final sound mapping from Slushy.",
