@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, Blocks, Clock, FlaskConical } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { GlossaryLink } from "@/components/lessons/GlossaryLink";
+import { DexGrowthExplorer } from "@/components/onchain/DexGrowthExplorer";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Badge } from "@/components/ui/Badge";
 import { Container, SectionHeading } from "@/components/ui/Section";
@@ -71,11 +72,11 @@ export default function OnChainMetricsPage() {
             </li>
             <li className="rounded-xl bg-navy-950/50 p-4 ring-1 ring-white/10">
               <span className="font-semibold text-ink">SOPR looks at coins that move.</span> Only the coins spent in a period
-              count.
+              count, and a spend can be a transfer between someone&apos;s own wallets, not a sale.
             </li>
             <li className="rounded-xl bg-navy-950/50 p-4 ring-1 ring-white/10">
               <span className="font-semibold text-ink">MVRV looks at every coin.</span> It compares all coins at today&apos;s
-              price with all coins at their last moved price.
+              price with all coins at the price they last moved, which is not necessarily what their owners paid.
             </li>
           </ul>
         </section>
@@ -108,11 +109,11 @@ export default function OnChainMetricsPage() {
             id="advanced-title"
             icon={<FlaskConical className="size-5" />}
             title="Advanced On-Chain Metrics"
-            description="Later, this section will introduce metrics from Slushy's own research. They are still being defined, so nothing is published here yet."
+            description="Metrics from Slushy's own research. The first one compares DEX swap volume across two weeks. The amounts here are invented, not live DEX data."
           />
-          <Badge tone="neutral" className="mt-4">
-            Planned
-          </Badge>
+          <div className="mt-5">
+            <DexGrowthExplorer />
+          </div>
         </section>
 
         <section className="panel p-5 text-sm text-muted sm:p-6">

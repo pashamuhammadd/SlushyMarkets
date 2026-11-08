@@ -9,7 +9,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { Badge } from "@/components/ui/Badge";
 import { Container, SectionHeading } from "@/components/ui/Section";
 import { RENKO_BOX_SIZES, RENKO_DEFAULT_BOX, RENKO_DEMO_CANDLES } from "@/data/renko-demo";
-import { LESSON_ID, RENKO_CHAPTERS, RENKO_QUIZ } from "@/data/lessons/renko-bricks";
+import { LESSON_ID, RENKO_COMPLETION, RENKO_CHAPTERS, RENKO_QUIZ } from "@/data/lessons/renko-bricks";
 import { pageMetadata } from "@/lib/site";
 import { learningResourceGraph } from "@/lib/structured-data";
 
@@ -122,7 +122,7 @@ export default function RenkoBricksPage() {
             description={`${RENKO_QUIZ.length} quick questions. Pick an answer to see the explanation.`}
           />
           <div className="mt-5">
-            <LessonQuiz lessonId={LESSON_ID} questions={RENKO_QUIZ} />
+            <LessonQuiz lessonId={LESSON_ID} questions={RENKO_QUIZ} completionMessage={RENKO_COMPLETION} />
           </div>
         </section>
 

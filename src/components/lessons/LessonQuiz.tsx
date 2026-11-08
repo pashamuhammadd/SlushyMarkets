@@ -10,13 +10,15 @@ import type { QuizQuestion } from "@/data/lessons/types";
 type LessonQuizProps = {
   lessonId: string;
   questions: QuizQuestion[];
+  /** Shown after a perfect score. Each lesson supplies its own, so the text always matches the topic. */
+  completionMessage: string;
 };
 
 /**
  * Short knowledge check. Each question locks after the first answer and always shows
  * the correct option with an explanation, so guessing teaches instead of scoring points.
  */
-export function LessonQuiz({ lessonId, questions }: LessonQuizProps) {
+export function LessonQuiz({ lessonId, questions, completionMessage }: LessonQuizProps) {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [saveFailed, setSaveFailed] = useState(false);
   const { progress, save, clear } = useDeviceProgress(lessonId);
@@ -123,7 +125,7 @@ export function LessonQuiz({ lessonId, questions }: LessonQuizProps) {
             </p>
             <p className="mt-1 text-sm text-muted">
               {score === questions.length
-                ? "Great work. You can read candles and volume by price from the same trades."
+                ? completionMessage
                 : "Good effort. Read the explanations above, replay a step, then try again."}
             </p>
             <p className="mt-2 text-xs text-subtle">

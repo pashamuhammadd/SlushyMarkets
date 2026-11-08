@@ -9,7 +9,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { Badge } from "@/components/ui/Badge";
 import { Container, SectionHeading } from "@/components/ui/Section";
 import { MA_DEMO_CANDLES } from "@/data/ma-demo";
-import { LESSON_ID, MA_CHAPTERS, MA_QUIZ } from "@/data/lessons/sma-vs-ema";
+import { LESSON_ID, MA_COMPLETION, MA_CHAPTERS, MA_QUIZ } from "@/data/lessons/sma-vs-ema";
 import { pageMetadata } from "@/lib/site";
 import { learningResourceGraph } from "@/lib/structured-data";
 
@@ -126,7 +126,7 @@ export default function SmaVsEmaPage() {
             description={`${MA_QUIZ.length} quick questions. Pick an answer to see the explanation.`}
           />
           <div className="mt-5">
-            <LessonQuiz lessonId={LESSON_ID} questions={MA_QUIZ} />
+            <LessonQuiz lessonId={LESSON_ID} questions={MA_QUIZ} completionMessage={MA_COMPLETION} />
           </div>
         </section>
 

@@ -122,13 +122,13 @@ export const GLOSSARY: GlossarySection[] = [
       {
         id: "sopr",
         term: "SOPR",
-        definition: "Spent Output Profit Ratio: value of moved coins when spent divided by their value when created. 1.0 is break even.",
+        definition: "Spent Output Profit Ratio: value of moved coins when spent divided by value when created. 1.0 is break even. A spend is not always a sale.",
       },
       { id: "market-value", term: "Market value", definition: "Every coin priced at today's price." },
       {
         id: "realized-value",
         term: "Realized value",
-        definition: "Every coin priced at the price when it last moved on chain. It only changes when coins move.",
+        definition: "Every coin priced at the price when it last moved on chain, not necessarily the price its owner paid. It only changes when coins move.",
       },
       { id: "mvrv", term: "MVRV", definition: "Market value divided by realized value. Above 1, coins are worth more today than when they last moved." },
     ],
