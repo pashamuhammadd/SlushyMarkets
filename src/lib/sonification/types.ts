@@ -7,14 +7,15 @@ import type { VoiceId } from "./voices";
  * market bars -> indicator analysis (mode.analyze) -> sound events per bar (mode.events)
  * -> scheduler (use-sonar-player) -> Web Audio engine (sonar-engine) -> user controls.
  *
- * A new mode only needs a new `SonificationMode`. The engine, scheduler and controls stay the same.
+ * A new mode only needs a new `SonificationMode`. The engine, scheduler, chart and controls
+ * stay the same.
  */
 
 /** One note inside a bar. Times are relative to the start of that bar. */
 export type SonicEvent = {
   offsetSec: number;
   hz: number;
-  /** 0 to 1. Zero means silent and is never scheduled. */
+  /** Usually 0 to 1. Up to 1.35 for deliberate emphasis. Zero means silent and is never scheduled. */
   amp: number;
   durationSec: number;
 };
@@ -41,17 +42,71 @@ export type LayerSettings = {
 export type LayerDefinition = {
   id: string;
   label: string;
-  /** Chart color for the line this layer follows. */
+  /** Chart color for the line or marker this layer follows. */
   color: string;
   /** Plain English description of what the layer sonifies. */
   describes: string;
+  /** Short note under the layer name, for example "165 Hz tone". */
+  detail: string;
+  /** Pitch used by the Preview button. */
+  previewHz: number;
+  /**
+   * "continuous" layers can sound on every bar and follow the pulse speed.
+   * "event" layers only sound when something happens (a breakout), so pulse speed never drops them.
+   */
+  kind: "continuous" | "event";
 };
+
+/** On or off switches that change how a mode maps data to sound. */
+export type ModeToggle = {
+  id: string;
+  label: string;
+  description: string;
+  defaultValue: boolean;
+};
+
+export type ModeOptions = Record<string, boolean>;
 
 export type Preset = {
   id: string;
   label: string;
   description: string;
   layers: Record<string, LayerSettings>;
+  /** Toggle values this preset sets. Missing toggles use their default. */
+  options?: ModeOptions;
+};
+
+export type ChartLine = {
+  id: string;
+  label: string;
+  color: string;
+  values: number[];
+  dashed?: boolean;
+};
+
+export type ChartMarker = {
+  index: number;
+  price: number;
+  kind: "up" | "down" | "return";
+};
+
+export type ChartModel = {
+  bars: Bar[];
+  lines: ChartLine[];
+  markers: ChartMarker[];
+  /** Screen reader description of what the chart shows. */
+  description: string;
+};
+
+/** One line of the live readout under the chart. */
+export type ReadoutItem = {
+  /** Matches a layer id when the item describes that layer, so mute and solo can be shown. */
+  id: string;
+  label: string;
+  color: string;
+  /** 0 to 1 (or a little above for emphasis). `null` hides the loudness meter. */
+  loudness: number | null;
+  text: string;
 };
 
 export type SonificationMode<Analysis> = {
@@ -59,8 +114,16 @@ export type SonificationMode<Analysis> = {
   title: string;
   layers: readonly LayerDefinition[];
   presets: readonly Preset[];
+  toggles: readonly ModeToggle[];
   /** Indicator work on the full series (warm up included). Returns data for the visible bars only. */
   analyze: (bars: readonly Bar[]) => Analysis;
   /** Notes for one layer at one visible bar, before pulse rate handling. */
-  events: (layerId: string, index: number, analysis: Analysis) => SonicEvent[];
+  events: (layerId: string, index: number, analysis: Analysis, options: ModeOptions) => SonicEvent[];
+  chart: (analysis: Analysis) => ChartModel;
+  readout: (index: number, analysis: Analysis, options: ModeOptions) => ReadoutItem[];
 };
+
+/** Toggle values from a preset, filling in defaults. */
+export function resolveOptions(toggles: readonly ModeToggle[], preset?: Preset): ModeOptions {
+  return Object.fromEntries(toggles.map((t) => [t.id, preset?.options?.[t.id] ?? t.defaultValue]));
+}

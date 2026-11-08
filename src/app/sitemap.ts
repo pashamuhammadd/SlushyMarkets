@@ -16,6 +16,7 @@ const routes: { path: string; priority: number; changeFrequency: "weekly" | "mon
   { path: "/learn/on-chain-metrics/mvrv", priority: 0.9, changeFrequency: "monthly" },
   { path: "/audio-lab", priority: 0.8, changeFrequency: "monthly" },
   { path: "/audio-lab/playground", priority: 0.8, changeFrequency: "monthly" },
+  { path: "/audio-lab/playground/sonar-bands", priority: 0.8, changeFrequency: "monthly" },
   { path: "/games", priority: 0.7, changeFrequency: "monthly" },
   { path: "/games/candle-builder", priority: 0.7, changeFrequency: "monthly" },
   { path: "/explore", priority: 0.7, changeFrequency: "monthly" },

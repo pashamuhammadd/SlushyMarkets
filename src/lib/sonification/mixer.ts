@@ -1,4 +1,4 @@
-import type { LayerSettings, PulseRate, SonicEvent } from "./types";
+import type { LayerDefinition, LayerSettings, PulseRate, SonicEvent } from "./types";
 
 /** Seconds of music per bar. 60 bars play in 30 seconds. */
 export const BAR_SECONDS = 0.5;
@@ -28,4 +28,13 @@ export function audibleGain(layer: LayerSettings, anySolo: boolean): number {
 
 export function hasSolo(layers: Record<string, LayerSettings>): boolean {
   return Object.values(layers).some((l) => l.solo);
+}
+
+/**
+ * Notes to schedule for one layer at one bar. Event layers (breakouts, returns) ignore the
+ * pulse speed, so a slow setting can never drop an event.
+ */
+export function notesForBar(layer: LayerDefinition, settings: LayerSettings, events: readonly SonicEvent[], index: number): SonicEvent[] {
+  if (layer.kind === "event") return events.filter((e) => e.amp > 0);
+  return applyPulseRate(events, settings.rate, index);
 }

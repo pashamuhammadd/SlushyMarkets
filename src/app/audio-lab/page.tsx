@@ -73,11 +73,11 @@ export default function AudioLabPage() {
             <div>
               <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-cyan">New experiment</p>
               <h2 id="playground-link-title" className="text-2xl font-semibold text-ink">
-                Sound Playground: EMA Sonar
+                Sound Playground
               </h2>
               <p className="mt-1.5 max-w-2xl text-sm text-muted sm:text-base">
-                Hear how close price is to the 7, 20 and 50 EMAs. Choose instruments, pulse speeds and timeframes, then mute
-                or solo each layer.
+                Two sonar modes based on Slushy&apos;s prototypes: EMA Sonar for the 7, 20 and 50 EMAs, and Sonar Bands for a
+                price channel with breakout chimes. Mix instruments, mute or solo each layer.
               </p>
             </div>
           </div>

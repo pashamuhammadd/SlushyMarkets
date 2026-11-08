@@ -7,13 +7,10 @@ import { cn } from "@/lib/cn";
 import { useSonarPlayer } from "@/lib/hooks/use-sonar-player";
 import { TIMEFRAME_OPTIONS, VISIBLE_BARS, timeframeOption } from "@/lib/sonification/market";
 import { BAR_SECONDS, audibleGain, hasSolo } from "@/lib/sonification/mixer";
-import {
-  EMA_SONAR_LAYERS,
-  describeEmaRelation,
-  emaSonarMode,
-  type EmaSonarLayerConfig,
-} from "@/lib/sonification/modes/ema-sonar";
-import { PULSE_RATES, type LayerSettings, type PulseRate } from "@/lib/sonification/types";
+import { emaSonarMode } from "@/lib/sonification/modes/ema-sonar";
+import type { PlayableModeId } from "@/lib/sonification/modes";
+import { sonarBandsMode } from "@/lib/sonification/modes/sonar-bands";
+import { PULSE_RATES, type LayerDefinition, type LayerSettings, type PulseRate, type SonificationMode } from "@/lib/sonification/types";
 import { VOICES, VOICE_IDS, type VoiceId } from "@/lib/sonification/voices";
 import { SonarChart } from "./SonarChart";
 
@@ -31,16 +28,25 @@ const iconButton =
 const selectClass =
   "h-10 w-full rounded-xl bg-navy-950/70 px-3 text-sm text-ink ring-1 ring-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan";
 
-/** Interactive Sound Playground with the EMA Sonar mode. Audio starts only on Play. */
-export function SoundPlayground() {
-  const p = useSonarPlayer(emaSonarMode, INITIAL_SEED);
+/**
+ * Interactive Sound Playground. Pages pass a mode id (functions cannot cross from a server
+ * page to a client component), and the matching mode is picked here. Audio starts only on Play.
+ */
+export function SoundPlayground({ modeId }: { modeId: PlayableModeId }) {
+  return modeId === "sonar-bands" ? <PlaygroundView mode={sonarBandsMode} /> : <PlaygroundView mode={emaSonarMode} />;
+}
+
+function PlaygroundView<A>({ mode }: { mode: SonificationMode<A> }) {
+  const p = useSonarPlayer(mode, INITIAL_SEED);
   const volumeId = useId();
   const playing = p.status === "playing";
   const active = p.status === "playing" || p.status === "paused";
   const tf = timeframeOption(p.timeframe);
   const readoutBar = active || p.status === "finished" ? p.cursor : VISIBLE_BARS - 1;
-  const preset = emaSonarMode.presets.find((x) => x.id === p.presetId);
+  const preset = mode.presets.find((x) => x.id === p.presetId);
   const anySolo = hasSolo(p.layers);
+  const chart = mode.chart(p.analysis);
+  const readout = mode.readout(readoutBar, p.analysis, p.options);
 
   const statusText =
     p.status === "playing"
@@ -58,7 +64,7 @@ export function SoundPlayground() {
         <fieldset>
           <legend className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-subtle">Preset</legend>
           <div className="flex flex-wrap gap-2">
-            {emaSonarMode.presets.map((x) => (
+            {mode.presets.map((x) => (
               <button
                 key={x.id}
                 type="button"
@@ -94,6 +100,24 @@ export function SoundPlayground() {
         </fieldset>
       </div>
 
+      {mode.toggles.length > 0 ? (
+        <div className="flex flex-wrap gap-3">
+          {mode.toggles.map((t) => (
+            <div key={t.id} className="flex flex-wrap items-center gap-3 rounded-2xl bg-navy-950/45 p-3 ring-1 ring-white/10">
+              <button
+                type="button"
+                aria-pressed={p.options[t.id]}
+                onClick={() => p.setOption(t.id, !p.options[t.id])}
+                className={chip(p.options[t.id])}
+              >
+                {t.label}: {p.options[t.id] ? "On" : "Off"}
+              </button>
+              <p className="max-w-xl text-xs text-muted">{t.description}</p>
+            </div>
+          ))}
+        </div>
+      ) : null}
+
       {/* Chart and live readout */}
       <div className="rounded-2xl bg-navy-950/55 p-3 ring-1 ring-white/10 sm:p-4">
         <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -104,32 +128,35 @@ export function SoundPlayground() {
           </span>
         </div>
         <SonarChart
-          analysis={p.analysis}
+          model={chart}
           revealTo={active ? p.cursor : null}
           cursor={active || p.status === "finished" ? p.cursor : null}
           timeframeLabel={tf.id}
         />
-        <ul className="mt-3 grid gap-2 sm:grid-cols-3" aria-label={`Price compared with each EMA at bar ${readoutBar + 1}`}>
-          {EMA_SONAR_LAYERS.map((l) => {
-            const r = describeEmaRelation(l.id, readoutBar, p.analysis);
-            const heard = Math.round(r.loudness * 100);
-            const muted = audibleGain(p.layers[l.id], anySolo) === 0;
+        <ul className="mt-3 grid gap-2 sm:grid-cols-3" aria-label={`Live readout at bar ${readoutBar + 1}`}>
+          {readout.map((item) => {
+            const settings = p.layers[item.id];
+            const muted = settings ? audibleGain(settings, anySolo) === 0 : false;
+            const heard = item.loudness === null ? null : Math.round(Math.min(item.loudness, 1) * 100);
             return (
-              <li key={l.id} className="rounded-xl bg-navy-900/70 p-3 ring-1 ring-white/10">
+              <li key={item.id} className="rounded-xl bg-navy-900/70 p-3 ring-1 ring-white/10">
                 <div className="flex items-center justify-between gap-2 text-sm">
                   <span className="flex items-center gap-2 font-semibold text-ink">
-                    <span aria-hidden="true" className="inline-block h-1 w-4 rounded-full" style={{ backgroundColor: l.color }} />
-                    {l.label}
+                    <span aria-hidden="true" className="inline-block h-1 w-4 rounded-full" style={{ backgroundColor: item.color }} />
+                    {item.label}
                   </span>
-                  <span className="tabular-nums text-muted">{muted ? "Silenced" : `Loudness ${heard}%`}</span>
+                  {heard !== null ? (
+                    <span className="tabular-nums text-muted">
+                      {muted ? "Silenced" : item.loudness !== null && item.loudness > 1 ? "Extra loud" : `Loudness ${heard}%`}
+                    </span>
+                  ) : null}
                 </div>
-                <div aria-hidden="true" className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/5">
-                  <div className="h-full rounded-full" style={{ width: `${muted ? 0 : heard}%`, backgroundColor: l.color }} />
-                </div>
-                <p className="mt-2 text-xs text-muted">
-                  Price is {r.side === "on" ? "right on the line" : `${Math.abs(r.distanceAtr).toFixed(1)} ATR ${r.side}`}
-                  {r.motion === "steady" ? "" : `, ${r.motion}`}.
-                </p>
+                {heard !== null ? (
+                  <div aria-hidden="true" className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/5">
+                    <div className="h-full rounded-full" style={{ width: `${muted ? 0 : heard}%`, backgroundColor: item.color }} />
+                  </div>
+                ) : null}
+                <p className="mt-2 text-xs text-muted">{item.text}</p>
               </li>
             );
           })}
@@ -188,9 +215,9 @@ export function SoundPlayground() {
       </div>
 
       {/* Layer mixer */}
-      <section aria-labelledby="mixer-title" className="rounded-2xl bg-navy-950/45 p-3 ring-1 ring-white/10 sm:p-4">
+      <section aria-labelledby={`${mode.id}-mixer-title`} className="rounded-2xl bg-navy-950/45 p-3 ring-1 ring-white/10 sm:p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <h3 id="mixer-title" className="font-sans text-base font-semibold text-ink">
+          <h3 id={`${mode.id}-mixer-title`} className="font-sans text-base font-semibold text-ink">
             Audio layers
           </h3>
           <button type="button" onClick={p.resetToPreset} className={cn(chip(false), "inline-flex items-center gap-1.5")}>
@@ -199,18 +226,18 @@ export function SoundPlayground() {
           </button>
         </div>
         <ul className="grid gap-3">
-          {EMA_SONAR_LAYERS.map((l) => (
+          {mode.layers.map((l) => (
             <LayerRow
               key={l.id}
               layer={l}
               settings={p.layers[l.id]}
               onChange={(patch) => p.updateLayer(l.id, patch)}
-              onPreview={() => void p.previewLayer(l.id, l.hz)}
+              onPreview={() => void p.previewLayer(l.id)}
             />
           ))}
         </ul>
         <p className="mt-3 text-xs text-subtle">
-          Mute, Solo and Volume change the sound right away. A new instrument or pulse speed starts on the next bar.
+          Mute, Solo and Volume change the sound right away. A new instrument, pulse speed or switch starts on the next bar.
         </p>
       </section>
     </div>
@@ -223,7 +250,7 @@ function LayerRow({
   onChange,
   onPreview,
 }: {
-  layer: EmaSonarLayerConfig;
+  layer: LayerDefinition;
   settings: LayerSettings;
   onChange: (patch: Partial<LayerSettings>) => void;
   onPreview: () => void;
@@ -242,7 +269,7 @@ function LayerRow({
           <span aria-hidden="true" className="inline-block h-1 w-4 rounded-full" style={{ backgroundColor: layer.color }} />
           {layer.label}
         </p>
-        <p className="mt-0.5 text-xs text-subtle">{layer.hz} Hz tone</p>
+        <p className="mt-0.5 text-xs text-subtle">{layer.detail}</p>
       </div>
       <label className="text-xs text-muted" htmlFor={`${base}-voice`}>
         Instrument
@@ -259,21 +286,28 @@ function LayerRow({
           ))}
         </select>
       </label>
-      <label className="text-xs text-muted" htmlFor={`${base}-rate`}>
-        Pulse speed
-        <select
-          id={`${base}-rate`}
-          value={settings.rate}
-          onChange={(e) => onChange({ rate: Number(e.target.value) as PulseRate })}
-          className={cn(selectClass, "mt-1")}
-        >
-          {PULSE_RATES.map((r) => (
-            <option key={r.value} value={r.value}>
-              {r.label}
-            </option>
-          ))}
-        </select>
-      </label>
+      {layer.kind === "continuous" ? (
+        <label className="text-xs text-muted" htmlFor={`${base}-rate`}>
+          Pulse speed
+          <select
+            id={`${base}-rate`}
+            value={settings.rate}
+            onChange={(e) => onChange({ rate: Number(e.target.value) as PulseRate })}
+            className={cn(selectClass, "mt-1")}
+          >
+            {PULSE_RATES.map((r) => (
+              <option key={r.value} value={r.value}>
+                {r.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : (
+        <p className="text-xs text-muted">
+          Pulse speed
+          <span className="mt-1 flex h-10 items-center rounded-xl px-3 text-sm text-subtle ring-1 ring-white/5">Only when it happens</span>
+        </p>
+      )}
       <label className="text-xs text-muted" htmlFor={`${base}-gain`}>
         Layer volume {Math.round(settings.gain * 100)}%
         <input
