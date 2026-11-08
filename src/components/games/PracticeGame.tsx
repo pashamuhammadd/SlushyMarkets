@@ -308,7 +308,7 @@ export function PracticeGame() {
           <Stat label="Realized P&L" value={signedMoney(round.account.realizedPnl - round.account.fees)} className={pnlColor(round.account.realizedPnl - round.account.fees)} hint="after costs" />
         </dl>
         <p role="status" className="mt-3 text-sm text-muted">
-          {position ? `${position.side === "long" ? "Long" : "Short"} from ${position.entryPrice.toFixed(2)}` : "No open position"} · {round.account.transactions} transactions · {money(round.account.fees)} costs
+          {position ? `${position.side === "long" ? "Long" : "Short"} from ${position.entryPrice.toFixed(2)}` : "No open position"} · {round.account.transactions} {round.account.transactions === 1 ? "transaction" : "transactions"} · {money(round.account.fees)} costs
         </p>
         <div className="mt-3 flex gap-2">
           <button type="button" disabled={position?.side === "long"} onClick={() => act("long")} className={cn(tradeButton, "bg-success/15 text-success ring-success/50 hover:bg-success/25")}>
