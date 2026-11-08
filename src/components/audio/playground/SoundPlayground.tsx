@@ -8,6 +8,7 @@ import { useSonarPlayer } from "@/lib/hooks/use-sonar-player";
 import { TIMEFRAME_OPTIONS, VISIBLE_BARS, timeframeOption } from "@/lib/sonification/market";
 import { BAR_SECONDS, audibleGain, hasSolo } from "@/lib/sonification/mixer";
 import { emaSonarMode } from "@/lib/sonification/modes/ema-sonar";
+import { erDrumsMode } from "@/lib/sonification/modes/er-drums";
 import type { PlayableModeId } from "@/lib/sonification/modes";
 import { sonarBandsMode } from "@/lib/sonification/modes/sonar-bands";
 import { PULSE_RATES, type LayerDefinition, type LayerSettings, type PulseRate, type SonificationMode } from "@/lib/sonification/types";
@@ -33,7 +34,9 @@ const selectClass =
  * page to a client component), and the matching mode is picked here. Audio starts only on Play.
  */
 export function SoundPlayground({ modeId }: { modeId: PlayableModeId }) {
-  return modeId === "sonar-bands" ? <PlaygroundView mode={sonarBandsMode} /> : <PlaygroundView mode={emaSonarMode} />;
+  if (modeId === "sonar-bands") return <PlaygroundView mode={sonarBandsMode} />;
+  if (modeId === "sonar-er-drums") return <PlaygroundView mode={erDrumsMode} />;
+  return <PlaygroundView mode={emaSonarMode} />;
 }
 
 function PlaygroundView<A>({ mode }: { mode: SonificationMode<A> }) {

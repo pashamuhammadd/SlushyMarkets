@@ -13,6 +13,7 @@ import {
   emaSonarMode,
 } from "./modes/ema-sonar";
 import { MODE_LISTINGS } from "./modes";
+import { analyzeErDrums, ER_DRUM, erDrumsChart, erDrumsEvents, erDrumsMode, erDrumsReadout, lowEfficiencyZones } from "./modes/er-drums";
 import {
   analyzeSonarBands,
   BAND_ATR_MULTIPLIER,
@@ -169,7 +170,7 @@ describe("EMA Sonar", () => {
 
   it("lists exactly the implemented modes as live, each with a page", () => {
     const live = MODE_LISTINGS.filter((m) => m.status === "live");
-    expect(live.map((m) => m.id)).toEqual([emaSonarMode.id, sonarBandsMode.id]);
+    expect(live.map((m) => m.id)).toEqual([emaSonarMode.id, sonarBandsMode.id, erDrumsMode.id]);
     expect(live.every((m) => m.href)).toBe(true);
   });
 
@@ -327,5 +328,70 @@ describe("event layers", () => {
     expect(notesForBar(layer("event"), slow, [note], 3)).toEqual([note]);
     expect(notesForBar(layer("continuous"), slow, [note], 3)).toEqual([]);
     expect(notesForBar(layer("event"), { ...slow, rate: 4 }, [note], 2)).toEqual([note]);
+  });
+});
+
+describe("ER drums", () => {
+  const series = buildMarket(20261108, "15m");
+  const analysis = analyzeErDrums(series);
+
+  it("matches the worked examples on the page", () => {
+    const fromMoves = (moves: number[]) => moves.reduce<number[]>((acc, m) => [...acc, acc[acc.length - 1] + m], [100]);
+    expect(efficiencyRatio(fromMoves([1, 1, 1, 1, 1, 1, 1]), 7)[7]).toBe(1);
+    expect(efficiencyRatio(fromMoves([2, -1, 2, -1, 2, -1, 2]), 7)[7]).toBeCloseTo(5 / 11, 10);
+    expect(efficiencyRatio(fromMoves([1, -1, 1, -1, 1, -1, 1]), 7)[7]).toBeCloseTo(1 / 7, 10);
+  });
+
+  it("computes ER(7) from the full series for every visible bar", () => {
+    const full = efficiencyRatio(series.map((b) => b.close), 7);
+    expect(analysis.er).toHaveLength(VISIBLE_BARS);
+    expect(analysis.er[0]).toBe(full[WARMUP_BARS]);
+    expect(analysis.er[VISIBLE_BARS - 1]).toBe(full[full.length - 1]);
+  });
+
+  it("plays three drum hits only while ER(7) is below 0.5", () => {
+    let played = 0;
+    let rested = 0;
+    analysis.er.forEach((er, i) => {
+      const notes = erDrumsEvents("erDrums", i, analysis, {});
+      if (er < 0.5) {
+        played += 1;
+        expect(notes.map((n) => n.offsetSec)).toEqual([0, 0.15, 0.3]);
+        expect(notes.every((n) => n.hz === ER_DRUM.hz && n.offsetSec + n.durationSec < BAR_SECONDS)).toBe(true);
+      } else {
+        rested += 1;
+        expect(notes).toEqual([]);
+      }
+    });
+    expect(played).toBeGreaterThan(0);
+    expect(rested).toBeGreaterThan(0);
+  });
+
+  it("reuses the Sonar Bands channel with motion off by default", () => {
+    expect(erDrumsEvents("upper", 5, analysis, {})).toEqual(sonarBandsEvents("upper", 5, analysis, { motion: false }));
+    expect(resolveOptions(erDrumsMode.toggles)).toEqual({ motion: false });
+    expect(erDrumsMode.layers.map((l) => l.id)).toEqual(["erDrums", ...sonarBandsMode.layers.map((l) => l.id)]);
+  });
+
+  it("shades each run of low efficiency bars once", () => {
+    expect(lowEfficiencyZones([0.6, 0.3, 0.2, 0.7, 0.4]).map(({ from, to }) => [from, to])).toEqual([
+      [1, 2],
+      [4, 4],
+    ]);
+    expect(lowEfficiencyZones([0.9, 0.5])).toEqual([]);
+    const zones = erDrumsChart(analysis).zones ?? [];
+    const shaded = zones.reduce((n, z) => n + z.to - z.from + 1, 0);
+    expect(shaded).toBe(analysis.er.filter((v) => v < 0.5).length);
+  });
+
+  it("explains the ER value in the readout", () => {
+    const item = erDrumsReadout(10, analysis).find((x) => x.id === "erDrums");
+    expect(item?.text).toContain(analysis.er[10].toFixed(2));
+  });
+
+  it("has presets for every layer", () => {
+    for (const preset of erDrumsMode.presets) {
+      expect(Object.keys(preset.layers).sort()).toEqual(erDrumsMode.layers.map((l) => l.id).sort());
+    }
   });
 });

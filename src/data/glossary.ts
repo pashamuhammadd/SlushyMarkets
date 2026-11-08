@@ -160,6 +160,11 @@ export const GLOSSARY: GlossarySection[] = [
         definition: "A repeating tone that gets louder as price gets closer to a line, like a sonar ping. Used by EMA Sonar and Sonar Bands.",
       },
       {
+        id: "efficiency-ratio",
+        term: "Efficiency Ratio (ER)",
+        definition: "Net price change divided by the total distance travelled. Near 1 is a straight move, near 0 is choppy back and forth.",
+      },
+      {
         id: "price-channel",
         term: "Price channel",
         definition: "A band above and a band below a moving average. Sonar Bands sets them 1.7 average ranges from a 10 bar EMA.",
