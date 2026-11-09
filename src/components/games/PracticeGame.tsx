@@ -198,7 +198,7 @@ export function PracticeGame() {
               <span className="font-semibold text-ink">{CONFIG.rounds} rounds, 1 minute each.</span> Each chart starts with one candle and grows. You only see what has already happened.
             </li>
             <li className="rounded-xl bg-navy-950/50 p-4 ring-1 ring-white/10">
-              <span className="font-semibold text-ink">{money(CONFIG.startingBalance)} virtual per round.</span> Go long, go short or close. Each transaction costs {(CONFIG.feeRate * 100).toFixed(1)}% of the position, and any open position closes when the minute ends.
+              <span className="font-semibold text-ink">{money(CONFIG.startingBalance)} virtual per round.</span> Go long, go short or close. Each transaction pays a {(CONFIG.feeRate * 100).toFixed(2)}% fee and {(CONFIG.slippageRate * 100).toFixed(2)}% slippage, and any open position closes when the minute ends.
             </li>
             <li className="rounded-xl bg-navy-950/50 p-4 ring-1 ring-white/10">
               <span className="font-semibold text-ink">Sound is optional.</span> The presets use EMA Sonar: a line gets louder as price comes close to it. Change the sound at any time.

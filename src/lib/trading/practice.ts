@@ -27,14 +27,19 @@ export type Account = {
 
 export const PRACTICE_CONFIG = {
   startingBalance: 10_000,
-  /** Provisional: 0.1% of position value per transaction, until Slushy confirms a fee. */
-  feeRate: 0.001,
+  /** Set by Slushy: 0.05% fee and 0.02% adverse slippage per side, no commission. */
+  feeRate: 0.0005,
+  slippageRate: 0.0002,
   rounds: 3,
   /** 120 bars at 0.5 seconds each is one minute. */
   barsPerRound: 120,
   barSeconds: 0.5,
   warmupBars: 60,
 } as const;
+
+/** Price actually received: buying pays a little more, selling receives a little less. */
+const slipped = (price: number, buying: boolean) => price * (1 + (buying ? 1 : -1) * PRACTICE_CONFIG.slippageRate);
+const exitFill = (account: Account, price: number) => slipped(price, account.position?.side === "short");
 
 export function createAccount(startingBalance: number = PRACTICE_CONFIG.startingBalance): Account {
   return { startingBalance, balance: startingBalance, position: null, realizedPnl: 0, fees: 0, transactions: 0, peakEquity: startingBalance, maxDrawdown: 0 };
@@ -114,7 +119,7 @@ export function advanceRound(state: RoundState, bars: readonly Bar[], target: nu
   let account = state.account;
   for (let i = state.bar + 1; i <= to; i += 1) account = markToMarket(account, bars[i].close);
   if (to >= last) {
-    account = markToMarket(closePosition(account, bars[last].close), bars[last].close);
+    account = markToMarket(closePosition(account, exitFill(account, bars[last].close)), bars[last].close);
     return { bar: last, account, finished: true };
   }
   return { ...state, bar: Math.max(state.bar, to), account };
@@ -125,7 +130,12 @@ export type TradeAction = Side | "close";
 export function tradeRound(state: RoundState, bars: readonly Bar[], action: TradeAction): RoundState {
   if (state.finished) return state;
   const price = bars[state.bar].close;
-  const next = action === "close" ? closePosition(state.account, price) : openPosition(state.account, action, price);
+  const next =
+    action === "close"
+      ? closePosition(state.account, exitFill(state.account, price))
+      : state.account.position && state.account.position.side !== action
+        ? openPosition(closePosition(state.account, exitFill(state.account, price)), action, slipped(price, action === "long"))
+        : openPosition(state.account, action, slipped(price, action === "long"));
   return next === state.account ? state : { ...state, account: markToMarket(next, price) };
 }
 
