@@ -16,7 +16,7 @@ Route: `/games/practice`. Engine: `src/lib/trading/practice.ts` (pure functions,
 ## Provisional, needs Slushy
 
 - Charts are simulated with the Sound Playground generator and labeled so. Historical BTC needs a verified source, timestamps, OHLC checks and confirmed usage rights.
-- Fee of 0.1% per transaction is a placeholder.
+- Costs follow Slushy: 0.05% fee and 0.02% slippage per side.
 - Optional leverage (reported: unlocks after $200 virtual profit, up to 5x, black and white candles) is not built, because the rules could not be checked against the prototype in this session.
 
 ## Experiment versus practice

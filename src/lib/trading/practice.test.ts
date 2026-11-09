@@ -90,7 +90,7 @@ describe("round flow", () => {
   it("fills at the latest revealed bar and closes at the end", () => {
     let s = advanceRound(createRound(), bars, 1);
     s = tradeRound(s, bars, "long");
-    expect(s.account.position?.entryPrice).toBe(110);
+    expect(s.account.position?.entryPrice).toBeCloseTo(110 * 1.0002, 8);
     s = advanceRound(s, bars, 3);
     expect(s.finished).toBe(true);
     expect(s.account.position).toBeNull();
