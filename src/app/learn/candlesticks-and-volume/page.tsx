@@ -57,7 +57,7 @@ export default function CandlesticksAndVolumePage() {
         eyebrow="Lesson 1"
         title="Candlesticks and Volume"
         description="Watch candles form from individual trades while the very same trades stack up as volume by price."
-        pose="trading"
+        pose="candleCarry"
       >
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
           <Badge tone="cyan">

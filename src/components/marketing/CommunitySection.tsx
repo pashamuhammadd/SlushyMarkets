@@ -29,7 +29,7 @@ export function CommunitySection() {
           </div>
           <div className="flex shrink-0 flex-col items-center gap-2 self-center">
             <SpeechBubble>Good ideas?</SpeechBubble>
-            <Mascot pose="cool" sizes="128px" className="w-28 sm:w-32" />
+            <Mascot pose="megaphone" sizes="128px" className="w-28 sm:w-32" />
           </div>
         </div>
 

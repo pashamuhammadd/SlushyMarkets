@@ -64,7 +64,7 @@ export default function SoprLessonPage() {
         eyebrow="On-Chain Metrics · Lesson 1"
         title="SOPR: was the coin worth more when it moved?"
         description="Spent Output Profit Ratio compares what moved coins were worth when they were created with what they were worth when they were spent."
-        pose="thinking"
+        pose="chainDetective"
       >
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
           <Badge tone="cyan">

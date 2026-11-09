@@ -11,9 +11,9 @@ const base =
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-linear-to-r from-cyan to-icy text-navy-950 shadow-glow-cyan hover:brightness-110 hover:-translate-y-0.5 active:translate-y-0",
+    "btn-sheen bg-linear-to-r from-cyan to-icy text-navy-950 shadow-glow-cyan hover:brightness-110 hover:-translate-y-0.5 active:translate-y-0",
   secondary:
-    "border border-cyan/40 bg-navy-800/60 text-ink hover:border-cyan hover:bg-navy-700/80 hover:-translate-y-0.5 active:translate-y-0",
+    "btn-spin border border-cyan/40 bg-navy-800/60 text-ink hover:border-cyan hover:bg-navy-700/80 hover:-translate-y-0.5 active:translate-y-0",
   ghost: "text-muted hover:text-ink hover:bg-white/5",
 };
 

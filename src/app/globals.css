@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./motion.css";
 
 /*
  * SlushyMarkets design tokens.
@@ -75,6 +76,8 @@
   }
 
   body {
+    /* clip, not hidden, so the sticky header keeps working while sections slide in */
+    overflow-x: clip;
     background-color: var(--color-navy-900);
     color: var(--color-ink);
     font-family: var(--font-sans);

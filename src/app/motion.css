@@ -1,0 +1,124 @@
+/*
+ * SlushyMarkets motion. Each element family moves in its own way:
+ * mascots act out their pose, page sections enter differently on scroll, and buttons, cards
+ * and icons each have their own hover. Loops rest between beats so a page is never busy.
+ * Charts, sliders and playback areas are left alone so they stay easy to read.
+ * Global reduced motion handling lives in globals.css.
+ */
+
+/* Mascot idles, one per pose */
+[class*="idle-"] {
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+.idle-wave { animation: m-wave 4.2s ease-in-out infinite; }
+.idle-groove { animation: m-groove 1.8s ease-in-out infinite; }
+.idle-sway { animation: m-sway 3.2s ease-in-out infinite; }
+.idle-keys { animation: m-keys 3.6s ease-in-out infinite; }
+.idle-scan { animation: m-scan 5.5s ease-in-out infinite; }
+.idle-drum { animation: m-drum 3s linear infinite; }
+.idle-tick { animation: m-tick 2s steps(1, end) infinite; transform-origin: 50% 60%; }
+.idle-mash { animation: m-mash 3.4s linear infinite; }
+.idle-shout { animation: m-shout 3.8s ease-out infinite; transform-origin: 35% 60%; }
+.idle-point { animation: m-point 3.4s ease-in-out infinite; }
+.idle-heave { animation: m-heave 3.2s ease-in-out infinite; }
+.idle-surf { animation: m-surf 5s ease-in-out infinite; transform-origin: 50% 80%; }
+.idle-stack { animation: m-stack 3.6s cubic-bezier(0.3, 1.4, 0.5, 1) infinite; }
+.idle-peer { animation: m-peer 6s ease-in-out infinite; }
+.idle-balance { animation: m-balance 4.6s ease-in-out infinite; }
+.idle-cheer { animation: m-cheer 2.8s cubic-bezier(0.3, 1.5, 0.5, 1) infinite; }
+.idle-nod { animation: m-nod 4.4s ease-in-out infinite; transform-origin: 50% 70%; }
+.idle-puzzled { animation: m-puzzled 6.5s ease-in-out infinite; }
+.idle-fix { animation: m-fix 4s linear infinite; }
+.idle-hover { animation: m-hover 5s ease-in-out infinite; }
+.idle-float { animation: float 6s ease-in-out infinite; }
+.idle-peek { animation: m-peek 5s ease-in-out infinite; }
+
+@keyframes m-wave { 0%, 45%, 100% { transform: rotate(0); } 10%, 30% { transform: rotate(3.5deg); } 20% { transform: rotate(-2deg); } }
+@keyframes m-groove { 0%, 100% { transform: translateY(0) rotate(-1.2deg); } 50% { transform: translateY(-5px) rotate(1.2deg); } }
+@keyframes m-sway { 0%, 100% { transform: translateX(-3px) rotate(-0.8deg); } 50% { transform: translateX(3px) rotate(0.8deg); } }
+@keyframes m-keys { 0%, 50%, 100% { transform: scaleY(1); } 8%, 24%, 40% { transform: scaleY(0.975); } 16%, 32% { transform: scaleY(1.01); } }
+@keyframes m-scan { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+@keyframes m-drum { 0%, 42%, 100% { transform: translateY(0); } 6%, 18%, 30% { transform: translateY(-5px) scaleY(1.01); } 12%, 24%, 36% { transform: translateY(1px) scaleY(0.985); } }
+@keyframes m-tick { 0%, 50% { transform: rotate(-1.6deg); } 25%, 75% { transform: rotate(1.6deg); } }
+@keyframes m-mash { 0%, 36%, 100% { transform: translate(0, 0); } 6%, 18%, 30% { transform: translate(-1.5px, 1px); } 12%, 24% { transform: translate(1.5px, -1px); } }
+@keyframes m-shout { 0%, 42%, 100% { transform: scale(1); } 10% { transform: scale(1.05) rotate(-1deg); } 26% { transform: scale(0.99); } }
+@keyframes m-point { 0%, 50%, 100% { transform: translateX(0); } 18% { transform: translateX(7px); } 32% { transform: translateX(3px); } }
+@keyframes m-heave { 0%, 100% { transform: scale(1, 1); } 45% { transform: scale(1.025, 0.965); } 62% { transform: scale(0.985, 1.025) translateY(-3px); } }
+@keyframes m-surf { 0%, 100% { transform: translate(-6px, 2px) rotate(-3deg); } 25% { transform: translate(0, -6px) rotate(1deg); } 50% { transform: translate(6px, 1px) rotate(3deg); } 75% { transform: translate(0, 5px) rotate(-1deg); } }
+@keyframes m-stack { 0%, 60%, 100% { transform: translateY(0); } 15% { transform: translateY(-9px); } 32% { transform: translateY(0); } 42% { transform: translateY(-3px); } }
+@keyframes m-peer { 0%, 20%, 100% { transform: translateX(0) rotate(0); } 32%, 50% { transform: translateX(-6px) rotate(-1.5deg); } 65%, 82% { transform: translateX(6px) rotate(1.5deg); } }
+@keyframes m-balance { 0%, 100% { transform: rotate(-2.5deg); } 50% { transform: rotate(2.5deg); } }
+@keyframes m-cheer { 0%, 55%, 100% { transform: translateY(0) scale(1); } 20% { transform: translateY(-14px) scale(1.02); } 40% { transform: translateY(0) scale(1.02, 0.97); } }
+@keyframes m-nod { 0%, 40%, 100% { transform: rotate(0); } 10%, 28% { transform: rotate(2.4deg) translateY(1px); } 19% { transform: rotate(-0.6deg); } }
+@keyframes m-puzzled { 0%, 30%, 100% { transform: rotate(0); } 40%, 58% { transform: rotate(-3.5deg); } 68%, 86% { transform: rotate(2.5deg); } }
+@keyframes m-fix { 0%, 62%, 100% { transform: rotate(0); } 8%, 24%, 40% { transform: rotate(2deg); } 16%, 32%, 48% { transform: rotate(-2deg); } }
+@keyframes m-hover { 0%, 100% { transform: translateY(0) rotate(-0.8deg); } 50% { transform: translateY(-4px) rotate(0.8deg); } }
+@keyframes m-peek { 0%, 55%, 100% { transform: translateY(8px); } 66%, 88% { transform: translateY(-2px) rotate(-5deg); } }
+
+/* One time entrances */
+.enter-pop { animation: e-pop 0.75s cubic-bezier(0.25, 1.45, 0.4, 1) both 0.1s; }
+.enter-stamp { animation: e-stamp 0.55s cubic-bezier(0.3, 1.6, 0.5, 1) both 0.15s; }
+.enter-slide { animation: e-slide 0.45s ease-out both; }
+.answer-right { animation: e-right 0.45s cubic-bezier(0.3, 1.6, 0.5, 1); }
+.answer-wrong { animation: e-wrong 0.42s ease-in-out; }
+
+@keyframes e-pop { from { opacity: 0; transform: translateY(26px) scale(0.72) rotate(-5deg); } to { opacity: 1; transform: none; } }
+@keyframes e-stamp { from { opacity: 0; transform: scale(2.1) rotate(-16deg); } to { opacity: 1; transform: none; } }
+@keyframes e-slide { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+@keyframes e-right { 40% { transform: scale(1.025); } }
+@keyframes e-wrong { 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
+
+/* Decorations */
+.deco-drift { animation: d-drift 11s ease-in-out infinite, d-twinkle 5s ease-in-out infinite; }
+.deco-sweep { animation: d-sweep 4.5s ease-in-out infinite; -webkit-mask-size: 300% 100%; mask-size: 300% 100%; -webkit-mask-image: linear-gradient(90deg, #000 35%, rgb(0 0 0 / 0.35) 50%, #000 65%); mask-image: linear-gradient(90deg, #000 35%, rgb(0 0 0 / 0.35) 50%, #000 65%); }
+
+@keyframes d-drift { 0%, 100% { transform: translate(0, 0) rotate(0); } 50% { transform: translate(-14px, 12px) rotate(4deg); } }
+@keyframes d-twinkle { 0%, 100% { opacity: 0.45; } 50% { opacity: 0.8; } }
+@keyframes d-sweep { from { -webkit-mask-position: 100% 0; mask-position: 100% 0; } to { -webkit-mask-position: 0% 0; mask-position: 0% 0; } }
+
+/* Hover: buttons, logo, cards and icons each differ */
+.btn-sheen { position: relative; overflow: hidden; }
+.btn-sheen::after { content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.55) 50%, transparent 65%); transform: translateX(-120%); pointer-events: none; }
+.btn-sheen:hover::after { transform: translateX(120%); transition: transform 0.7s ease; }
+.btn-sheen svg:last-child { transition: transform 0.25s ease; }
+.btn-sheen:hover svg:last-child { transform: translateX(4px); }
+.btn-spin svg:first-child { transition: transform 0.4s cubic-bezier(0.3, 1.6, 0.5, 1); }
+.btn-spin:hover svg:first-child { transform: rotate(-14deg) scale(1.18); }
+
+.logo-head { transform-origin: 50% 90%; transition: transform 0.3s cubic-bezier(0.3, 1.6, 0.5, 1); }
+.group:hover .logo-head { transform: rotate(-9deg) scale(1.1); }
+
+.card-lift { transition: translate 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease; }
+.card-lift:hover { translate: 0 -5px; border-color: rgb(55 213 250 / 0.4); box-shadow: var(--shadow-glow-cyan); }
+.card-tilt { transition: rotate 0.3s cubic-bezier(0.3, 1.5, 0.5, 1), border-color 0.3s ease; }
+.card-tilt:nth-child(odd):hover { rotate: -0.7deg; border-color: rgb(240 93 235 / 0.4); }
+.card-tilt:nth-child(even):hover { rotate: 0.7deg; border-color: rgb(139 92 246 / 0.5); }
+
+.icon-hop { transition: transform 0.35s cubic-bezier(0.3, 1.7, 0.5, 1); }
+.group:hover .icon-hop { transform: translateY(-4px) rotate(-6deg) scale(1.08); }
+.icon-wobble { transform-origin: 50% 80%; }
+.group:hover .icon-wobble { animation: h-wobble 0.6s ease-in-out; }
+@keyframes h-wobble { 25% { transform: rotate(-9deg); } 60% { transform: rotate(7deg); } }
+
+/* Scroll reveals, only where the browser supports scroll timelines. Elsewhere content simply shows. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    [class*="reveal-"] { animation-timing-function: ease-out; animation-fill-mode: both; animation-timeline: view(); animation-range: entry 0% entry 55%; }
+    .reveal-rise { animation-name: r-rise; }
+    .reveal-left { animation-name: r-left; }
+    .reveal-right { animation-name: r-right; }
+    .reveal-zoom { animation-name: r-zoom; }
+    .reveal-alt:nth-child(odd) { animation-name: r-left; }
+    .reveal-alt:nth-child(even) { animation-name: r-right; }
+    .reveal-tilt { animation-name: r-tilt; transform-origin: 50% 100%; }
+    .reveal-blur { animation-name: r-blur; }
+  }
+}
+
+@keyframes r-rise { from { opacity: 0; transform: translateY(44px); } }
+@keyframes r-left { from { opacity: 0; transform: translateX(-46px); } }
+@keyframes r-right { from { opacity: 0; transform: translateX(46px); } }
+@keyframes r-zoom { from { opacity: 0; transform: scale(0.93); } }
+@keyframes r-tilt { from { opacity: 0; transform: perspective(900px) rotateX(16deg); } }
+@keyframes r-blur { from { opacity: 0; filter: blur(9px); } }

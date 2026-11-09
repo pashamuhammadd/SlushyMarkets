@@ -224,7 +224,7 @@ export function PracticeGame() {
       <div className="space-y-5">
         <section className="panel panel-glow p-5 sm:p-6" aria-live="polite">
           <div className="flex flex-col items-center gap-4 sm:flex-row">
-            {phase === "final" ? <Mascot pose="celebrate" sizes="140px" className="w-28 shrink-0" /> : null}
+            {phase === "final" ? <Mascot pose="quizTryAgain" sizes="140px" className="w-28 shrink-0" /> : null}
             <div>
               <h2 className="text-2xl font-semibold text-ink">{phase === "final" ? "Your practice results" : `Round ${results.length} complete`}</h2>
               <p className={cn("mt-1 font-display text-3xl font-semibold tabular-nums", pnlColor(total.netPnl))}>

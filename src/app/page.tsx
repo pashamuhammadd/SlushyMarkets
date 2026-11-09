@@ -20,11 +20,21 @@ export default function HomePage() {
     <div className="flex flex-col gap-10 sm:gap-14">
       <Hero />
       <FeatureCards />
-      <LessonPreviewSection />
-      <ThreeTrendsSection />
-      <HowItWorks />
-      <LearningPath />
-      <CommunitySection />
+      <div className="reveal-zoom">
+        <LessonPreviewSection />
+      </div>
+      <div className="reveal-left">
+        <ThreeTrendsSection />
+      </div>
+      <div className="reveal-tilt">
+        <HowItWorks />
+      </div>
+      <div className="reveal-blur">
+        <LearningPath />
+      </div>
+      <div className="reveal-right">
+        <CommunitySection />
+      </div>
     </div>
   );
 }

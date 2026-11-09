@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ListChecks } from "lucide-react";
+import { Mascot } from "@/components/brand/Mascot";
 import { Badge } from "@/components/ui/Badge";
 import { SectionHeading } from "@/components/ui/Section";
 import { cn } from "@/lib/cn";
@@ -45,7 +46,7 @@ export function PlaygroundModesList() {
       />
       <ul className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
         {MODE_LISTINGS.map((m) => (
-          <li key={m.id} className="panel p-4">
+          <li key={m.id} className="panel reveal-rise p-4">
             <div className="flex items-center justify-between gap-2">
               <h3 className="font-sans text-sm font-semibold text-ink">
                 {m.href ? (
@@ -58,7 +59,10 @@ export function PlaygroundModesList() {
               </h3>
               <Badge tone={m.status === "live" ? "success" : "neutral"}>{m.status === "live" ? "Live" : "Planned"}</Badge>
             </div>
-            <p className="mt-2 text-sm text-muted">{m.summary}</p>
+            <div className="mt-2 flex items-end justify-between gap-3">
+              <p className="text-sm text-muted">{m.summary}</p>
+              {m.status === "planned" ? <Mascot pose="comingSoon" decorative still sizes="48px" className="w-10 shrink-0" /> : null}
+            </div>
           </li>
         ))}
       </ul>

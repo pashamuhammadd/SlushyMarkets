@@ -91,7 +91,7 @@ export default function ExplorePage() {
                   href={lesson.href!}
                   className="panel group flex h-full items-center gap-4 p-4 transition hover:-translate-y-0.5 hover:border-cyan/40"
                 >
-                  <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-navy-950/70 p-2.5 ring-1 ring-white/10">
+                  <span className="block size-14 shrink-0">
                     <LessonIcon kind={lesson.icon} />
                   </span>
                   <span className="min-w-0 flex-1">

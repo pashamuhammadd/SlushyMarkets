@@ -38,7 +38,7 @@ export default function PracticePage() {
         eyebrow="Practice Mode"
         title="Three Charts. One Minute Each. Find Your Sound."
         description="Trade three simulated charts with virtual money. Try them with sound, try them in silence, and see what changes for you."
-        pose="cool"
+        pose="stopwatch"
       >
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
           <Badge tone="violet">Simulated data</Badge>

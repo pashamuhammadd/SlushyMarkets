@@ -1,5 +1,5 @@
 import { ArrowRight, AudioLines, BarChart3, GraduationCap, PlayCircle, UserRoundCheck } from "lucide-react";
-import { Mascot } from "@/components/brand/Mascot";
+import { BrandImage, Mascot } from "@/components/brand/Mascot";
 import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Section";
@@ -15,6 +15,7 @@ export function Hero() {
   return (
     <section aria-labelledby="hero-title" className="relative overflow-hidden">
       <div aria-hidden="true" className="grid-lines pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" />
+      <BrandImage name="deco-ice-crystals" sizes="240px" className="deco-drift pointer-events-none absolute left-[44%] top-6 hidden h-auto w-52 -scale-x-100 lg:block" />
       <Container className="relative grid items-center gap-8 pb-10 pt-10 sm:pt-14 lg:grid-cols-[1.05fr_1fr] lg:gap-6 lg:pb-16 lg:pt-16">
         <div className="animate-fade-up">
           <p className="mb-4 font-display text-lg font-semibold tracking-tight sm:text-xl">
@@ -34,10 +35,15 @@ export function Hero() {
             with quick exercises. Made for curious beginners, guided by LiquiditySlushy.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <ButtonLink href="/learn" size="lg">
-              Start Learning
-              <ArrowRight aria-hidden="true" className="size-5" />
-            </ButtonLink>
+            <div className="relative flex">
+              <div aria-hidden="true" className="pointer-events-none absolute -top-7 right-5">
+                <Mascot pose="headWink" decorative sizes="40px" className="w-7" />
+              </div>
+              <ButtonLink href="/learn" size="lg" className="flex-1">
+                Start Learning
+                <ArrowRight aria-hidden="true" className="size-5" />
+              </ButtonLink>
+            </div>
             <ButtonLink href="/explore" size="lg" variant="secondary">
               <PlayCircle aria-hidden="true" className="size-5 text-cyan" />
               Explore Demo

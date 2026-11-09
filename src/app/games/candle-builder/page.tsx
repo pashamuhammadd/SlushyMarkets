@@ -39,7 +39,7 @@ export default function CandleBuilderPage() {
         eyebrow="Game"
         title="Candle Builder"
         description="Every candle is a summary of trades. Read one minute of trades and build its candle yourself."
-        pose="cool"
+        pose="candleCarry"
       >
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
           <Badge tone="cyan">Practice</Badge>

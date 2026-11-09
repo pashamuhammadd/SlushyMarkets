@@ -62,7 +62,7 @@ export default function MvrvLessonPage() {
         eyebrow="On-Chain Metrics · Lesson 2"
         title="MVRV: two buckets, two prices"
         description="Market value prices every coin at today's price. Realized value prices each coin at the moment it last moved. MVRV is one divided by the other."
-        pose="cool"
+        pose="twoBuckets"
       >
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
           <Badge tone="cyan">

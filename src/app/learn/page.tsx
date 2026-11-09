@@ -32,14 +32,14 @@ export default function LearnPage() {
         eyebrow="Learn"
         title="Trading lessons"
         description="Short lessons that show how charts and indicators are built, not just what they look like. Every module is labeled honestly so you know what is ready today."
-        pose="thinking"
+        pose="welcomeWave"
       />
       <Container>
         <ul className="grid gap-4 md:grid-cols-2">
           {lessons.map((lesson) => (
-            <li key={lesson.slug} id={lesson.slug} className="panel flex scroll-mt-24 flex-col p-5 sm:p-6">
+            <li key={lesson.slug} id={lesson.slug} className="group panel card-lift flex scroll-mt-24 flex-col p-5 reveal-alt sm:p-6">
               <div className="flex items-start gap-4">
-                <span className="grid size-16 shrink-0 place-items-center rounded-2xl bg-navy-950/70 p-2.5 ring-1 ring-white/10">
+                <span className="block size-16 shrink-0">
                   <LessonIcon kind={lesson.icon} />
                 </span>
                 <div className="min-w-0 flex-1">

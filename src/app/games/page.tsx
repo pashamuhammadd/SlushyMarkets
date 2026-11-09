@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Gamepad2, ShieldCheck } from "lucide-react";
+import { ArrowRight, ShieldCheck } from "lucide-react";
+import { BrandImage, Mascot } from "@/components/brand/Mascot";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Badge } from "@/components/ui/Badge";
@@ -29,14 +30,14 @@ export default function GamesPage() {
         eyebrow="Games"
         title="Practice games"
         description="Quick games that turn each lesson into practice. Play as often as you like; your best score stays on this device."
-        pose="excited"
+        pose="gameController"
       />
       <Container className="space-y-8">
         <ul className="grid gap-4 md:grid-cols-2">
           {games.map((game) => (
-            <li key={game.slug} className="panel flex flex-col p-5 sm:p-6">
+            <li key={game.slug} className="group panel card-tilt reveal-zoom relative flex flex-col p-5 sm:p-6">
               <div className="flex flex-wrap items-center gap-2">
-                <Gamepad2 aria-hidden="true" className="size-5 text-cyan" />
+                <BrandImage name="icon-games" sizes="32px" className="icon-wobble size-8" />
                 <h2 className="text-xl font-semibold text-ink">{game.title}</h2>
                 <Badge tone={game.status === "available" ? "success" : "neutral"}>
                   {game.status === "available" ? "Play now" : "Planned"}
@@ -50,7 +51,10 @@ export default function GamesPage() {
                     Play {game.title} <ArrowRight aria-hidden="true" className="size-4" />
                   </Link>
                 ) : (
-                  <span className="text-sm text-subtle">Not available yet</span>
+                  <div className="flex items-end justify-between gap-3">
+                    <span className="text-sm text-subtle">Not available yet</span>
+                    <Mascot pose="comingSoon" decorative still sizes="56px" className="-mb-2 w-12" />
+                  </div>
                 )}
               </div>
             </li>

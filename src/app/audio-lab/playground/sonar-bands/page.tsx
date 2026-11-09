@@ -58,7 +58,7 @@ export default function SonarBandsPage() {
         eyebrow="Audio Lab · Sound Playground"
         title="Sonar Bands"
         description="A channel follows the market: a midline with one band above and one below. Each band has its own organ that swells as price comes near. Chimes tell you when price breaks out, knocks tell you when it comes back."
-        pose="thinking"
+        pose="sonarRadar"
       >
         <div className="flex flex-wrap gap-2">
           <Badge tone="violet">Simulated data</Badge>

@@ -16,7 +16,7 @@ export default function Error({ error, retry }: { error: unknown; retry: () => v
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col items-center px-4 py-20 text-center">
-      <Mascot pose="sad" sizes="128px" className="w-28" />
+      <Mascot pose="repairWrench" sizes="128px" className="w-28" />
       <h1 className="mt-6 text-4xl font-bold text-ink">Something went wrong</h1>
       <p className="mt-3 max-w-md text-muted">
         This part of SlushyMarkets did not load. Please try again. If it keeps happening, tell us on the feedback page.

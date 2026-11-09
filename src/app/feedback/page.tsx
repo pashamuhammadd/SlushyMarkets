@@ -29,7 +29,7 @@ export default function FeedbackPage() {
         eyebrow="Feedback"
         title="Help shape SlushyMarkets"
         description="Your feedback decides which lessons come next and how they should feel."
-        pose="cool"
+        pose="megaphone"
       />
       <Container className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
         <section aria-label="Feedback form" className="panel panel-glow relative p-5 sm:p-7">
