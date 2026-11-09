@@ -49,10 +49,10 @@ export type EmaSonarAnalysis = {
   emas: Record<EmaLayerId, number[]>;
 };
 
-export function analyzeEmaSonar(series: readonly Bar[]): EmaSonarAnalysis {
+export function analyzeEmaSonar(series: readonly Bar[], visibleBars: number = VISIBLE_BARS): EmaSonarAnalysis {
   const closes = series.map((b) => b.close);
   const atrAll = averageRange(series, ATR_PERIOD);
-  const start = Math.max(0, series.length - VISIBLE_BARS);
+  const start = Math.max(0, series.length - visibleBars);
   const emas = {} as Record<EmaLayerId, number[]>;
   for (const layer of EMA_SONAR_LAYERS) {
     const line = ema(closes, layer.period);
@@ -186,7 +186,7 @@ export const emaSonarMode: SonificationMode<EmaSonarAnalysis> = {
   })),
   presets: EMA_SONAR_PRESETS,
   toggles: [],
-  analyze: analyzeEmaSonar,
+  analyze: (series) => analyzeEmaSonar(series),
   events: emaSonarEvents,
   chart: emaSonarChart,
   readout: emaSonarReadout,

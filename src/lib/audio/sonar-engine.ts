@@ -122,6 +122,11 @@ export class SonarEngine {
 
 let shared: SonarEngine | null = null;
 
+/** The engine if one exists. Never creates an AudioContext, so it is safe outside a click. */
+export function peekSonarEngine(): SonarEngine | null {
+  return shared;
+}
+
 /** One engine for the whole page. Call only from a click or key handler. */
 export function getSonarEngine(): SonarEngine {
   if (!shared) shared = new SonarEngine();
