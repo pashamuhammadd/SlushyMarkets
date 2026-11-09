@@ -1,6 +1,6 @@
 import { ArrowRight, Music, Info } from "lucide-react";
 import { TrendTiles } from "@/components/audio/TrendTiles";
-import { Mascot } from "@/components/brand/Mascot";
+import { BrandImage, Mascot } from "@/components/brand/Mascot";
 import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
 import { Container, SectionHeading } from "@/components/ui/Section";
@@ -26,7 +26,8 @@ export function ThreeTrendsSection() {
           <div className="mt-6 grid items-center gap-6 lg:grid-cols-[220px_1fr]">
             <div className="flex items-end justify-center gap-2 lg:flex-col lg:items-center">
               <SpeechBubble className="max-w-44">Markets sound better together!</SpeechBubble>
-              <Mascot pose="excited" sizes="140px" className="w-28 lg:w-36" />
+              <Mascot pose="piano" sizes="140px" className="w-28 lg:w-36" />
+              <BrandImage name="deco-sound-candles" sizes="160px" className="deco-sweep hidden h-auto w-40 lg:block" />
             </div>
 
             <div className="space-y-4">

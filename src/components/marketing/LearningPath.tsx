@@ -22,7 +22,7 @@ const stages: Stage[] = [
     body: "Candles, traded volume and volume by price.",
     status: "First lesson available",
     tone: "success",
-    pose: "happy",
+    pose: "welcomeWave",
     accent: "from-cyan/30",
   },
   {
@@ -31,7 +31,7 @@ const stages: Stage[] = [
     body: "Moving averages with SMA vs EMA, and price based Renko bricks.",
     status: "2 lessons available",
     tone: "success",
-    pose: "thinking",
+    pose: "lineSurfer",
     accent: "from-electric/30",
   },
   {
@@ -40,7 +40,7 @@ const stages: Stage[] = [
     body: "How daily, 4 hour and 15 minute trends relate, and how to hear price near moving averages.",
     status: "Audio Lab and Sound Playground live",
     tone: "violet",
-    pose: "cool",
+    pose: "headphones",
     accent: "from-violet/30",
   },
   {
@@ -49,7 +49,7 @@ const stages: Stage[] = [
     body: "Read a full chart story with every tool you learned.",
     status: "Future idea",
     tone: "neutral",
-    pose: "laughing",
+    pose: "teacherPointing",
     accent: "from-magenta/30",
   },
 ];
@@ -83,7 +83,7 @@ export function LearningPath() {
                   <h3 className="text-base font-semibold text-ink">{stage.title}</h3>
                 </div>
                 <div className="mt-3 flex items-end gap-3">
-                  <Mascot pose={stage.pose} decorative sizes="64px" className="w-16 shrink-0" />
+                  <Mascot pose={stage.pose} decorative still sizes="64px" className="w-16 shrink-0" />
                   <p className="text-sm text-muted">{stage.body}</p>
                 </div>
                 <Badge tone={stage.tone} className="mt-4">

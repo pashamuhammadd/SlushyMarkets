@@ -60,7 +60,7 @@ export default function RenkoBricksPage() {
         eyebrow="Lesson 3"
         title="Renko Bricks"
         description="A chart made of equal bricks that only cares how far price moved. Build it step by step next to a normal candle chart."
-        pose="trading"
+        pose="brickBuilder"
       >
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
           <Badge tone="cyan">

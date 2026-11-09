@@ -2,7 +2,7 @@
 
 import { useId, useState } from "react";
 import { CheckCircle2, RotateCcw, XCircle, Trophy } from "lucide-react";
-import { Mascot } from "@/components/brand/Mascot";
+import { BrandImage, Mascot } from "@/components/brand/Mascot";
 import { cn } from "@/lib/cn";
 import { useDeviceProgress } from "@/lib/hooks/use-device-progress";
 import type { QuizQuestion } from "@/data/lessons/types";
@@ -80,6 +80,7 @@ export function LessonQuiz({ lessonId, questions, completionMessage }: LessonQui
                           "flex min-h-12 items-center gap-3 rounded-xl px-4 py-2.5 text-left text-sm ring-1 transition",
                           !locked && "bg-navy-950/50 text-ink ring-white/10 hover:bg-navy-700/60 hover:ring-cyan/50",
                           locked && isCorrect && "bg-success/12 text-ink ring-success/60",
+                          locked && isChosen && (isCorrect ? "answer-right" : "answer-wrong"),
                           locked && isChosen && !isCorrect && "bg-danger/12 text-ink ring-danger/60",
                           locked && !isChosen && !isCorrect && "bg-navy-950/30 text-muted ring-white/5",
                         )}
@@ -101,7 +102,7 @@ export function LessonQuiz({ lessonId, questions, completionMessage }: LessonQui
                 </div>
                 <div aria-live="polite">
                   {locked ? (
-                    <p className={cn("mt-3 rounded-xl px-4 py-3 text-sm", correct ? "bg-success/10" : "bg-danger/10")}>
+                    <p className={cn("enter-slide mt-3 rounded-xl px-4 py-3 text-sm", correct ? "bg-success/10" : "bg-danger/10")}>
                       <span className={cn("font-semibold", correct ? "text-success" : "text-danger")}>
                         {correct ? "Correct. " : "Not quite. "}
                       </span>
@@ -117,10 +118,14 @@ export function LessonQuiz({ lessonId, questions, completionMessage }: LessonQui
 
       {finished ? (
         <div className="panel panel-glow flex flex-col items-center gap-4 p-6 text-center sm:flex-row sm:text-left">
-          <Mascot pose={score === questions.length ? "celebrate" : "thinking"} sizes="160px" className="w-36 shrink-0" />
+          <Mascot pose={score === questions.length ? "quizTrophy" : "quizTryAgain"} sizes="160px" className="w-36 shrink-0" />
           <div className="flex-1" aria-live="polite">
             <p className="flex items-center justify-center gap-2 font-display text-2xl font-semibold text-ink sm:justify-start">
-              <Trophy aria-hidden="true" className="size-6 text-gold" />
+              {score === questions.length ? (
+                <BrandImage name="badge-lesson-complete" sizes="40px" className="enter-stamp h-10 w-auto" />
+              ) : (
+                <Trophy aria-hidden="true" className="size-6 text-gold" />
+              )}
               {score} of {questions.length} correct
             </p>
             <p className="mt-1 text-sm text-muted">

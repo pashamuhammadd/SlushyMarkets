@@ -48,7 +48,7 @@ export default function OnChainMetricsPage() {
         eyebrow="Learn · On-Chain Metrics"
         title="On-chain metrics, one coin story at a time"
         description="A blockchain records every time coins move. On-chain metrics turn those records into numbers. Start with two of the most common ones, using a tiny Bitcoin world of just two coins."
-        pose="thinking"
+        pose="teacherPointing"
       >
         <div className="flex flex-wrap gap-2">
           <Badge tone="cyan">Beginner</Badge>

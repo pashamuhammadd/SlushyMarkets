@@ -47,7 +47,7 @@ export default function SoundPlaygroundPage() {
         eyebrow="Audio Lab · Sound Playground"
         title="EMA Sonar"
         description="Like a sonar ping, each moving average gets its own sound. The closer price gets to a line, the louder that line plays. Mix the layers and listen to the chart."
-        pose="thinking"
+        pose="djMixer"
       >
         <div className="flex flex-wrap gap-2">
           <Badge tone="violet">Simulated data</Badge>

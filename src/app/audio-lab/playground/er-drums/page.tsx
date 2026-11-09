@@ -51,7 +51,7 @@ export default function ErDrumsPage() {
         eyebrow="Audio Lab · Sound Playground"
         title="Sonar Channels and ER drums"
         description="Some stretches of a chart go somewhere, others just shake back and forth. The Efficiency Ratio puts a number on that, and here the drums play whenever the market is choppy."
-        pose="thinking"
+        pose="drums"
       >
         <div className="flex flex-wrap gap-2">
           <Badge tone="violet">Simulated data</Badge>

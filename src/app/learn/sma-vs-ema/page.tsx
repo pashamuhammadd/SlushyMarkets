@@ -60,7 +60,7 @@ export default function SmaVsEmaPage() {
         eyebrow="Lesson 2"
         title="SMA vs EMA"
         description="Two moving averages, the same closing prices. Watch both lines form candle by candle and see why one reacts faster."
-        pose="thinking"
+        pose="lineSurfer"
       >
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
           <Badge tone="cyan">

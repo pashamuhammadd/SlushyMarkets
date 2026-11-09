@@ -1,9 +1,21 @@
+import { BrandImage, type BrandImageName } from "@/components/brand/Mascot";
 import type { Lesson } from "@/data/lessons";
+
+/** "profile" has no illustrated icon, so it keeps its glyph in a matching tile. */
+const ICONS: Partial<Record<Lesson["icon"], BrandImageName>> = {
+  candles: "icon-candlesticks",
+  averages: "icon-moving-average",
+  renko: "icon-renko",
+  onchain: "icon-on-chain",
+  sound: "icon-audio-lab",
+};
 
 /** Small illustrative glyphs for lesson cards. Decorative, not data. */
 export function LessonIcon({ kind }: { kind: Lesson["icon"] }) {
+  const image = ICONS[kind];
+  if (image) return <BrandImage name={image} sizes="64px" className="icon-hop size-full object-contain" />;
   return (
-    <svg viewBox="0 0 64 64" className="size-full" aria-hidden="true">
+    <svg viewBox="0 0 64 64" className="icon-hop size-full rounded-[1.15rem] bg-navy-950 p-2.5 ring-2 ring-violet/60" aria-hidden="true">
       {kind === "candles" ? (
         <g strokeWidth="2" strokeLinecap="round">
           <line x1="14" x2="14" y1="14" y2="50" stroke="#44D9A4" />

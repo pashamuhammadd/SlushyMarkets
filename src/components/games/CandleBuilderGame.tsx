@@ -128,7 +128,7 @@ export function CandleBuilderGame() {
             <Play aria-hidden="true" className="size-4" /> Start game
           </button>
         </div>
-        <Mascot pose="trading" sizes="180px" className="mx-auto hidden w-40 md:block" />
+        <Mascot pose="candleCarry" sizes="180px" className="mx-auto hidden w-40 md:block" />
       </div>
     );
   }
@@ -137,7 +137,7 @@ export function CandleBuilderGame() {
     const perfect = score === MAX_SCORE;
     return (
       <div ref={topRef} className="panel panel-glow grid scroll-mt-24 gap-5 p-5 text-center sm:p-7" role="status">
-        <Mascot pose={perfect ? "celebrate" : score >= MAX_SCORE * 0.6 ? "happy" : "thinking"} sizes="160px" className="mx-auto w-32" />
+        <Mascot pose={perfect ? "quizTrophy" : score >= MAX_SCORE * 0.6 ? "happy" : "quizTryAgain"} sizes="160px" className="mx-auto w-32" />
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan">Game over</p>
           <h2 className="mt-1 text-3xl font-bold text-ink">

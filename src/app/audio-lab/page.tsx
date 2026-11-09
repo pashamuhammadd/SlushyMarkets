@@ -43,7 +43,7 @@ export default function AudioLabPage() {
         eyebrow="Audio Lab"
         title="Three Trends, One Piano"
         description="Hear market structure. Each timeframe plays in its own piano register, so you can notice when trends agree and when they clash."
-        pose="excited"
+        pose="headphones"
       >
         <div className="flex flex-wrap gap-2">
           <Badge tone="violet">Synthetic learning demo</Badge>

@@ -1,5 +1,5 @@
-import { ArrowRight, GraduationCap } from "lucide-react";
-import { Mascot } from "@/components/brand/Mascot";
+import { ArrowRight } from "lucide-react";
+import { BrandImage, Mascot } from "@/components/brand/Mascot";
 import { CandleVolumePreview } from "@/components/lessons/CandleVolumePreview";
 import { ButtonLink } from "@/components/ui/Button";
 import { Container, SectionHeading } from "@/components/ui/Section";
@@ -9,10 +9,10 @@ export function LessonPreviewSection() {
   return (
     <section aria-labelledby="lesson-preview-title" className="scroll-mt-24" id="lesson-preview">
       <Container>
-        <div className="panel panel-glow p-4 sm:p-6 lg:p-8">
+        <div className="group panel panel-glow p-4 sm:p-6 lg:p-8">
           <SectionHeading
             id="lesson-preview-title"
-            icon={<GraduationCap className="size-5" />}
+            icon={<BrandImage name="icon-learn" sizes="40px" className="icon-wobble size-full" />}
             title="Interactive lesson preview"
             description="Press Play and watch candles form while volume builds at the prices where trades actually happened."
             action={
