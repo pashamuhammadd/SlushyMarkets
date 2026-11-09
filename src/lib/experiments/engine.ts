@@ -14,8 +14,8 @@ export const EXPERIMENT_SETTINGS: ExperimentSettings = { initial: 10_000, notion
 export type PaperSide = 1 | -1;
 export type QueuedOrder = PaperSide | 0;
 export type PaperBar = { date: string; o: number; c: number };
-export type OpenPosition = { side: PaperSide; entry: number; quantity: number; entryFee: number; date: string };
-export type ClosedTrade = OpenPosition & { exit: number; exitDate: string; gross: number; net: number; fees: number; forced: boolean };
+export type OpenPosition = { side: PaperSide; entry: number; quantity: number; entryFee: number; date: string; leverage: number };
+export type ClosedTrade = OpenPosition & { exit: number; exitDate: string; gross: number; net: number; fees: number; forced: boolean; marginClose?: boolean };
 export type Fill = { date: string; price: number; action: "LONG" | "SHORT" | "CLOSE" };
 
 export type PaperAccount = {
@@ -28,10 +28,18 @@ export type PaperAccount = {
   fills: Fill[];
   peak: number;
   maxDrawdown: number;
+  /** Multiplier for the next entry. Only the Arcade round lets players change it. Open positions keep theirs. */
+  leverage: number;
 };
 
 export function createPaperAccount(settings: ExperimentSettings = EXPERIMENT_SETTINGS): PaperAccount {
-  return { settings, balance: settings.initial, fees: 0, position: null, pending: null, trades: [], fills: [], peak: settings.initial, maxDrawdown: 0 };
+  return { settings, balance: settings.initial, fees: 0, position: null, pending: null, trades: [], fills: [], peak: settings.initial, maxDrawdown: 0, leverage: 1 };
+}
+
+export const MAX_LEVERAGE = 2;
+
+export function setLeverage(account: PaperAccount, leverage: number): PaperAccount {
+  return { ...account, leverage: Math.min(MAX_LEVERAGE, Math.max(1, Math.round(leverage))) };
 }
 
 export function queueOrder(account: PaperAccount, order: QueuedOrder): PaperAccount {
@@ -44,19 +52,19 @@ function open(account: PaperAccount, side: PaperSide, price: number, date: strin
   const s = account.settings;
   if (account.balance <= 0) return account;
   const fill = price * (1 + side * s.slippage);
-  const notional = Math.min(s.notional, account.balance);
+  const notional = Math.min(s.notional * account.leverage, account.balance);
   const fee = feeFor(notional, s);
   if (notional < 1 || fee >= account.balance) return account;
   return {
     ...account,
     balance: account.balance - fee,
     fees: account.fees + fee,
-    position: { side, entry: fill, quantity: notional / fill, entryFee: fee, date },
+    position: { side, entry: fill, quantity: notional / fill, entryFee: fee, date, leverage: account.leverage },
     fills: [...account.fills, { date, price: fill, action: side === 1 ? "LONG" : "SHORT" }],
   };
 }
 
-function close(account: PaperAccount, price: number, date: string, forced: boolean): PaperAccount {
+function close(account: PaperAccount, price: number, date: string, forced: boolean, marginClose = false): PaperAccount {
   const p = account.position;
   if (!p) return account;
   const fill = price * (1 - p.side * account.settings.slippage);
@@ -67,7 +75,7 @@ function close(account: PaperAccount, price: number, date: string, forced: boole
     balance: account.balance + gross - fee,
     fees: account.fees + fee,
     position: null,
-    trades: [...account.trades, { ...p, exit: fill, exitDate: date, gross, net: gross - p.entryFee - fee, fees: p.entryFee + fee, forced }],
+    trades: [...account.trades, { ...p, exit: fill, exitDate: date, gross, net: gross - p.entryFee - fee, fees: p.entryFee + fee, forced, ...(marginClose ? { marginClose } : {}) }],
     fills: [...account.fills, { date, price: fill, action: "CLOSE" }],
   };
 }
@@ -93,9 +101,35 @@ export function advanceBar(account: PaperAccount, bar: PaperBar, last = false): 
     }
   }
   if (last) next = close(next, bar.c, bar.date, true);
+  else if (marginRisk(next, bar.c).ratio >= 1) next = close(next, bar.c, bar.date, true, true);
   const equity = accountEquity(next, bar.c);
   const peak = Math.max(next.peak, equity);
   return { ...next, peak, maxDrawdown: Math.max(next.maxDrawdown, (peak - equity) / peak) };
+}
+
+/**
+ * Practice margin for leveraged positions: entry notional / leverage. When the open loss plus the
+ * entry fee reaches it at a daily close, the position closes there with costs. 1x positions have none.
+ */
+export function marginRisk(account: PaperAccount, price: number): { margin: number; ratio: number } {
+  const p = account.position;
+  if (!p || p.leverage <= 1) return { margin: 0, ratio: 0 };
+  const margin = (p.quantity * p.entry) / p.leverage;
+  return { margin, ratio: Math.max(0, -unrealized(account, price) + p.entryFee) / margin };
+}
+
+export type LeverageReview = { used: boolean; actual: number; allOneX: number; effect: number };
+
+/** What the same trades would have made at 1x. Gross and fees scale with leverage, commission does not. */
+export function leverageReview(account: PaperAccount): LeverageReview {
+  const c = account.settings.commission;
+  let actual = 0;
+  let allOneX = 0;
+  for (const t of account.trades) {
+    actual += t.net;
+    allOneX += t.gross / t.leverage - ((t.fees - 2 * c) / t.leverage + 2 * c);
+  }
+  return { used: account.trades.some((t) => t.leverage > 1), actual, allOneX, effect: actual - allOneX };
 }
 
 export type ExperimentResult = {

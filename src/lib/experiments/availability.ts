@@ -8,3 +8,8 @@ import { experimentYear } from "./squeeze";
 export function isBtcExperimentEnabled(): boolean {
   return process.env.EXPERIMENT_BTC_2025_ENABLED === "true" && experimentYear(BTC_USD_DAILY, 2025) !== null;
 }
+
+/** Same rule for the daily mystery experiment, with EXPERIMENT_DAILY_ENABLED. */
+export function isDailyExperimentEnabled(): boolean {
+  return process.env.EXPERIMENT_DAILY_ENABLED === "true";
+}

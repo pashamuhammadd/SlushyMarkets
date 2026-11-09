@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { isBtcExperimentEnabled } from "@/lib/experiments/availability";
-import { EXPERIMENTS, statsGroups, validateRoundSubmission, type ExperimentId } from "@/lib/experiments/rounds";
+import { isBtcExperimentEnabled, isDailyExperimentEnabled } from "@/lib/experiments/availability";
+import { PRESET_INFO } from "@/lib/experiments/daily/sound";
+import { BTC_2025_VERSION, EXPERIMENTS, dailyVersion, statsByPreset, statsGroups, validateRoundSubmission, type ExperimentId, type RoundSubmission } from "@/lib/experiments/rounds";
 import { readExperimentStats, storeExperimentRound } from "@/lib/server/experiment-store";
 import { rateLimit } from "@/lib/server/rate-limit";
 
@@ -11,20 +12,28 @@ function json(body: Record<string, unknown>, status: number, headers?: HeadersIn
 }
 
 const unavailable = () => json({ ok: false, error: "unavailable" }, 404);
+const enabled = (experiment: ExperimentId) => (experiment === "btc-2025" ? isBtcExperimentEnabled() : isDailyExperimentEnabled());
+const PRESET_NAMES = Object.fromEntries(Object.entries(PRESET_INFO).map(([id, info]) => [id, info.name]));
+
+/** Each experiment only accepts its own versions and regular rounds. */
+function belongs(r: RoundSubmission): boolean {
+  if (r.experiment === "btc-2025") return r.experimentVersion === BTC_2025_VERSION && r.round === 1;
+  return r.round <= 3 && Object.keys(PRESET_INFO).some((p) => dailyVersion(p) === r.experimentVersion);
+}
 
 /** GET ?experiment=btc-2025 returns pooled results. Only finished, opted-in rounds exist in the data. */
 export async function GET(request: Request) {
-  if (!isBtcExperimentEnabled()) return unavailable();
   const experiment = new URL(request.url).searchParams.get("experiment") as ExperimentId;
   if (!EXPERIMENTS.includes(experiment)) return json({ ok: false, error: "invalid" }, 400);
+  if (!enabled(experiment)) return unavailable();
   const rows = await readExperimentStats(experiment);
   if (!rows) return json({ ok: false, error: "storage_failed" }, 502);
-  return json({ ok: true, groups: statsGroups(rows) }, 200);
+  return json({ ok: true, groups: experiment === "btc-2025" ? statsGroups(rows) : statsByPreset(rows, PRESET_NAMES) }, 200);
 }
 
 /** POST one opted-in round summary. 201 only after it is stored. */
 export async function POST(request: Request) {
-  if (!isBtcExperimentEnabled()) return unavailable();
+  if (!isBtcExperimentEnabled() && !isDailyExperimentEnabled()) return unavailable();
   if (!request.headers.get("content-type")?.includes("application/json")) return json({ ok: false, error: "unsupported_type" }, 415);
   if (Number(request.headers.get("content-length") ?? 0) > MAX_BODY_BYTES) return json({ ok: false, error: "too_large" }, 413);
   const text = await request.text();
@@ -41,7 +50,8 @@ export async function POST(request: Request) {
     return json({ ok: false, error: "invalid" }, 400);
   }
   const round = validateRoundSubmission(body);
-  if (!round) return json({ ok: false, error: "invalid" }, 400);
+  if (!round || !belongs(round)) return json({ ok: false, error: "invalid" }, 400);
+  if (!enabled(round.experiment)) return unavailable();
 
   const stored = await storeExperimentRound(round);
   if (!stored.ok) return json({ ok: false, error: stored.reason }, stored.reason === "not_configured" ? 503 : 502);

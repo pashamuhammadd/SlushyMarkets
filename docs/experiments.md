@@ -24,6 +24,28 @@ Every step is needed. Until then the page and API answer 404.
 
 Opt in or private must be chosen before the round starts. Stored fields: submission id, experiment, version, round, sound (on, off, mixed), net P&L, drawdown, trade count, wins, fees, winning and losing trade P&L. Nothing else. The server validates consistency and ignores repeated submission ids. Pooled win rate = all wins / all trades. Pooled profit factor = all winning P&L / all losing P&L.
 
-## Not built yet
+## Daily mystery-market experiment (version 2)
 
-2021 BTC bonus round, SOL year rounds, Dark Castle reward, trade log download, dot grids, and the daily mystery-market experiment.
+Route `/experiments/daily`, not linked, noindex. Rebuilt from Slushy's `/practice` prototype (`practice.js?v=cyan-button1` and its modules), read on 10 November 2026.
+
+- Three regular rounds of 120 candles at 0.5 s, then one Arcade bonus of 240 candles at 0.25 s with optional 2x leverage. Same costs as the BTC experiment.
+- Chart sets change at 00:00 and 12:00 UTC (`src/lib/experiments/daily/cycle.ts`), identical for everyone in a cycle. One attempt per round per cycle in each browser.
+- The server sends only 20 context candles before a round, the tradable candles on start, and names the market only after a signed, timed reveal (`EXPERIMENT_SIGNING_SECRET`, falling back to the Supabase key).
+- Prices are indexed so the first context close is 100.
+- Presets: Squeeze Sonar, Efficiency Rhythm (ER14), Volume Pulse + Sonar Channels, EMA Sonar 7/20/50, Chart Only. ER14, the ER channel and the EMA gains were checked against the prototype's preview data and match exactly. Volume Pulse is offered only for charts with taker buy volume.
+- 2x positions close at a daily close when the loss including the entry fee reaches entry notional / leverage. The result compares the same trades at 1x.
+- Shared statistics: regular rounds only, version `daily-v2-<preset>`, grouped by preset. Arcade stays on the device.
+
+### Turning it on
+
+1. Add more history to `src/data/experiments/daily-series.ts`. With only BTC 2024 to 2025 there are not enough candles for four separate charts, so the API answers 503 until more series are added (SOL from Slushy's `sol-data.js`, BTC 2020 to 2021 from `bonus-data.js`, and Binance taker buy volume for Volume Pulse).
+2. Optional: set `EXPERIMENT_SIGNING_SECRET` in Vercel to a long random string.
+3. Set `EXPERIMENT_DAILY_ENABLED=true`, Preview first.
+
+### Left out of the daily experiment
+
+Adaptive Cloud preset (needs its exact formula and the recorded rain and thunder files), flames, siren and speech effects, the Dark Castle song, and the prototype's server-side first-attempt check.
+
+## Not built yet (BTC experiment)
+
+2021 BTC bonus round, SOL year rounds, Dark Castle reward, trade log download, dot grids.

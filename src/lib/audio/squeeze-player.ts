@@ -1,11 +1,17 @@
 "use client";
 
-import type { SoundEvent } from "@/lib/experiments/squeeze";
+import type { DailyNote } from "@/lib/experiments/daily/sound";
 
 /** Web Audio voices for the BTC experiment. Starts only after a click. Each bar cuts the one before. */
 export class SqueezePlayer {
   private ctx: AudioContext | null = null;
   private bus: GainNode | null = null;
+  private level = 0.7;
+
+  /** 0 to 1. Applies from the next bar. */
+  setVolume(volume: number) {
+    this.level = Math.min(1, Math.max(0, volume));
+  }
 
   async ready(): Promise<boolean> {
     try {
@@ -22,18 +28,18 @@ export class SqueezePlayer {
     this.bus = null;
   }
 
-  play(events: readonly SoundEvent[]) {
+  play(events: readonly DailyNote[]) {
     this.cut();
     const ctx = this.ctx;
     if (!ctx || ctx.state !== "running") return;
     const bus = ctx.createGain();
-    bus.gain.value = 0.7;
+    bus.gain.value = this.level;
     bus.connect(ctx.destination);
     this.bus = bus;
     const at = ctx.currentTime + 0.01;
     for (const e of events) {
       if (e.kind === "cymbal") this.cymbal(ctx, bus, at + e.offset);
-      else this.note(ctx, bus, at + e.offset, e.hz, e.volume, e.kind);
+      else this.note(ctx, bus, at + e.offset, e.hz, e.volume, e.kind, e.duration);
     }
   }
 
@@ -43,11 +49,13 @@ export class SqueezePlayer {
     this.ctx = null;
   }
 
-  private note(ctx: AudioContext, bus: GainNode, at: number, hz: number, volume: number, kind: "chime" | "drum") {
-    const duration = kind === "drum" ? 0.075 : 0.095;
-    const partials: Array<[number, number]> = kind === "drum" ? [[1, 1]] : [[1, 1], [2.76, 0.23], [4.1, 0.08]];
+  private note(ctx: AudioContext, bus: GainNode, at: number, hz: number, volume: number, kind: Exclude<DailyNote["kind"], "cymbal">, length?: number) {
+    const duration = length ?? (kind === "drum" ? 0.075 : kind === "organ" ? 0.2 : 0.095);
+    const partials: Array<[number, number]> =
+      kind === "drum" || kind === "wood" ? [[1, 1]] : kind === "organ" ? [[1, 1], [2, 0.3], [3, 0.12]] : kind === "bell" ? [[1, 1], [2.76, 0.2]] : [[1, 1], [2.76, 0.23], [4.1, 0.08]];
     for (const [ratio, weight] of partials) {
       const osc = ctx.createOscillator();
+      osc.type = kind === "wood" ? "triangle" : "sine";
       const gain = ctx.createGain();
       osc.frequency.setValueAtTime(hz * ratio, at);
       if (kind === "drum") osc.frequency.exponentialRampToValueAtTime(hz * ratio * 0.45, at + 0.065);
