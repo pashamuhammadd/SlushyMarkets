@@ -100,6 +100,16 @@ export function poolStats(rows: readonly RoundStatsRow[]): PooledStats | null {
 
 export type StatsGroup = { label: string; stats: PooledStats | null };
 
+export const dailyVersion = (preset: string) => `daily-v2-${preset}`;
+
+/** Daily experiment: everything together, then each sound preset on its own. */
+export function statsByPreset(rows: readonly RoundStatsRow[], names: Record<string, string>): StatsGroup[] {
+  return [
+    { label: "All shared rounds", stats: poolStats(rows) },
+    ...Object.entries(names).map(([preset, label]) => ({ label, stats: poolStats(rows.filter((r) => r.experiment_version === dailyVersion(preset))) })),
+  ];
+}
+
 /** Everything together, then each sound setting on its own. */
 export function statsGroups(rows: readonly RoundStatsRow[]): StatsGroup[] {
   const labels: Record<SoundSetting, string> = { on: "Sound on", off: "Chart only", mixed: "Mixed" };
