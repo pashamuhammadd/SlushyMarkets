@@ -8,7 +8,7 @@ import { LessonQuiz } from "@/components/lessons/LessonQuiz";
 import { Badge } from "@/components/ui/Badge";
 import { Container, SectionHeading } from "@/components/ui/Section";
 import { DEMO_BAND_USD, DEMO_BUCKET_USD } from "@/data/demo-trades";
-import { LESSON_ID, QUIZ } from "@/data/lessons/candlesticks-and-volume";
+import { LESSON_ID, QUIZ_COMPLETION, QUIZ } from "@/data/lessons/candlesticks-and-volume";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { pageMetadata } from "@/lib/site";
 import { learningResourceGraph } from "@/lib/structured-data";
@@ -113,7 +113,7 @@ export default function CandlesticksAndVolumePage() {
             description="Three quick questions. Pick an answer to see the explanation."
           />
           <div className="mt-5">
-            <LessonQuiz lessonId={LESSON_ID} questions={QUIZ} />
+            <LessonQuiz lessonId={LESSON_ID} questions={QUIZ} completionMessage={QUIZ_COMPLETION} />
           </div>
         </section>
 

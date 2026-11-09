@@ -8,7 +8,7 @@ import { MvrvExplorer } from "@/components/onchain/MvrvExplorer";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Badge } from "@/components/ui/Badge";
 import { Container, SectionHeading } from "@/components/ui/Section";
-import { MVRV_LESSON_ID, MVRV_QUIZ } from "@/data/lessons/on-chain-metrics";
+import { LAST_MOVED_IS_NOT_PAID, MVRV_COMPLETION, MVRV_LESSON_ID, MVRV_QUIZ } from "@/data/lessons/on-chain-metrics";
 import { pageMetadata } from "@/lib/site";
 import { learningResourceGraph } from "@/lib/structured-data";
 
@@ -29,7 +29,7 @@ const ideas = [
   },
   {
     title: "Realized value: last moved price",
-    body: "Every coin priced at the BTC price when it last moved on chain. It only changes when coins move.",
+    body: "Every coin priced at the BTC price when it last moved on chain. That is a valuation method, not a record of what owners paid. It only changes when coins move.",
     formula: "Realized value = sum of (coin x last moved price)",
   },
   {
@@ -89,6 +89,18 @@ export default function MvrvLessonPage() {
           </div>
         </section>
 
+        <aside aria-labelledby="mvrv-realized-title" className="panel border border-magenta/30 p-5 sm:p-6">
+          <h2 id="mvrv-realized-title" className="text-xl font-semibold text-ink">
+            What the pink bucket really measures
+          </h2>
+          <p className="mt-2 font-semibold text-cyan-soft">{LAST_MOVED_IS_NOT_PAID}</p>
+          <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm text-muted">
+            <li>Market value and realized value are two different ways to price the same coins.</li>
+            <li>Realized value is a method: it prices each coin at its last on-chain move.</li>
+            <li>If someone buys at one price and later moves the coin to a new wallet at another price, realized value uses the later one.</li>
+          </ul>
+        </aside>
+
         <section aria-labelledby="mvrv-ideas-title">
           <SectionHeading id="mvrv-ideas-title" icon={<BookOpen className="size-5" />} title="Key ideas" />
           <ul className="mt-5 grid gap-3 md:grid-cols-3">
@@ -121,7 +133,7 @@ export default function MvrvLessonPage() {
             description={`${MVRV_QUIZ.length} quick questions. Pick an answer to see the explanation.`}
           />
           <div className="mt-5">
-            <LessonQuiz lessonId={MVRV_LESSON_ID} questions={MVRV_QUIZ} />
+            <LessonQuiz lessonId={MVRV_LESSON_ID} questions={MVRV_QUIZ} completionMessage={MVRV_COMPLETION} />
           </div>
         </section>
 

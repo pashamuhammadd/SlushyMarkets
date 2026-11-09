@@ -10,7 +10,7 @@ import { SoprTimeline } from "@/components/onchain/SoprTimeline";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Badge } from "@/components/ui/Badge";
 import { Container, SectionHeading } from "@/components/ui/Section";
-import { SOPR_LESSON_ID, SOPR_QUIZ } from "@/data/lessons/on-chain-metrics";
+import { SOPR_COMPLETION, SOPR_LESSON_ID, SOPR_QUIZ, SPEND_IS_NOT_A_SALE } from "@/data/lessons/on-chain-metrics";
 import { pageMetadata } from "@/lib/site";
 import { learningResourceGraph } from "@/lib/structured-data";
 
@@ -55,7 +55,7 @@ export default function SoprLessonPage() {
             { name: "On-Chain Metrics", path: "/learn/on-chain-metrics" },
             { name: "SOPR", path: PATH },
           ],
-          teaches: ["Spent Output Profit Ratio", "Break even at 1.0", "Realized profit and loss on chain"],
+          teaches: ["Spent Output Profit Ratio", "Break even at 1.0", "Why a blockchain spend is not always a sale"],
           minutes: 6,
           resourceType: "Interactive lesson",
         })}
@@ -79,6 +79,19 @@ export default function SoprLessonPage() {
       </PageHeader>
 
       <Container className="space-y-12">
+        <aside aria-labelledby="sopr-spend-title" className="panel border border-cyan/30 p-5 sm:p-6">
+          <h2 id="sopr-spend-title" className="text-xl font-semibold text-ink">
+            First, what a &quot;spend&quot; means
+          </h2>
+          <p className="mt-2 font-semibold text-cyan-soft">{SPEND_IS_NOT_A_SALE}</p>
+          <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm text-muted">
+            <li>Bitcoin that moves on chain was not always sold.</li>
+            <li>A transfer between two wallets owned by the same person is recorded too.</li>
+            <li>SOPR is built from Bitcoin outputs that were spent on the blockchain. In this lesson, &quot;spent&quot; always means &quot;moved on chain&quot;.</li>
+            <li>A move alone does not prove a sale. The chain shows that coins moved, not why.</li>
+          </ul>
+        </aside>
+
         <section aria-labelledby="sopr-coin-title" className="panel panel-glow p-4 sm:p-6">
           <SectionHeading
             id="sopr-coin-title"
@@ -129,7 +142,7 @@ export default function SoprLessonPage() {
           <details className="panel mt-3 p-5 text-sm text-muted">
             <summary className="cursor-pointer font-semibold text-ink">Limits of SOPR</summary>
             <ul className="mt-3 list-disc space-y-1.5 pl-5">
-              <li>A spend on chain is not always a sale. Moving coins between your own wallets also counts unless a provider filters it.</li>
+              <li>{SPEND_IS_NOT_A_SALE} Some providers try to filter these moves, but no filter is perfect.</li>
               <li>Exchanges move coins internally, which can blur the picture. Providers use different filters, so SOPR values differ between sites.</li>
               <li>SOPR describes coins that already moved. It does not say whether price will rise or fall next.</li>
               <li>The timeline above is invented with a fixed seed so everyone sees the same line. It is not real Bitcoin data.</li>
@@ -146,7 +159,7 @@ export default function SoprLessonPage() {
             description={`${SOPR_QUIZ.length} quick questions. Pick an answer to see the explanation.`}
           />
           <div className="mt-5">
-            <LessonQuiz lessonId={SOPR_LESSON_ID} questions={SOPR_QUIZ} />
+            <LessonQuiz lessonId={SOPR_LESSON_ID} questions={SOPR_QUIZ} completionMessage={SOPR_COMPLETION} />
           </div>
         </section>
 

@@ -28,6 +28,22 @@ export function soprZone(value: number, tolerance = 0.005): SoprZone {
   return value > 1 ? "profit" : "loss";
 }
 
+/** SOPR gauge range. Matches the price sliders: $25,000 to $100,000 gives 0.25 to 4. */
+export const SOPR_GAUGE = { min: 0.25, max: 4 } as const;
+export const SOPR_GAUGE_TICKS = [0.25, 0.5, 1, 2, 4] as const;
+
+/**
+ * Where a SOPR value sits on the gauge, from 0 (left) to 1 (right). The scale is logarithmic,
+ * so halving and doubling are the same distance and 1.0 is exactly the middle. A log scale
+ * cannot show 0, so 0 and anything below the minimum (or not a number) pin to the left edge.
+ */
+export function soprGaugePosition(value: number, range: { min: number; max: number } = SOPR_GAUGE): number {
+  if (!Number.isFinite(value) && value !== Infinity) return 0;
+  if (value <= range.min) return 0;
+  if (value >= range.max) return 1;
+  return Math.log(value / range.min) / Math.log(range.max / range.min);
+}
+
 /** A coin (or output) with the BTC price at the moment it last moved on chain. */
 export type Coin = { id: string; label: string; amountBtc: number; lastMovedPriceUsd: number };
 
@@ -50,6 +66,33 @@ export function mvrv(coins: readonly Coin[], priceUsd: number): number | null {
 /** Moving a coin on chain resets its last moved price to the current price. Returns new coins. */
 export function moveCoin(coins: readonly Coin[], id: string, priceUsd: number): Coin[] {
   return coins.map((c) => (c.id === id ? { ...c, lastMovedPriceUsd: priceUsd } : { ...c }));
+}
+
+export type VolumeGrowth =
+  | { status: "ok"; percent: number }
+  /** The earlier period had no volume, so an ordinary growth percentage is not defined. */
+  | { status: "zero-base" }
+  /** Negative or non-numeric input, or too few days of data. */
+  | { status: "invalid" };
+
+/** ((recent / previous) - 1) x 100. Never returns Infinity or NaN. */
+export function volumeGrowthPercent(recentUsd: number, previousUsd: number): VolumeGrowth {
+  if (!Number.isFinite(recentUsd) || !Number.isFinite(previousUsd) || recentUsd < 0 || previousUsd < 0) return { status: "invalid" };
+  if (previousUsd === 0) return { status: "zero-base" };
+  return { status: "ok", percent: (recentUsd / previousUsd - 1) * 100 };
+}
+
+export const DEX_GROWTH_WINDOW_DAYS = 7;
+
+/**
+ * DEX Volume Growth (7-day): the latest 7 days of USD swap volume against the 7 days before them.
+ * `dailyUsd` is oldest first and needs at least 14 days. Only the last 14 are used.
+ */
+export function dexVolumeGrowth7d(dailyUsd: readonly number[]): VolumeGrowth {
+  const n = DEX_GROWTH_WINDOW_DAYS;
+  if (dailyUsd.length < 2 * n || dailyUsd.some((v) => !Number.isFinite(v) || v < 0)) return { status: "invalid" };
+  const total = (days: readonly number[]) => days.reduce((sum, v) => sum + v, 0);
+  return volumeGrowthPercent(total(dailyUsd.slice(-n)), total(dailyUsd.slice(-2 * n, -n)));
 }
 
 export type Crossing = { index: number; direction: "up" | "down" };

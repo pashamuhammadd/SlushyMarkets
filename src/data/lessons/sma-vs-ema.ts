@@ -89,6 +89,8 @@ export function maChapterStart(index: number): number {
   return index === 0 ? 0 : MA_CHAPTERS[index - 1].end;
 }
 
+export const MA_COMPLETION = "Great work. You can explain how SMA and EMA weigh prices differently and why one reacts faster.";
+
 export const MA_QUIZ: QuizQuestion[] = [
   {
     id: "q-sma-calc",

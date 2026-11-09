@@ -51,6 +51,16 @@ export const SOPR_BUCKET_ROUNDS: readonly { label: string; outputs: readonly [Sp
   },
 ];
 
+export const SOPR_COMPLETION =
+  "Great job! You've completed the SOPR part of On-Chain Metrics and learned how blockchain analysis compares what moved Bitcoin was worth when created and when spent.";
+
+export const MVRV_COMPLETION =
+  "Great job! You've completed the On-Chain Metrics lesson and learned how SOPR and MVRV help explain Bitcoin's blockchain activity and valuation.";
+
+/** Slushy's corrections, shown word for word in the lessons. */
+export const SPEND_IS_NOT_A_SALE = "Moving BTC between your own wallets also counts as a blockchain spend. It does not necessarily mean someone sold.";
+export const LAST_MOVED_IS_NOT_PAID = "This uses the price when coins last moved, not necessarily the price their owners actually paid.";
+
 export const SOPR_QUIZ: QuizQuestion[] = [
   {
     id: "q-sopr-calc",
@@ -98,7 +108,19 @@ export const SOPR_QUIZ: QuizQuestion[] = [
       { id: "d", text: "Because SOPR ignores the price when coins were created" },
     ],
     correct: "b",
-    explanation: "On chain, moving coins to your own new address looks like a spend. Data providers try to filter this, but SOPR is still an estimate of realized profit, not a list of trades.",
+    explanation: "Moving BTC between your own wallets also counts as a blockchain spend. It does not necessarily mean someone sold. Data providers try to filter some of these moves, but SOPR is still an estimate, not a list of trades.",
+  },
+  {
+    id: "q-sopr-own-wallets",
+    prompt: "Sam moves 1 BTC from one of Sam's wallets to another of Sam's wallets. What does the blockchain show?",
+    options: [
+      { id: "a", text: "A spend, even though nobody sold anything" },
+      { id: "b", text: "Nothing, transfers to yourself are never recorded" },
+      { id: "c", text: "Proof that Sam sold 1 BTC" },
+      { id: "d", text: "Proof that someone else bought 1 BTC" },
+    ],
+    correct: "a",
+    explanation: "The old output is spent and a new one is created, so the move is recorded. The blockchain shows that coins moved. It does not show why, so a spend alone does not prove a sale.",
   },
 ];
 
@@ -150,5 +172,17 @@ export const MVRV_QUIZ: QuizQuestion[] = [
     ],
     correct: "b",
     explanation: "Lost coins keep their old realized price, levels that mattered in past cycles may not repeat, and the ratio says nothing about timing. It describes the market, it does not predict it.",
+  },
+  {
+    id: "q-mvrv-paid",
+    prompt: "Dana bought 1 BTC at $30,000, then moved it to a new wallet when BTC was $70,000. Which price does realized value use for that coin?",
+    options: [
+      { id: "a", text: "$30,000, because that is what Dana paid" },
+      { id: "b", text: "$70,000, because that is the price when the coin last moved" },
+      { id: "c", text: "Today's price, whatever it is" },
+      { id: "d", text: "The average of the two prices" },
+    ],
+    correct: "b",
+    explanation: "Realized value uses the price when coins last moved, not necessarily the price their owners actually paid. Dana's own wallet transfer reset the coin's realized price to $70,000.",
   },
 ];

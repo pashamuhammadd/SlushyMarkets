@@ -96,6 +96,8 @@ export function renkoChapterStart(index: number): number {
   return index === 0 ? 0 : RENKO_CHAPTERS[index - 1].end;
 }
 
+export const RENKO_COMPLETION = "Great work. You can explain how Renko bricks form from price movement instead of time.";
+
 export const RENKO_QUIZ: QuizQuestion[] = [
   {
     id: "q-next-up",

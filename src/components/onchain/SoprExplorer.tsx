@@ -4,9 +4,10 @@ import { useId, useRef, useState } from "react";
 import { Bell, BellOff, Music } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { PRICE_SLIDER, SOPR_DEFAULTS } from "@/data/lessons/on-chain-metrics";
+import { cn } from "@/lib/cn";
 import { formatUsd } from "@/lib/format";
 import { useCueAudio } from "@/lib/hooks/use-cue-audio";
-import { sopr, soprZone, valueToHz } from "@/lib/onchain/metrics";
+import { SOPR_GAUGE_TICKS, soprGaugePosition, sopr, soprZone, valueToHz } from "@/lib/onchain/metrics";
 import { ValueBucket } from "./ValueBucket";
 
 const ZONE_UI = {
@@ -36,8 +37,6 @@ export function SoprExplorer() {
   }
 
   const hz = (v: number) => valueToHz(v, PRICE_SLIDER.min, PRICE_SLIDER.max);
-  // Position on a log scale from 0.5 to 2.0, so 1.0 sits in the middle and halving equals doubling.
-  const scale = (v: number) => (Math.log2(Math.min(Math.max(v, 0.5), 2)) + 1) / 2;
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr] lg:items-center">
@@ -81,17 +80,33 @@ export function SoprExplorer() {
             SOPR = {formatUsd(spent)} / {formatUsd(created)} = <span className="text-lg font-semibold text-ink">{ratio.toFixed(2)}</span>
           </p>
           <div aria-hidden="true" className="relative mt-4 h-3 rounded-full bg-linear-to-r from-danger/50 via-white/15 to-success/50">
-            <span className="absolute -top-1.5 h-6 w-0.5 bg-ink/80" style={{ left: `${scale(1) * 100}%` }} />
+            <span className="absolute -top-1.5 h-6 w-0.5 bg-ink/80" style={{ left: `${soprGaugePosition(1) * 100}%` }} />
             <span
               className="absolute -top-1 size-5 -translate-x-1/2 rounded-full bg-ink shadow-glow-cyan transition-[left] duration-300 motion-reduce:transition-none"
-              style={{ left: `${scale(ratio) * 100}%` }}
+              style={{ left: `${soprGaugePosition(ratio) * 100}%` }}
             />
           </div>
-          <div aria-hidden="true" className="mt-1 flex justify-between text-[11px] text-subtle">
-            <span>0.5</span>
-            <span>1.0</span>
-            <span>2.0</span>
+          <div aria-hidden="true" className="relative mt-2 h-4 text-[11px] tabular-nums text-subtle">
+            {SOPR_GAUGE_TICKS.map((tick) => {
+              const position = soprGaugePosition(tick);
+              return (
+                <span
+                  key={tick}
+                  className={cn(
+                    "absolute",
+                    position === 0 ? "translate-x-0" : position === 1 ? "-translate-x-full" : "-translate-x-1/2",
+                    tick === 1 && "font-bold text-ink",
+                  )}
+                  style={{ left: `${position * 100}%` }}
+                >
+                  {tick === 1 ? "1.0" : tick}
+                </span>
+              );
+            })}
           </div>
+          <p className="mt-1 text-xs text-subtle">
+            Covers every value these sliders can make, 0.25 to 4. Each mark doubles the one before it, and 1.0, break even, sits in the middle.
+          </p>
           <Badge tone={ZONE_UI[zone].tone} className="mt-3">
             {ZONE_UI[zone].text}
           </Badge>

@@ -91,6 +91,8 @@ export function chapterStart(index: number): number {
   return index === 0 ? 0 : CHAPTERS[index - 1].end;
 }
 
+export const QUIZ_COMPLETION = "Great work. You can read candles and volume by price from the same trades.";
+
 export const QUIZ: QuizQuestion[] = [
   {
     id: "q-high",
