@@ -78,6 +78,16 @@ export const lessons: Lesson[] = [
     icon: "onchain",
   },
   {
+    slug: "echo-bands",
+    title: "Echo Bands",
+    summary: "Hear where a candle closes between two bands: the close note moves in pitch and timing between a low and a high band note.",
+    status: "available",
+    href: "/learn/echo-bands",
+    topics: ["Price channels", "Distance from boundaries", "Ear training"],
+    minutes: 6,
+    icon: "sound",
+  },
+  {
     slug: "three-trends-one-piano",
     title: "Learn With Sound",
     summary:
