@@ -80,15 +80,27 @@ export function squeezeBars(raw: readonly RawCandle[]): SqueezeBar[] {
 
 export type ExperimentYear = { all: SqueezeBar[]; startIndex: number; days: SqueezeBar[] };
 
-/** Splits history into the bars before a year and the tradable year. Null if the year is not complete. */
-export function experimentYear(raw: readonly RawCandle[], year: number): ExperimentYear | null {
+/**
+ * The tradable days of a year, after the indicators have warmed up. At least one earlier bar is
+ * kept as the preview, so a year whose history starts inside it (SOL 2020) begins a day later,
+ * and a year still in progress (SOL 2026) stops at its last candle. Null if the data has gaps.
+ */
+export function experimentPeriod(raw: readonly RawCandle[], year: number): ExperimentYear | null {
   const all = squeezeBars(raw);
-  const days = all.filter((b) => b.date.startsWith(`${year}-`));
-  const expected = (Date.UTC(year + 1, 0, 1) - Date.UTC(year, 0, 1)) / 86_400_000;
-  const startIndex = all.findIndex((b) => b.date === `${year}-01-01`);
-  if (days.length !== expected || startIndex < 1) return null;
+  let startIndex = all.findIndex((b) => b.date.startsWith(`${year}-`));
+  if (startIndex < 0) return null;
+  if (startIndex === 0) startIndex = 1;
+  const days = all.slice(startIndex).filter((b) => b.date.startsWith(`${year}-`));
+  if (days.length < 30) return null;
   for (let i = 1; i < days.length; i += 1) if (days[i].time - days[i - 1].time !== 86_400) return null;
   return days.every((b) => b.l <= Math.min(b.o, b.c) && b.h >= Math.max(b.o, b.c) && b.l > 0) ? { all, startIndex, days } : null;
+}
+
+/** A complete calendar year starting on 1 January. Null if any day is missing. */
+export function experimentYear(raw: readonly RawCandle[], year: number): ExperimentYear | null {
+  const period = experimentPeriod(raw, year);
+  const expected = (Date.UTC(year + 1, 0, 1) - Date.UTC(year, 0, 1)) / 86_400_000;
+  return period && period.days.length === expected && period.days[0].date === `${year}-01-01` ? period : null;
 }
 
 export const BAR_SECONDS = 0.5;
@@ -110,4 +122,30 @@ export function barSoundEvents(b: SqueezeBar, seconds: number = BAR_SECONDS): So
   if (b.squeeze) return Array.from({ length: level }, (_, j) => ({ kind: "drum", offset: (j * seconds) / level, hz: (b.age + j) % 2 ? 110 : 220, volume: pulseVolume(b.age) }));
   if (b.direction) return Array.from({ length: level }, (_, j) => ({ kind: "chime", offset: (j * seconds) / level, hz: b.direction > 0 ? 1050 : 520, volume: pulseVolume(b.age) }));
   return [];
+}
+
+export type DotMeter = { id: string; label: string; value: string; unit: string; note: string; dots: number };
+
+/** Dots out of 20 for a value against a maximum, as in the prototype's dot grids. */
+export function dotCount(value: number, max: number): number {
+  return value <= 0 || !Number.isFinite(value) ? 0 : Math.min(20, Math.max(1, Math.round((value / max) * 20)));
+}
+
+/**
+ * The prototype's visual guide: five numbers, each with a 20 dot grid.
+ * Gap: how far the Bollinger Bands sit outside the Keltner Channels, as a share of the channel half width.
+ */
+export function squeezeMeters(b: SqueezeBar, seconds: number = BAR_SECONDS): DotMeter[] {
+  const gap = (Math.max(b.bbH - b.kcH, b.kcL - b.bbL) / ((b.kcH - b.kcL) / 2)) * 100;
+  const rate = speedLevel(b.age) / seconds;
+  const drums = b.squeeze && !b.entry ? rate : 0;
+  const chimes = !b.squeeze && !b.release && b.direction ? rate : 0;
+  const maxRate = 5 / seconds;
+  return [
+    { id: "gap", label: "Gap to compression", value: Math.max(0, gap).toFixed(0), unit: "%", note: "20 dots = 100%, 0 while compressed", dots: dotCount(gap, 100) },
+    { id: "compressed", label: "Compression candles", value: b.squeeze ? String(b.age) : "0", unit: "bars", note: "20 dots at 19 candles", dots: dotCount(b.squeeze ? b.age : 0, 19) },
+    { id: "outside", label: "Outside compression", value: b.squeeze ? "0" : String(b.age), unit: "bars", note: "20 dots at 19 candles", dots: dotCount(b.squeeze ? 0 : b.age, 19) },
+    { id: "chimes", label: `${b.direction > 0 ? "High" : "Low"} chime pulses`, value: chimes.toFixed(1), unit: "/sec", note: "20 dots = maximum pulse rate", dots: dotCount(chimes, maxRate) },
+    { id: "drums", label: "Drum pulses", value: drums.toFixed(1), unit: "/sec", note: "20 dots = maximum pulse rate", dots: dotCount(drums, maxRate) },
+  ];
 }

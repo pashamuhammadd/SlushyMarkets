@@ -46,6 +46,12 @@ Route `/experiments/daily`, not linked, noindex. Rebuilt from Slushy's `/practic
 
 Adaptive Cloud preset (needs its exact formula and the recorded rain and thunder files), flames, siren and speech effects, the Dark Castle song, and the prototype's server-side first-attempt check.
 
-## Not built yet (BTC experiment)
+## BTC experiment unlocks (Slushy, 10 November 2026)
 
-2021 BTC bonus round, SOL year rounds, Dark Castle reward, trade log download, dot grids.
+- Finishing 2025 unlocks a secret 2021 BTC round (Coinbase data, one attempt).
+- Finishing 2021 unlocks the Dark Castle theme (`public/experiments/dark-castle.mp3`, made with ChatGPT for Slushy, cleared by him) and SOL/USD years 2020 to 2026 (Yahoo Finance, one attempt each). SOL 2020 starts on 24 April and SOL 2026 stops at the last candle in the file.
+- Bonus rounds stay on the device and are not added to the shared statistics.
+- Every round shows the prototype's five numbers with 20 dot grids: gap to compression, compression candles, outside compression, chime pulses and drum pulses (`squeezeMeters`).
+- Bonus data is loaded only after the unlock, so the first page load stays small.
+
+Not built yet: trade log download.

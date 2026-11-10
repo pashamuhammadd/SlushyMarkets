@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { EXPERIMENT_SETTINGS, accountEquity, advanceBar, createPaperAccount, experimentResult, queueOrder, type PaperBar } from "./engine";
 import { BTC_2025_VERSION, poolStats, statsGroups, validateRoundSubmission, type RoundStatsRow } from "./rounds";
-import { barSoundEvents, entryChimes, experimentYear, releaseClashes, speedLevel, squeezeBars, type RawCandle, type SqueezeBar } from "./squeeze";
+import { barSoundEvents, dotCount, entryChimes, experimentPeriod, experimentYear, releaseClashes, speedLevel, squeezeBars, squeezeMeters, type RawCandle, type SqueezeBar } from "./squeeze";
 
 const bar = (date: string, o: number, c = o): PaperBar => ({ date, o, c });
 
@@ -211,5 +211,46 @@ describe("shared rounds", () => {
   it("reports sound settings separately", () => {
     const groups = statsGroups([row("on", 1, 5, 1, 1, 5, 0)]);
     expect(groups.map((g) => g.stats?.rounds ?? 0)).toEqual([1, 1, 0, 0]);
+  });
+});
+
+describe("bonus periods and dot meters", () => {
+  const day = 86_400;
+  const start2020 = Date.UTC(2020, 3, 10) / 1000;
+  const mk = (n: number, from: number): RawCandle[] =>
+    Array.from({ length: n }, (_, i) => {
+      const c = 100 + Math.sin(i / 4) * 5;
+      return [from + i * day, c - 3, c + 3, c, c, 1];
+    });
+
+  it("handles a year that starts inside the history and one still in progress", () => {
+    const raw = mk(200, start2020);
+    const p = experimentPeriod(raw, 2020)!;
+    expect(p.startIndex).toBe(1);
+    expect(p.days[0].date).toBe(p.all[1].date);
+    expect(p.days.at(-1)!.date).toBe(new Date((start2020 + 199 * day) * 1000).toISOString().slice(0, 10));
+    expect(experimentYear(raw, 2020)).toBeNull();
+    expect(experimentPeriod(raw, 2030)).toBeNull();
+  });
+
+  it("counts dots out of 20 like the prototype", () => {
+    expect(dotCount(0, 19)).toBe(0);
+    expect(dotCount(-5, 100)).toBe(0);
+    expect(dotCount(0.1, 100)).toBe(1);
+    expect(dotCount(19, 19)).toBe(20);
+    expect(dotCount(50, 19)).toBe(20);
+  });
+
+  it("builds the five meters", () => {
+    const base: SqueezeBar = { time: 0, date: "", o: 1, h: 1, l: 1, c: 1, ema14: 100, bbL: 90, bbH: 110, kcL: 95, kcH: 105, direction: 1, squeeze: false, release: false, entry: false, prior: 0, age: 6 };
+    const m = squeezeMeters(base);
+    expect(m.map((x) => x.id)).toEqual(["gap", "compressed", "outside", "chimes", "drums"]);
+    expect(m[0]).toMatchObject({ value: "100", dots: 20 });
+    expect(m[2]).toMatchObject({ value: "6", dots: 6 });
+    expect(m[3]).toMatchObject({ value: "4.0", dots: 8 });
+    expect(m[4].dots).toBe(0);
+    const squeezed = squeezeMeters({ ...base, squeeze: true, bbL: 96, bbH: 104 });
+    expect(squeezed[0].dots).toBe(0);
+    expect(squeezed[4].value).toBe("4.0");
   });
 });
