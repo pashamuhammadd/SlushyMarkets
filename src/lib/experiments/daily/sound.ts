@@ -1,9 +1,10 @@
 import { barSoundEvents } from "../squeeze";
+import { cloudPlan } from "./cloud";
 import type { DailyBar } from "./indicators";
 
 /** Sound presets of the daily experiment. Pure note plans, played by SqueezePlayer. */
 
-export const DAILY_PRESETS = ["squeeze", "efficiency", "volume", "ema", "none"] as const;
+export const DAILY_PRESETS = ["squeeze", "efficiency", "volume", "ema", "cloud", "none"] as const;
 export type DailyPreset = (typeof DAILY_PRESETS)[number];
 
 export const PRESET_INFO: Record<DailyPreset, { name: string; description: string }> = {
@@ -26,11 +27,16 @@ export const PRESET_INFO: Record<DailyPreset, { name: string; description: strin
     name: "EMA Sonar (7 / 20 / 50)",
     description: "7 EMA: slow pluck. 20 EMA: medium organ. 50 EMA: fast deep organ. Each gets louder as price comes near it. The 7 EMA goes silent at 1 ATR or more away.",
   },
+  cloud: {
+    name: "Adaptive Cloud v1.0",
+    description:
+      "Slushy's adaptive cloud: an adaptive log-price center and an EMA100 anchor with a volatility buffer, delayed two daily candles. Rain and thunder while price is inside the cloud, high chimes above it, lower chimes below it. It describes where price is, it is not a forecast.",
+  },
   none: { name: "Chart Only", description: "Candles and your fills only. No market sounds." },
 };
 
 export type DailyNote =
-  | { kind: "chime" | "drum" | "bell" | "organ" | "wood"; offset: number; hz: number; volume: number; duration?: number }
+  | { kind: "chime" | "drum" | "bell" | "organ" | "wood" | "pure"; offset: number; hz: number; volume: number; duration?: number }
   | { kind: "cymbal"; offset: number };
 
 const PENTATONIC = [523.25, 587.33, 659.25, 783.99, 880];
@@ -96,5 +102,6 @@ export function presetNotes(preset: DailyPreset, b: DailyBar, position: number, 
   if (preset === "efficiency") return efficiencyNotes(b, seconds);
   if (preset === "volume") return volumeNotes(b, seconds);
   if (preset === "ema") return emaNotes(b, position);
+  if (preset === "cloud") return cloudPlan(b, position).notes.map((hz, j) => ({ kind: "pure" as const, offset: j * seconds * 0.45, hz, volume: 1, duration: Math.min(0.14, seconds * 0.4) }));
   return [];
 }

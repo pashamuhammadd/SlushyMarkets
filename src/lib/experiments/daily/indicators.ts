@@ -1,4 +1,5 @@
 import { squeezeBars, type RawCandle, type SqueezeBar } from "../squeeze";
+import { adaptiveCloud } from "./cloud";
 
 /**
  * Indicators for the daily mystery-market experiment, following Slushy's version 2 prototype.
@@ -25,6 +26,11 @@ export type DailyBar = SqueezeBar & {
   /** Taker buy share 0 to 1. Null when the source has no buyer and seller split. */
   buyShare: number | null;
   dominanceAge: number;
+  /** Adaptive Cloud v1.0, already lagged two candles. Null during its warm-up. */
+  cloudH: number | null;
+  cloudL: number | null;
+  cloudCenter: number | null;
+  cloudAnchor: number | null;
 };
 
 const WARMUP = 50;
@@ -61,6 +67,7 @@ export function dailyBars(raw: readonly RawCandle[], buyVolume?: readonly number
   const ema20 = emaSeries(closes, 20);
   const ema50 = emaSeries(closes, 50);
   const atr = wilderAtr(raw);
+  const cloud = adaptiveCloud(closes);
   const squeeze = new Map(squeezeBars(raw).map((b) => [b.time, b]));
   const out: DailyBar[] = [];
   for (let i = WARMUP; i < raw.length; i += 1) {
@@ -89,6 +96,10 @@ export function dailyBars(raw: readonly RawCandle[], buyVolume?: readonly number
       erAge: prev && prev.er > 0.5 === er > 0.5 ? prev.erAge + 1 : 1,
       erChannelL: closes[i - 14] - 0.5 * path,
       erChannelH: closes[i - 14] + 0.5 * path,
+      cloudH: cloud[i]?.cloudH ?? null,
+      cloudL: cloud[i]?.cloudL ?? null,
+      cloudCenter: cloud[i]?.cloudCenter ?? null,
+      cloudAnchor: cloud[i]?.cloudAnchor ?? null,
       volume: raw[i][5],
       volumeRatio: mean > 0 ? raw[i][5] / mean : 0,
       buyShare,
@@ -98,6 +109,7 @@ export function dailyBars(raw: readonly RawCandle[], buyVolume?: readonly number
   return out;
 }
 
+const CLOUD_KEYS = ["cloudH", "cloudL", "cloudCenter", "cloudAnchor"] as const;
 const PRICE_KEYS = ["o", "h", "l", "c", "ema14", "bbL", "bbH", "kcL", "kcH", "atr", "ema7", "ema20", "ema50", "erChannelL", "erChannelH"] as const;
 
 /** Rescales prices so `base` becomes 100, and hides real dates. Ratios and indicators are unchanged by scaling. */
@@ -106,6 +118,7 @@ export function indexBars(bars: readonly DailyBar[], base: number, startNumber =
   return bars.map((b, n) => {
     const scaled = { ...b, date: `Bar ${String(startNumber + n).padStart(3, "0")}`, time: startNumber + n };
     for (const key of PRICE_KEYS) scaled[key] = b[key] * f;
+    for (const key of CLOUD_KEYS) scaled[key] = b[key] === null ? null : b[key] * f;
     return scaled;
   });
 }

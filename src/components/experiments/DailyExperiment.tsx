@@ -21,6 +21,7 @@ import {
   type QueuedOrder,
 } from "@/lib/experiments/engine";
 import type { DailyBar } from "@/lib/experiments/daily/indicators";
+import { cloudState } from "@/lib/experiments/daily/cloud";
 import { DAILY_PRESETS, PRESET_INFO, presetNotes, type DailyPreset } from "@/lib/experiments/daily/sound";
 import { dailyVersion, type StatsGroup } from "@/lib/experiments/rounds";
 
@@ -203,6 +204,7 @@ export function DailyExperiment() {
 
   function finish(final: PaperAccount) {
     player.current?.cut();
+    player.current?.stopStorm();
     const current = readSaved();
     const item: HistoryItem = { round, preset: current.preset, result: experimentResult(final), ...(round === 3 ? { review: leverageReview(final) } : {}) };
     persist({ ...current, history: [...current.history, item] });
@@ -238,7 +240,9 @@ export function DailyExperiment() {
         setIndex(i);
         setAccount(a);
         player.current?.setVolume(readSaved().volume);
-        player.current?.play(presetNotes(readSaved().preset, bars[i], i, data.secondsPerBar));
+        const preset = readSaved().preset;
+        player.current?.play(presetNotes(preset, bars[i], i, data.secondsPerBar));
+        if (preset === "cloud") void player.current?.stormStep(cloudState(bars[i]) === "inside", data.secondsPerBar);
       }
       if (elapsed >= total || i === bars.length - 1) {
         window.clearInterval(timer);
@@ -260,7 +264,7 @@ export function DailyExperiment() {
     }
     setSaved({ ...current, started: [...current.started, round] });
     player.current ??= new SqueezePlayer();
-    void player.current.ready();
+    void player.current.ready().then((ok) => ok && current.preset === "cloud" && player.current?.prepareStorm());
     try {
       const response = await fetch("/api/experiments/daily", {
         method: "POST",
@@ -474,6 +478,7 @@ export function DailyExperiment() {
         <p>Every round starts with a fresh $10,000 and uses $2,000 positions, 0.05% fee and 0.02% adverse slippage per side, no commission. Orders fill at the next candle&apos;s open, and any open position closes at the final close. Stay flat whenever you like.</p>
         <p>Charts are real daily history with indexed prices, so the market and dates stay hidden until you finish. The same charts are used for everyone in a 12-hour set, and segments can return in later sets.</p>
         <p>This is an educational experiment, not proof of real-world trading ability. It does not model spreads, liquidity, funding or intraday liquidation. Sound describes indicator conditions and has not been shown to improve trading. Nothing here is investment advice.</p>
+        <p className="text-xs text-subtle">Adaptive Cloud v1.0 is Slushy&apos;s indicator. Storm audio: Thunder &amp; rain by iscence (Freesound #817640), CC0, excerpts edited for SlushyMarkets.</p>
       </section>
     </div>
   );
@@ -513,6 +518,12 @@ const LINES: Record<DailyPreset, Array<{ key: keyof DailyBar; color: string; das
     { key: "kcL", color: "var(--color-cyan)", dash: true },
     { key: "kcH", color: "var(--color-magenta)", dash: true },
   ],
+  cloud: [
+    { key: "cloudL", color: "var(--color-violet-soft)" },
+    { key: "cloudH", color: "var(--color-violet-soft)" },
+    { key: "cloudCenter", color: "var(--color-cyan-soft)", width: 2 },
+    { key: "cloudAnchor", color: "var(--color-gold)", width: 2 },
+  ],
   ema: [
     { key: "ema7", color: "var(--color-violet-soft)" },
     { key: "ema20", color: "var(--color-magenta)" },
@@ -532,6 +543,16 @@ function DailyChart({ bars, preset, fills, leveraged }: { bars: DailyBar[]; pres
   const y = (p: number) => VIEW.pad + ((top - p) / span) * (VIEW.h - VIEW.pad * 2);
   return (
     <svg viewBox={`0 0 ${VIEW.w} ${VIEW.h}`} preserveAspectRatio="none" role="img" aria-label="Mystery market daily candles with the selected sound profile's indicator lines. Revealed candles only." className={cn("h-64 w-full rounded-2xl bg-navy-950/60 ring-1 transition sm:h-96", leveraged ? "ring-2 ring-gold/70 shadow-[0_0_40px_-8px_rgb(255_197_61/0.6)]" : "ring-white/10")}>
+      {preset === "cloud" ? (
+        <polygon
+          fill="var(--color-violet)"
+          opacity={0.2}
+          points={(() => {
+            const ok = bars.map((b, i) => ({ b, i })).filter(({ b }) => b.cloudH !== null && b.cloudL !== null);
+            return [...ok.map(({ b, i }) => `${x(i)},${y(b.cloudH!)}`), ...ok.map(({ b, i }) => `${x(i)},${y(b.cloudL!)}`).reverse()].join(" ");
+          })()}
+        />
+      ) : null}
       {preset === "efficiency" ? (
         <polygon fill="var(--color-violet)" opacity={0.14} points={[...bars.map((b, i) => `${x(i)},${y(b.erChannelH)}`), ...bars.map((b, i) => `${x(i)},${y(b.erChannelL)}`).reverse()].join(" ")} />
       ) : null}
@@ -546,7 +567,7 @@ function DailyChart({ bars, preset, fills, leveraged }: { bars: DailyBar[]; pres
         );
       })}
       {lines.map((l) => (
-        <polyline key={l.key} fill="none" stroke={l.color} strokeWidth={l.width ?? 1.4} strokeDasharray={l.dash ? "4 4" : undefined} vectorEffect="non-scaling-stroke" points={bars.map((b, i) => `${x(i)},${y(b[l.key] as number)}`).join(" ")} />
+        <polyline key={l.key} fill="none" stroke={l.color} strokeWidth={l.width ?? 1.4} strokeDasharray={l.dash ? "4 4" : undefined} vectorEffect="non-scaling-stroke" points={bars.flatMap((b, i) => (Number.isFinite(b[l.key] as number) && b[l.key] !== null ? [`${x(i)},${y(b[l.key] as number)}`] : [])).join(" ")} />
       ))}
       {fills.map((f, n) => {
         const i = bars.findIndex((b) => b.date === f.date);

@@ -1,0 +1,141 @@
+[
+  {
+    "name": "warmup",
+    "bar": {
+      "c": 100,
+      "cloudL": null,
+      "cloudH": null
+    },
+    "i": 0,
+    "state": "warmup",
+    "notes": []
+  },
+  {
+    "name": "lower touch",
+    "bar": {
+      "c": 90,
+      "cloudL": 90,
+      "cloudH": 110
+    },
+    "i": 0,
+    "state": "inside",
+    "notes": []
+  },
+  {
+    "name": "upper touch",
+    "bar": {
+      "c": 110,
+      "cloudL": 90,
+      "cloudH": 110
+    },
+    "i": 0,
+    "state": "inside",
+    "notes": []
+  },
+  {
+    "name": "inside",
+    "bar": {
+      "c": 100,
+      "cloudL": 90,
+      "cloudH": 110
+    },
+    "i": 0,
+    "state": "inside",
+    "notes": []
+  },
+  {
+    "name": "above",
+    "bar": {
+      "c": 111,
+      "cloudL": 90,
+      "cloudH": 110
+    },
+    "i": 0,
+    "state": "above",
+    "notes": [
+      523.26,
+      587.32
+    ]
+  },
+  {
+    "name": "below",
+    "bar": {
+      "c": 89,
+      "cloudL": 90,
+      "cloudH": 110
+    },
+    "i": 0,
+    "state": "below",
+    "notes": [
+      261.63,
+      261.63
+    ]
+  },
+  {
+    "name": "above later",
+    "bar": {
+      "c": 111,
+      "cloudL": 90,
+      "cloudH": 110
+    },
+    "i": 6,
+    "state": "above",
+    "notes": [
+      587.32,
+      523.26
+    ]
+  },
+  {
+    "name": "below later",
+    "bar": {
+      "c": 89,
+      "cloudL": 90,
+      "cloudH": 110
+    },
+    "i": 6,
+    "state": "below",
+    "notes": [
+      293.66,
+      329.63
+    ]
+  },
+  {
+    "name": "calculated above",
+    "bar": {
+      "c": 103.6966265690157,
+      "cloudL": 101.21937483583918,
+      "cloudH": 102.98357245749523
+    },
+    "i": 0,
+    "state": "above",
+    "notes": [
+      523.26,
+      587.32
+    ]
+  },
+  {
+    "name": "calculated below",
+    "bar": {
+      "c": 121.33760265587759,
+      "cloudL": 123.50020414133355,
+      "cloudH": 144.8021790362911
+    },
+    "i": 66,
+    "state": "below",
+    "notes": [
+      329.63,
+      293.66
+    ]
+  },
+  {
+    "name": "calculated inside",
+    "bar": {
+      "c": 102.84963322958627,
+      "cloudL": 101.35277582043383,
+      "cloudH": 103.15622601437093
+    },
+    "i": 3,
+    "state": "inside",
+    "notes": []
+  }
+]
