@@ -17,3 +17,14 @@ describe("daily experiment data", () => {
     for (let cycle = start; cycle < start + 730; cycle += 1) expect(pickWindows(cycle, lengths)).not.toBeNull();
   });
 });
+
+describe("BTC experiment bonus rounds", () => {
+  it("has a full 2021 and every SOL year from 2020 to 2026", async () => {
+    const { experimentPeriod, experimentYear } = await import("@/lib/experiments/squeeze");
+    const { BTC_USD_DAILY_2020 } = await import("./btc-usd-daily-2020");
+    const { SOL_USD_DAILY } = await import("./sol-usd-daily");
+    expect(experimentYear(BTC_USD_DAILY_2020, 2021)?.days).toHaveLength(365);
+    for (const year of [2020, 2021, 2022, 2023, 2024, 2025, 2026]) expect(experimentPeriod(SOL_USD_DAILY, year), String(year)).not.toBeNull();
+    expect(experimentPeriod(SOL_USD_DAILY, 2020)!.days[0].date).toBe("2020-04-24");
+  });
+});
