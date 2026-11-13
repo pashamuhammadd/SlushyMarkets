@@ -42,9 +42,15 @@ Route `/experiments/daily`, not linked, noindex. Rebuilt from Slushy's `/practic
 2. Optional: set `EXPERIMENT_SIGNING_SECRET` in Vercel to a long random string.
 3. Set `EXPERIMENT_DAILY_ENABLED=true`, Preview first.
 
+### Adaptive Cloud v1.0 (added 10 November 2026)
+
+From Slushy's handoff package (`Adaptive_Cloud_v1_Nimia_Handoff.zip`). The calculation is ported to `src/lib/experiments/daily/cloud.ts` and tested against the package's fixtures (`fixtures/expected_cloud.json` to 1e-10, `fixtures/expected_sound.json` exactly). The cloud is computed from the first candle of each series, appears from index 101 and is shown two candles late; the close is compared with the lagged cloud, touching counts as inside. The vote is kept but not used for sound.
+
+Sound: two pentatonic chimes per candle above (octave up) or below (reversed); inside plays the recorded rain loop with thunder at most every max(6 s, 0.65 x its length), with a procedural rumble if the files fail. Recordings: `public/experiments/cloud-rain.mp3` and `cloud-thunder.mp3`, Thunder & rain by iscence (Freesound #817640), CC0, checksums match the package. Integration change: the files are served from `/experiments/` instead of the site root.
+
 ### Left out of the daily experiment
 
-Adaptive Cloud preset (needs its exact formula and the recorded rain and thunder files), flames, siren and speech effects, the Dark Castle song, and the prototype's server-side first-attempt check.
+Flames, siren and speech effects, the Dark Castle song in this experiment, and the prototype's server-side first-attempt check. TradingView rendering of the Pine reference was not tested.
 
 ## BTC experiment unlocks (Slushy, 10 November 2026)
 
