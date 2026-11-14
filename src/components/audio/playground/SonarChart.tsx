@@ -12,7 +12,8 @@ type SonarChartProps = {
   timeframeLabel: string;
 };
 
-const HEIGHT = 300;
+const BASE_HEIGHT = 300;
+const VOLUME_STRIP = 54;
 const PAD = { top: 16, right: 12, bottom: 28, left: 46 };
 
 const MARKER_COLORS = { up: "#44D9A4", down: "#FF6B8B", return: "#B79BFF" } as const;
@@ -23,7 +24,8 @@ const MARKER_COLORS = { up: "#44D9A4", down: "#FF6B8B", return: "#B79BFF" } as c
  */
 export function SonarChart({ model, revealTo, cursor, timeframeLabel }: SonarChartProps) {
   const [ref, width] = useElementWidth<HTMLDivElement>(720);
-  const { bars, lines, markers } = model;
+  const { bars, lines, markers, volume } = model;
+  const HEIGHT = BASE_HEIGHT + (volume ? VOLUME_STRIP : 0);
   const last = revealTo === null ? bars.length - 1 : revealTo;
 
   const values = bars.flatMap((b) => [b.high, b.low]).concat(lines.flatMap((l) => l.values));
@@ -34,7 +36,9 @@ export function SonarChart({ model, revealTo, cursor, timeframeLabel }: SonarCha
   const hi = max + span * 0.05;
 
   const plotW = Math.max(width - PAD.left - PAD.right, 40);
-  const plotH = HEIGHT - PAD.top - PAD.bottom;
+  const plotH = BASE_HEIGHT - PAD.top - PAD.bottom;
+  const stripLabelY = BASE_HEIGHT + 8;
+  const unit = volume ? (VOLUME_STRIP - 16) / volume.max : 0;
   const step = plotW / bars.length;
   const x = (i: number) => PAD.left + (i + 0.5) * step;
   const y = (p: number) => PAD.top + ((hi - p) / (hi - lo)) * plotH;
@@ -67,7 +71,7 @@ export function SonarChart({ model, revealTo, cursor, timeframeLabel }: SonarCha
             </text>
           </g>
         ))}
-        <text x={PAD.left} y={HEIGHT - 8} fontSize="11" fill={COLORS.label}>
+        <text x={PAD.left} y={BASE_HEIGHT - 8} fontSize="11" fill={COLORS.label}>
           Simulated price units · {timeframeLabel} bars
         </text>
 
@@ -137,8 +141,28 @@ export function SonarChart({ model, revealTo, cursor, timeframeLabel }: SonarCha
             ),
           )}
 
+        {volume ? (
+          <g>
+            <text x={PAD.left} y={stripLabelY} fontSize="10" fill={COLORS.label}>
+              {volume.label}
+            </text>
+            {bars.map((_, i) => {
+              if (i > last) return null;
+              const base = HEIGHT - 4;
+              const sellerH = volume.seller[i] * unit;
+              const buyerH = volume.buyer[i] * unit;
+              return (
+                <g key={`v${i}`}>
+                  <rect x={x(i) - bodyW / 2} y={base - sellerH} width={bodyW} height={sellerH} fill={volume.sellerColor} opacity={0.85} />
+                  <rect x={x(i) - bodyW / 2} y={base - sellerH - buyerH} width={bodyW} height={buyerH} fill={volume.buyerColor} opacity={0.85} />
+                </g>
+              );
+            })}
+          </g>
+        ) : null}
+
         {cursor !== null ? (
-          <line x1={x(cursor)} x2={x(cursor)} y1={PAD.top} y2={PAD.top + plotH} stroke="#E3CBFF" strokeWidth={1.5} />
+          <line x1={x(cursor)} x2={x(cursor)} y1={PAD.top} y2={volume ? HEIGHT - 4 : PAD.top + plotH} stroke="#E3CBFF" strokeWidth={1.5} />
         ) : null}
       </svg>
     </div>
