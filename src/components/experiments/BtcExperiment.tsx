@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode, type SyntheticEvent } from "react";
-import { ArrowDown, ArrowUp, Lock, Music, Play, RefreshCw, Square, Trophy, X } from "lucide-react";
+import { ArrowDown, ArrowUp, Download, Lock, Music, Play, RefreshCw, Square, Trophy, X } from "lucide-react";
 import { SqueezePlayer } from "@/lib/audio/squeeze-player";
 import { cn } from "@/lib/cn";
 import {
@@ -18,6 +18,7 @@ import {
   type QueuedOrder,
 } from "@/lib/experiments/engine";
 import { BTC_2025_VERSION, type SoundSetting, type StatsGroup } from "@/lib/experiments/rounds";
+import { downloadCsv, logTrades, tradeLogCsv, tradeLogFileName, type LoggedTrade } from "@/lib/experiments/trade-log";
 import {
   BAR_SECONDS,
   barSoundEvents,
@@ -49,6 +50,8 @@ type Attempt = {
   shared?: boolean;
   sound?: SoundSetting;
   result?: ExperimentResult;
+  /** Closed trades, kept for the CSV download. Older attempts do not have them. */
+  trades?: LoggedTrade[];
 };
 
 const listeners = new Set<() => void>();
@@ -454,7 +457,7 @@ function TradingRound({ attemptKey, period, asset, title, canStart, startHint, s
         playerRef.current?.cut();
         const current = attemptRef.current;
         if (!current) return;
-        const done: Attempt = { ...current, completed: true, result: experimentResult(account), sound: mixedRef.current ? "mixed" : initialSoundRef.current };
+        const done: Attempt = { ...current, completed: true, result: experimentResult(account), trades: logTrades(account.trades), sound: mixedRef.current ? "mixed" : initialSoundRef.current };
         writeAttempt(attemptKey, done);
         setPhase("prepare");
         finishRef.current?.(done);
@@ -512,6 +515,26 @@ function TradingRound({ attemptKey, period, asset, title, canStart, startHint, s
           <Stat label="Modeled fees" value={money(r.fees)} />
         </dl>
         <p className="text-sm text-muted">This round can only be played once in this browser. It is an educational result, not proof of real-world trading ability.</p>
+        {attempt.trades ? (
+          <button
+            type="button"
+            onClick={() =>
+              downloadCsv(
+                tradeLogFileName(`${asset} ${period.days[0].date.slice(0, 4)}`),
+                tradeLogCsv({
+                  market: `${asset}/USD daily, ${period.days[0].date} to ${period.days.at(-1)!.date}`,
+                  settings: EXPERIMENT_SETTINGS,
+                  result: r,
+                  trades: attempt.trades!,
+                  notes: [`Round: ${title}`, `Sound: ${attempt.sound ?? "on"}`],
+                }),
+              )
+            }
+            className="inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-semibold text-ink ring-1 ring-white/15 hover:bg-white/5"
+          >
+            <Download aria-hidden="true" className="size-4" /> Download trade log (CSV)
+          </button>
+        ) : null}
         {resultExtra?.(attempt)}
       </section>
     );

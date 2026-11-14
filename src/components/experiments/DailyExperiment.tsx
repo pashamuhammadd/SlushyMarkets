@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowDown, ArrowUp, Lock, Play, Volume2, X, Zap } from "lucide-react";
+import { ArrowDown, ArrowUp, Lock, Play, Volume2, X, Zap, Download } from "lucide-react";
 import { SqueezePlayer } from "@/lib/audio/squeeze-player";
 import { cn } from "@/lib/cn";
 import {
@@ -24,13 +24,14 @@ import type { DailyBar } from "@/lib/experiments/daily/indicators";
 import { cloudState } from "@/lib/experiments/daily/cloud";
 import { DAILY_PRESETS, PRESET_INFO, presetNotes, type DailyPreset } from "@/lib/experiments/daily/sound";
 import { dailyVersion, type StatsGroup } from "@/lib/experiments/rounds";
+import { downloadCsv, logTrades, tradeLogCsv, tradeLogFileName, type LoggedTrade } from "@/lib/experiments/trade-log";
 
 const STORE = "slushymarkets-daily-v2";
 const ROUND_NAMES = ["Round 1", "Round 2", "Round 3", "Arcade"];
 const COUNTDOWN = 3;
 const WINDOW = 55;
 
-type HistoryItem = { round: number; preset: DailyPreset; result: ExperimentResult; review?: LeverageReview; shared?: boolean };
+type HistoryItem = { round: number; preset: DailyPreset; result: ExperimentResult; review?: LeverageReview; shared?: boolean; trades?: LoggedTrade[] };
 type Saved = { cycle: number; started: number[]; history: HistoryItem[]; preset: DailyPreset; volume: number };
 type Loaded = { cycle: number; round: number; nextRefresh: number; offset: number; context: DailyBar[]; bars: number; secondsPerBar: number; hasVolume: boolean };
 type Identity = { asset: string; source: string; start: string; end: string };
@@ -206,7 +207,7 @@ export function DailyExperiment() {
     player.current?.cut();
     player.current?.stopStorm();
     const current = readSaved();
-    const item: HistoryItem = { round, preset: current.preset, result: experimentResult(final), ...(round === 3 ? { review: leverageReview(final) } : {}) };
+    const item: HistoryItem = { round, preset: current.preset, result: experimentResult(final), trades: logTrades(final.trades), ...(round === 3 ? { review: leverageReview(final) } : {}) };
     persist({ ...current, history: [...current.history, item] });
     setLast(item);
     setPhase("done");
@@ -443,6 +444,26 @@ export function DailyExperiment() {
             {shareStatus === "sending" ? "Sending your summary." : shareStatus === "done" ? "Your summary was added to the shared statistics." : shareStatus === "failed" ? "Your summary could not be saved to the shared statistics." : round === 3 ? "Arcade results stay on this device." : "Kept private. Nothing was sent."}
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
+            {last.trades ? (
+              <button
+                type="button"
+                onClick={() =>
+                  downloadCsv(
+                    tradeLogFileName(`daily ${ROUND_NAMES[round]}`),
+                    tradeLogCsv({
+                      market: identity ? `${identity.asset} daily, ${identity.start} to ${identity.end}, ${identity.source}` : "Mystery market (daily candles)",
+                      settings: EXPERIMENT_SETTINGS,
+                      result: last.result,
+                      trades: last.trades!,
+                      notes: [`Round: ${ROUND_NAMES[round]}`, `Sound: ${PRESET_INFO[last.preset].name}`, "Prices are indexed so the first context close is 100. Dates are shown as bar numbers."],
+                    }),
+                  )
+                }
+                className="inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-semibold text-ink ring-1 ring-white/15 hover:bg-white/5"
+              >
+                <Download aria-hidden="true" className="size-4" /> Download trade log (CSV)
+              </button>
+            ) : null}
             {round < 2 ? <ActionButton onClick={() => void load(round + 1)}>Next round</ActionButton> : null}
             {round === 2 && arcadeOpen ? <ActionButton onClick={() => void load(3)}>Arcade unlocked</ActionButton> : null}
           </div>
