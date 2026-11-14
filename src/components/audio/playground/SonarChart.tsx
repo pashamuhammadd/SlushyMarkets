@@ -53,10 +53,16 @@ export function SonarChart({ model, revealTo, cursor, timeframeLabel }: SonarCha
   const bodyW = Math.max(Math.min(step * 0.6, 9), 1.5);
   const ticks = [0, 0.5, 1].map((t) => lo + (hi - lo) * t);
 
-  const linePath = (series: number[]) =>
+  const linePath = (series: number[], stepped = false) =>
     series
       .slice(0, last + 1)
-      .map((v, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(1)},${y(v).toFixed(1)}`)
+      .map((v, i) =>
+        i === 0
+          ? `M${x(i).toFixed(1)},${y(v).toFixed(1)}`
+          : stepped
+            ? `H${x(i).toFixed(1)} V${y(v).toFixed(1)}`
+            : `L${x(i).toFixed(1)},${y(v).toFixed(1)}`,
+      )
       .join(" ");
 
   return (
@@ -113,7 +119,7 @@ export function SonarChart({ model, revealTo, cursor, timeframeLabel }: SonarCha
         {lines.map((l) => (
           <path
             key={l.id}
-            d={linePath(l.values)}
+            d={linePath(l.values, l.step)}
             fill="none"
             stroke={l.color}
             strokeWidth={l.dashed ? 1.5 : 2.25}

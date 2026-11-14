@@ -82,6 +82,8 @@ export type ChartLine = {
   color: string;
   values: number[];
   dashed?: boolean;
+  /** Draw as steps (flat until the value changes) instead of sloped segments. */
+  step?: boolean;
 };
 
 export type ChartMarker = {

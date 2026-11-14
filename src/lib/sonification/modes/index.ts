@@ -3,14 +3,14 @@
  * The others are Slushy's prototype ideas that will be ported one at a time, after each is
  * reviewed and tested.
  */
-export type PlayableModeId = "ema-sonar" | "sonar-bands" | "sonar-er-drums" | "sonar-volume" | "fractals";
+export type PlayableModeId = "ema-sonar" | "sonar-bands" | "sonar-er-drums" | "sonar-volume" | "fractals" | "multi-timeframe";
 
 export type ModeListing = {
   id: string;
   title: string;
   summary: string;
   status: "live" | "planned";
-  href?: "/audio-lab/playground" | "/audio-lab/playground/sonar-bands" | "/audio-lab/playground/er-drums" | "/audio-lab/playground/sonar-volume" | "/audio-lab/playground/fractals";
+  href?: "/audio-lab/playground" | "/audio-lab/playground/sonar-bands" | "/audio-lab/playground/er-drums" | "/audio-lab/playground/sonar-volume" | "/audio-lab/playground/fractals" | "/audio-lab/playground/multi-timeframe";
 };
 
 export const MODE_LISTINGS: readonly ModeListing[] = [
@@ -45,8 +45,9 @@ export const MODE_LISTINGS: readonly ModeListing[] = [
   {
     id: "multi-timeframe",
     title: "Two or three timeframes",
-    summary: "Layer price from several timeframes, with optional indicator cues.",
-    status: "planned",
+    summary: "Hear the chart timeframe and one or two slower timeframes together, with optional efficiency and MACD cues.",
+    status: "live",
+    href: "/audio-lab/playground/multi-timeframe",
   },
   {
     id: "fractals",
