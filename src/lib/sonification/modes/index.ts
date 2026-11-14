@@ -3,14 +3,14 @@
  * The others are Slushy's prototype ideas that will be ported one at a time, after each is
  * reviewed and tested.
  */
-export type PlayableModeId = "ema-sonar" | "sonar-bands" | "sonar-er-drums" | "sonar-volume";
+export type PlayableModeId = "ema-sonar" | "sonar-bands" | "sonar-er-drums" | "sonar-volume" | "fractals";
 
 export type ModeListing = {
   id: string;
   title: string;
   summary: string;
   status: "live" | "planned";
-  href?: "/audio-lab/playground" | "/audio-lab/playground/sonar-bands" | "/audio-lab/playground/er-drums" | "/audio-lab/playground/sonar-volume";
+  href?: "/audio-lab/playground" | "/audio-lab/playground/sonar-bands" | "/audio-lab/playground/er-drums" | "/audio-lab/playground/sonar-volume" | "/audio-lab/playground/fractals";
 };
 
 export const MODE_LISTINGS: readonly ModeListing[] = [
@@ -51,7 +51,8 @@ export const MODE_LISTINGS: readonly ModeListing[] = [
   {
     id: "fractals",
     title: "Fractals: confirm or reject",
-    summary: "Cues when a swing high or low forms, confirms or gets rejected.",
-    status: "planned",
+    summary: "A knock for each candidate swing, a chime pair when it is confirmed and a thud when it is rejected.",
+    status: "live",
+    href: "/audio-lab/playground/fractals",
   },
 ];

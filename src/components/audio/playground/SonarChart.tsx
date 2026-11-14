@@ -16,7 +16,15 @@ const BASE_HEIGHT = 300;
 const VOLUME_STRIP = 54;
 const PAD = { top: 16, right: 12, bottom: 28, left: 46 };
 
-const MARKER_COLORS = { up: "#44D9A4", down: "#FF6B8B", return: "#B79BFF" } as const;
+const MARKER_COLORS = {
+  up: "#44D9A4",
+  down: "#FF6B8B",
+  return: "#B79BFF",
+  candidate: "#B79BFF",
+  "swing-high": "#FF6B8B",
+  "swing-low": "#44D9A4",
+  reject: "#FFD166",
+} as const;
 
 /**
  * Candles plus the lines of the current mode, drawn from the same analysis the sound is built
@@ -115,11 +123,39 @@ export function SonarChart({ model, revealTo, cursor, timeframeLabel }: SonarCha
         ))}
 
         {markers
-          .filter((m) => m.index <= last)
-          .map((m) =>
-            m.kind === "return" ? (
+          .filter((m) => (m.revealAt ?? m.index) <= last)
+          .map((m, k) =>
+            m.kind === "candidate" ? (
+              <circle
+                key={`c${k}`}
+                cx={x(m.index)}
+                cy={y(m.price) - (m.direction ?? 1) * 6}
+                r={2.5}
+                fill={MARKER_COLORS.candidate}
+              />
+            ) : m.kind === "swing-high" || m.kind === "swing-low" ? (
+              <path
+                key={`s${k}`}
+                d={
+                  m.kind === "swing-high"
+                    ? `M${x(m.index) - 5},${y(m.price) - 13} L${x(m.index) + 5},${y(m.price) - 13} L${x(m.index)},${y(m.price) - 5} Z`
+                    : `M${x(m.index) - 5},${y(m.price) + 13} L${x(m.index) + 5},${y(m.price) + 13} L${x(m.index)},${y(m.price) + 5} Z`
+                }
+                fill={MARKER_COLORS[m.kind]}
+                stroke="#0B1020"
+                strokeWidth={1}
+              />
+            ) : m.kind === "reject" ? (
+              <path
+                key={`x${k}`}
+                d={`M${x(m.index) - 4},${y(m.price) - 4} L${x(m.index) + 4},${y(m.price) + 4} M${x(m.index) + 4},${y(m.price) - 4} L${x(m.index) - 4},${y(m.price) + 4}`}
+                stroke={MARKER_COLORS.reject}
+                strokeWidth={2.25}
+                strokeLinecap="round"
+              />
+            ) : m.kind === "return" ? (
               <rect
-                key={`r${m.index}`}
+                key={`r${k}`}
                 x={x(m.index) - 4}
                 y={y(m.price) - 4}
                 width={8}
@@ -130,7 +166,7 @@ export function SonarChart({ model, revealTo, cursor, timeframeLabel }: SonarCha
               />
             ) : (
               <circle
-                key={`b${m.index}`}
+                key={`b${k}`}
                 cx={x(m.index)}
                 cy={y(m.price)}
                 r={5.5}

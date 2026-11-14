@@ -170,7 +170,7 @@ describe("EMA Sonar", () => {
 
   it("lists exactly the implemented modes as live, each with a page", () => {
     const live = MODE_LISTINGS.filter((m) => m.status === "live");
-    expect(live.map((m) => m.id)).toEqual([emaSonarMode.id, sonarBandsMode.id, erDrumsMode.id, "sonar-volume"]);
+    expect(live.map((m) => m.id)).toEqual([emaSonarMode.id, sonarBandsMode.id, erDrumsMode.id, "sonar-volume", "fractals"]);
     expect(live.every((m) => m.href)).toBe(true);
   });
 
