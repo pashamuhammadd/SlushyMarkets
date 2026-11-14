@@ -87,7 +87,11 @@ export type ChartLine = {
 export type ChartMarker = {
   index: number;
   price: number;
-  kind: "up" | "down" | "return";
+  kind: "up" | "down" | "return" | "candidate" | "swing-high" | "swing-low" | "reject";
+  /** For candidate markers: 1 above the bar (a high), -1 below (a low). */
+  direction?: 1 | -1;
+  /** Bar at which the marker appears during playback, when later than `index`. */
+  revealAt?: number;
 };
 
 /** A shaded stretch of bars, for example where a condition holds. Inclusive indexes. */

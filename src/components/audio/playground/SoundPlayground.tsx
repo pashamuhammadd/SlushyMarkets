@@ -10,6 +10,7 @@ import { BAR_SECONDS, audibleGain, hasSolo } from "@/lib/sonification/mixer";
 import { emaSonarMode } from "@/lib/sonification/modes/ema-sonar";
 import { erDrumsMode } from "@/lib/sonification/modes/er-drums";
 import { sonarVolumeMode } from "@/lib/sonification/modes/sonar-volume";
+import { fractalsMode } from "@/lib/sonification/modes/fractals";
 import type { PlayableModeId } from "@/lib/sonification/modes";
 import { sonarBandsMode } from "@/lib/sonification/modes/sonar-bands";
 import { PULSE_RATES, type LayerDefinition, type LayerSettings, type PulseRate, type SonificationMode } from "@/lib/sonification/types";
@@ -38,6 +39,7 @@ export function SoundPlayground({ modeId }: { modeId: PlayableModeId }) {
   if (modeId === "sonar-bands") return <PlaygroundView mode={sonarBandsMode} />;
   if (modeId === "sonar-er-drums") return <PlaygroundView mode={erDrumsMode} />;
   if (modeId === "sonar-volume") return <PlaygroundView mode={sonarVolumeMode} />;
+  if (modeId === "fractals") return <PlaygroundView mode={fractalsMode} />;
   return <PlaygroundView mode={emaSonarMode} />;
 }
 

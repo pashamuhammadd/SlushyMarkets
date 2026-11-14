@@ -20,6 +20,7 @@ const routes: { path: string; priority: number; changeFrequency: "weekly" | "mon
   { path: "/audio-lab/playground/sonar-bands", priority: 0.8, changeFrequency: "monthly" },
   { path: "/audio-lab/playground/er-drums", priority: 0.8, changeFrequency: "monthly" },
   { path: "/audio-lab/playground/sonar-volume", priority: 0.8, changeFrequency: "monthly" },
+  { path: "/audio-lab/playground/fractals", priority: 0.8, changeFrequency: "monthly" },
   { path: "/games", priority: 0.7, changeFrequency: "monthly" },
   { path: "/games/candle-builder", priority: 0.7, changeFrequency: "monthly" },
   { path: "/games/practice", priority: 0.7, changeFrequency: "monthly" },
