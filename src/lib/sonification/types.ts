@@ -102,6 +102,8 @@ export type ChartModel = {
   lines: ChartLine[];
   markers: ChartMarker[];
   zones?: ChartZone[];
+  /** Optional stacked volume strip under the candles (buyers on top of sellers). */
+  volume?: { buyer: number[]; seller: number[]; max: number; buyerColor: string; sellerColor: string; label: string };
   /** Screen reader description of what the chart shows. */
   description: string;
 };

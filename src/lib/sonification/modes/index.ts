@@ -3,14 +3,14 @@
  * The others are Slushy's prototype ideas that will be ported one at a time, after each is
  * reviewed and tested.
  */
-export type PlayableModeId = "ema-sonar" | "sonar-bands" | "sonar-er-drums";
+export type PlayableModeId = "ema-sonar" | "sonar-bands" | "sonar-er-drums" | "sonar-volume";
 
 export type ModeListing = {
   id: string;
   title: string;
   summary: string;
   status: "live" | "planned";
-  href?: "/audio-lab/playground" | "/audio-lab/playground/sonar-bands" | "/audio-lab/playground/er-drums";
+  href?: "/audio-lab/playground" | "/audio-lab/playground/sonar-bands" | "/audio-lab/playground/er-drums" | "/audio-lab/playground/sonar-volume";
 };
 
 export const MODE_LISTINGS: readonly ModeListing[] = [
@@ -38,8 +38,9 @@ export const MODE_LISTINGS: readonly ModeListing[] = [
   {
     id: "sonar-volume",
     title: "Sonar Channels and volume",
-    summary: "Short drum bursts for simulated buyer and seller volume.",
-    status: "planned",
+    summary: "Quick high and low drum hits for simulated buyer and seller volume, on top of the Sonar Bands channel.",
+    status: "live",
+    href: "/audio-lab/playground/sonar-volume",
   },
   {
     id: "multi-timeframe",
