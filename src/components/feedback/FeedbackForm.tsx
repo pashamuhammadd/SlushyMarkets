@@ -12,7 +12,7 @@ type Status =
   | { kind: "success" }
   | { kind: "error"; message: string };
 
-type ApiResponse = { ok: boolean; message?: string; fields?: Partial<Record<FeedbackField, string>> };
+type ApiResponse = { ok: boolean; error?: string; message?: string; fields?: Partial<Record<FeedbackField, string>> };
 
 const inputBase =
   "w-full rounded-xl bg-navy-950/60 px-4 text-sm text-ink ring-1 ring-white/10 placeholder:text-subtle transition focus:outline-none focus:ring-2 focus:ring-cyan aria-[invalid=true]:ring-danger/70";
@@ -30,6 +30,7 @@ export function FeedbackForm() {
   const [email, setEmail] = useState("");
   const [consent, setConsent] = useState(false);
   const startedAt = useRef<number | null>(null);
+  const token = useRef<Promise<string | null> | null>(null);
   const id = useId();
 
   function clearError(field: FeedbackField) {
@@ -37,8 +38,17 @@ export function FeedbackForm() {
     if (status.kind === "error") setStatus({ kind: "idle" });
   }
 
+  /** Ask the server for a signed form token once someone starts writing. */
+  function requestToken() {
+    token.current = fetch("/api/feedback", { cache: "no-store" })
+      .then((r) => r.json() as Promise<{ token?: string | null }>)
+      .then((d) => d.token ?? null)
+      .catch(() => null);
+  }
+
   function markStarted() {
     if (startedAt.current === null) startedAt.current = Date.now();
+    if (token.current === null) requestToken();
   }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -49,6 +59,8 @@ export function FeedbackForm() {
     setErrors({});
 
     try {
+      if (token.current === null) requestToken();
+      const formToken = await token.current;
       const response = await fetch("/api/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -61,6 +73,7 @@ export function FeedbackForm() {
           page: document.referrer ? safePath(document.referrer) : null,
           website: String(form.get("website") ?? ""),
           startedAt: startedAt.current ?? Date.now(),
+          token: formToken,
         }),
       });
       const data = (await response.json().catch(() => ({ ok: false }))) as ApiResponse;
@@ -70,6 +83,8 @@ export function FeedbackForm() {
         return;
       }
       if (data.fields) setErrors(data.fields);
+      // An expired, reused or invalid form token: fetch a fresh one now, so the next try works.
+      if (data.error === "rejected") requestToken();
       setStatus({ kind: "error", message: data.message ?? "Something went wrong. Nothing was saved, please try again." });
     } catch {
       setStatus({ kind: "error", message: "Network error. Nothing was saved, please check your connection and try again." });
@@ -93,6 +108,7 @@ export function FeedbackForm() {
             setRating(null);
             setStatus({ kind: "idle" });
             startedAt.current = null;
+            token.current = null;
           }}
           className="inline-flex h-10 items-center rounded-full px-4 text-sm font-semibold text-ink ring-1 ring-white/15 transition hover:bg-white/5"
         >

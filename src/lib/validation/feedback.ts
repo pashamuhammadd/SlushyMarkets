@@ -18,6 +18,14 @@ export const MESSAGE_MAX = 2000;
 export const EMAIL_MAX = 254;
 /** Humans need a moment to write something. Faster submissions are treated as bots. */
 export const MIN_FILL_MS = 2500;
+/** More links than this in one message is almost always spam. */
+export const MAX_LINKS = 2;
+const LINK_TOKEN_RE = /^[("'<]*(?:https?:\/\/|www\.|[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:com|net|org|io|xyz|ru|cn|top|info|biz|link|click|co)(?:[/:?#]|[),.!?'">]*$))/i;
+
+/** Words that look like a link (with or without http). Each link counts once. */
+export function countLinks(text: string): number {
+  return text.split(/\s+/).filter((word) => LINK_TOKEN_RE.test(word)).length;
+}
 
 export type FeedbackInput = {
   topic: FeedbackTopic;
@@ -66,6 +74,7 @@ export function validateFeedback(raw: unknown, now: number = Date.now()): Valida
   const message = asString(body.message).replace(CONTROL_RE, "").trim();
   if (message.length < MESSAGE_MIN) errors.message = `Please write at least ${MESSAGE_MIN} characters.`;
   else if (message.length > MESSAGE_MAX) errors.message = `Please keep it under ${MESSAGE_MAX} characters.`;
+  else if (countLinks(message) > MAX_LINKS) errors.message = `Please include at most ${MAX_LINKS} links.`;
 
   const emailRaw = asString(body.email).trim();
   const email = emailRaw.length ? emailRaw.toLowerCase() : null;

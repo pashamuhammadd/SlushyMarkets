@@ -24,6 +24,41 @@ export function isFeedbackConfigured(): boolean {
   return getSupabaseConfig() !== null;
 }
 
+/** Most messages the whole site accepts in FLOOD_WINDOW_MS, across every server instance. */
+export const FLOOD_LIMIT = 30;
+export const FLOOD_WINDOW_MS = 10 * 60 * 1000;
+
+/** Total from a PostgREST Content-Range header such as "0-24/57" or "*\/0". */
+export function parseContentRangeTotal(header: string | null): number | null {
+  const total = header?.split("/")[1];
+  const n = total === undefined ? Number.NaN : Number(total);
+  return Number.isInteger(n) && n >= 0 ? n : null;
+}
+
+/**
+ * Site wide flood guard: counts rows stored in the last FLOOD_WINDOW_MS in Supabase itself, so
+ * it holds across serverless instances (the per IP limit in rate-limit.ts lives in one
+ * instance's memory). If the count cannot be read, the message is allowed, so a Supabase hiccup
+ * never blocks real visitors.
+ */
+export async function recentFeedbackCount(now: number = Date.now()): Promise<number | null> {
+  const config = getSupabaseConfig();
+  if (!config) return null;
+  const since = new Date(now - FLOOD_WINDOW_MS).toISOString();
+  try {
+    const response = await fetch(`${config.url}/rest/v1/feedback?select=id&created_at=gte.${encodeURIComponent(since)}`, {
+      method: "HEAD",
+      headers: { ...supabaseAuthHeaders(config.serviceKey), Prefer: "count=exact" },
+      cache: "no-store",
+      signal: AbortSignal.timeout(4000),
+    });
+    if (!response.ok) return null;
+    return parseContentRangeTotal(response.headers.get("content-range"));
+  } catch {
+    return null;
+  }
+}
+
 export type StoreResult = { ok: true } | { ok: false; reason: "not_configured" | "storage_failed" };
 
 export async function storeFeedback(input: FeedbackInput, meta: { userAgent: string | null }): Promise<StoreResult> {

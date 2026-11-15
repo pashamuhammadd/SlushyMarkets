@@ -75,3 +75,15 @@ describe("validateFeedback", () => {
     expect(validateFeedback(null, now).ok).toBe(false);
   });
 });
+
+describe("link limit", () => {
+  it("counts links and rejects messages with more than two", async () => {
+    const { countLinks, MAX_LINKS } = await import("./feedback");
+    expect(countLinks("see https://a.com and www.b.org, also cheap-pills.xyz")).toBe(3);
+    expect(countLinks("The 4h chart and 0.5 ER felt clear. Version 1.2 is great.")).toBe(0);
+    const spam = validateFeedback({ ...base, message: "buy http://x.com http://y.com http://z.com now" }, now);
+    expect(spam.ok).toBe(false);
+    if (!spam.ok) expect(spam.errors.message).toBe(`Please include at most ${MAX_LINKS} links.`);
+    expect(validateFeedback({ ...base, message: "Bug on https://slushymarkets.com/learn page" }, now).ok).toBe(true);
+  });
+});
