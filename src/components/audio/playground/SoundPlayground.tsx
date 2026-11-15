@@ -12,6 +12,7 @@ import { erDrumsMode } from "@/lib/sonification/modes/er-drums";
 import { sonarVolumeMode } from "@/lib/sonification/modes/sonar-volume";
 import { fractalsMode } from "@/lib/sonification/modes/fractals";
 import { twoWallMode } from "@/lib/sonification/modes/two-wall";
+import { priceVolumeMode } from "@/lib/sonification/modes/price-volume";
 import { multiTimeframeMode } from "@/lib/sonification/modes/multi-timeframe";
 import type { PlayableModeId } from "@/lib/sonification/modes";
 import { sonarBandsMode } from "@/lib/sonification/modes/sonar-bands";
@@ -43,6 +44,7 @@ export function SoundPlayground({ modeId }: { modeId: PlayableModeId }) {
   if (modeId === "sonar-volume") return <PlaygroundView mode={sonarVolumeMode} />;
   if (modeId === "fractals") return <PlaygroundView mode={fractalsMode} />;
   if (modeId === "two-wall") return <PlaygroundView mode={twoWallMode} />;
+  if (modeId === "price-volume") return <PlaygroundView mode={priceVolumeMode} />;
   if (modeId === "multi-timeframe") return <PlaygroundView mode={multiTimeframeMode} />;
   return <PlaygroundView mode={emaSonarMode} />;
 }
