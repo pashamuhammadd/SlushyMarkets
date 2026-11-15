@@ -118,8 +118,8 @@ export const ER_DRUMS_PRESETS: readonly Preset[] = [
     description: "The prototype mix: drums while the market is choppy, organs for the channel edges, chimes and knocks for breakouts and returns.",
     layers: {
       erDrums: settings("drum"),
-      lower: settings("organ"),
-      upper: settings("organ"),
+      lower: settings("speaker-organ"),
+      upper: settings("speaker-organ"),
       midline: settings("tuned-wood", quiet),
       breakout: settings("chime"),
       return: settings("wood"),
@@ -132,8 +132,8 @@ export const ER_DRUMS_PRESETS: readonly Preset[] = [
     description: "Only the efficiency drums. Listen for stretches of silence: those are the straighter, more efficient moves.",
     layers: {
       erDrums: settings("drum"),
-      lower: settings("organ", quiet),
-      upper: settings("organ", quiet),
+      lower: settings("speaker-organ", quiet),
+      upper: settings("speaker-organ", quiet),
       midline: settings("tuned-wood", quiet),
       breakout: settings("chime", quiet),
       return: settings("wood", quiet),
@@ -146,8 +146,8 @@ export const ER_DRUMS_PRESETS: readonly Preset[] = [
     description: "Drums for choppy stretches plus chimes and knocks. Do breakouts tend to happen while the drums are playing or resting?",
     layers: {
       erDrums: settings("drum"),
-      lower: settings("organ", quiet),
-      upper: settings("organ", quiet),
+      lower: settings("speaker-organ", quiet),
+      upper: settings("speaker-organ", quiet),
       midline: settings("tuned-wood", quiet),
       breakout: settings("chime"),
       return: settings("wood"),

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getSonarEngine, type SonarEngine } from "@/lib/audio/sonar-engine";
 import { buildMarket, VISIBLE_BARS, type TimeframeId } from "@/lib/sonification/market";
-import { audibleGain, BAR_SECONDS, hasSolo, notesForBar } from "@/lib/sonification/mixer";
+import { audibleGain, BAR_SECONDS, duckLevel, hasSolo, notesForBar, PLAYGROUND_OUTPUT_BOOST } from "@/lib/sonification/mixer";
 import { resolveOptions, type LayerSettings, type ModeOptions, type Preset, type SonificationMode } from "@/lib/sonification/types";
 
 const LOOKAHEAD_SEC = 0.15;
@@ -57,7 +57,7 @@ export function useSonarPlayer<A>(mode: SonificationMode<A>, initialSeed: number
     const engine = engineRef.current;
     if (!engine) return;
     const solo = hasSolo(next);
-    for (const [id, layer] of Object.entries(next)) engine.setLayerGain(id, audibleGain(layer, solo));
+    for (const [id, layer] of Object.entries(next)) engine.setLayerGain(id, audibleGain(layer, solo) * PLAYGROUND_OUTPUT_BOOST);
   }, []);
 
   useEffect(() => {
@@ -119,6 +119,10 @@ export function useSonarPlayer<A>(mode: SonificationMode<A>, initialSeed: number
               return;
             }
             const when = nextTimeRef.current;
+            if (mode.ducking) {
+              const level = duckLevel(mode.ducking, bar, analysisRef.current, layersRef.current);
+              for (const id of mode.ducking.layers) engine.setLayerDuck(id, level, when);
+            }
             for (const layer of mode.layers) {
               const settings = layersRef.current[layer.id];
               if (!settings) continue;
@@ -198,7 +202,8 @@ export function useSonarPlayer<A>(mode: SonificationMode<A>, initialSeed: number
         engine.setMuted(muted);
         await engine.resume();
         const previewBus = `preview-${id}`;
-        engine.setLayerGain(previewBus, layersRef.current[id]?.gain ?? 0.7);
+        engine.setLayerGain(previewBus, (layersRef.current[id]?.gain ?? 0.7) * PLAYGROUND_OUTPUT_BOOST);
+        if (mode.ducking?.layers.includes(id)) engine.setLayerDuck(previewBus, mode.ducking.base);
         const voice = layersRef.current[id]?.voice ?? "organ";
         for (let j = 0; j < 3; j += 1) engine.playTone(previewBus, voice, engine.ctx.currentTime + 0.05 + j * 0.25, hz, 1, 0.2);
         setError(null);

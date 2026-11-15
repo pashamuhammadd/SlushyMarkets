@@ -114,8 +114,8 @@ describe("EMA Sonar", () => {
     ]);
     expect(EMA_SONAR_PRESETS[0].layers).toMatchObject({
       ema7: { voice: "tuned-wood", rate: 1 },
-      ema20: { voice: "organ", rate: 2 },
-      ema50: { voice: "organ", rate: 4 },
+      ema20: { voice: "speaker-organ", rate: 2 },
+      ema50: { voice: "speaker-organ", rate: 4 },
     });
   });
 

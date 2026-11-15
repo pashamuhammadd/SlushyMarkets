@@ -1,7 +1,15 @@
-import type { LayerDefinition, LayerSettings, PulseRate, SonicEvent } from "./types";
+import type { Ducking, LayerDefinition, LayerSettings, PulseRate, SonicEvent } from "./types";
 
 /** Seconds of music per bar. 60 bars play in 30 seconds. */
 export const BAR_SECONDS = 0.5;
+
+/**
+ * Extra output for the Sound Playground, from Slushy's speaker comparison (15 November 2026):
+ * about 3.5 times the earlier level so it is audible on phone and laptop speakers. Applied to
+ * the playground's layer buses, so other pages that share the audio engine keep their level and
+ * the relative loudness between layers does not change.
+ */
+export const PLAYGROUND_OUTPUT_BOOST = 3.5;
 
 /**
  * Applies a layer's pulse rate to the notes of one bar (bars are half a second long):
@@ -28,6 +36,19 @@ export function audibleGain(layer: LayerSettings, anySolo: boolean): number {
 
 export function hasSolo(layers: Record<string, LayerSettings>): boolean {
   return Object.values(layers).some((l) => l.solo);
+}
+
+/** Ducked level for one bar. Only audible source layers count; with none audible it is just the base. */
+export function duckLevel<A>(ducking: Ducking<A>, index: number, analysis: A, layers: Record<string, LayerSettings>): number {
+  const solo = hasSolo(layers);
+  let strength = 0;
+  for (const id of ducking.sources) {
+    const settings = layers[id];
+    if (!settings || audibleGain(settings, solo) <= 0) continue;
+    strength = Math.max(strength, ducking.strength(id, index, analysis));
+  }
+  strength = Math.min(1, Math.max(0, strength));
+  return ducking.base * (1 - ducking.depth * strength);
 }
 
 /**

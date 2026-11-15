@@ -1,8 +1,9 @@
 import type { Bar } from "../market";
-import type { ChartModel, LayerSettings, ModeOptions, Preset, ReadoutItem, SonicEvent, SonificationMode } from "../types";
+import type { ChartModel, Ducking, LayerSettings, ModeOptions, Preset, ReadoutItem, SonicEvent, SonificationMode } from "../types";
 import type { VoiceId } from "../voices";
 import {
   analyzeSonarBands,
+  bandLoudness,
   sonarBandsChart,
   sonarBandsEvents,
   sonarBandsMode,
@@ -23,6 +24,10 @@ import {
  * - buyer hits: 220 Hz drum, seller hits: 110 Hz drum, amplitude 1.1, 0.095 s
  * - hits are spread over the first 0.22 s of the bar, buyers first: 0.02 + slot x 0.22 / units
  * - the organs, chimes and knocks are the same as Sonar Bands, motion pairs off, midline muted
+ *
+ * Speaker mix (Slushy, 15 November 2026): the default drum is "Rounded wood", which sounds at
+ * 1.8 x these source pitches (about 396 Hz for buyers, 198 Hz for sellers), the organs use the
+ * brighter speaker organ, and the drums are ducked under the channel organs (VOLUME_DUCKING).
  */
 
 export const VOLUME_DRUM = { buyerHz: 220, sellerHz: 110, amp: 1.1, durationSec: 0.095, startSec: 0.02, spreadSec: 0.22 } as const;
@@ -96,13 +101,27 @@ export function sonarVolumeReadout(index: number, a: SonarVolumeAnalysis): Reado
   const [lower, upper, channel] = sonarBandsReadout(index, a);
   const lead = f.buyerHits > f.sellerHits ? "buyers lead" : f.sellerHits > f.buyerHits ? "sellers lead" : "even";
   return [
-    { id: "buyerVolume", label: "Buyer volume (simulated)", color: BUYER_COLOR, loudness: f.buyerHits / 5, text: `${f.buyerHits} of ${f.units} hits at ${VOLUME_DRUM.buyerHz} Hz, ${lead}.` },
-    { id: "sellerVolume", label: "Seller volume (simulated)", color: SELLER_COLOR, loudness: f.sellerHits / 5, text: `${f.sellerHits} of ${f.units} hits at ${VOLUME_DRUM.sellerHz} Hz.` },
+    { id: "buyerVolume", label: "Buyer volume (simulated)", color: BUYER_COLOR, loudness: f.buyerHits / 5, text: `${f.buyerHits} of ${f.units} hits on the higher drum, ${lead}.` },
+    { id: "sellerVolume", label: "Seller volume (simulated)", color: SELLER_COLOR, loudness: f.sellerHits / 5, text: `${f.sellerHits} of ${f.units} hits on the lower drum.` },
     lower,
     upper,
     channel,
   ];
 }
+
+/**
+ * Speaker mix from Slushy's comparison (style E, 15 November 2026): volume drums start 6 dB down
+ * (base 0.5) and dip up to 6 dB more as an AUDIBLE channel organ gets loud (depth 0.5):
+ * sonar silent about -6 dB, half strength about -8.5 dB, full strength about -12 dB.
+ * Buyer and seller drums move together, so their balance stays the same.
+ */
+export const VOLUME_DUCKING: Ducking<SonarVolumeAnalysis> = {
+  layers: ["buyerVolume", "sellerVolume"],
+  sources: ["lower", "upper"],
+  base: 0.5,
+  depth: 0.5,
+  strength: (id, index, a) => (id === "lower" || id === "upper" ? bandLoudness(id, index, a) : 0),
+};
 
 function settings(voice: VoiceId, extra: Partial<LayerSettings> = {}): LayerSettings {
   return { voice, rate: 2, gain: 0.7, mute: false, solo: false, ...extra };
@@ -116,10 +135,10 @@ export const SONAR_VOLUME_PRESETS: readonly Preset[] = [
     label: "Slushy's Sonar Bands",
     description: "The prototype mix: a higher drum for buyers, a lower drum for sellers, organs for the channel edges, chimes and knocks for breakouts and returns.",
     layers: {
-      buyerVolume: settings("drum"),
-      sellerVolume: settings("drum"),
-      lower: settings("organ"),
-      upper: settings("organ"),
+      buyerVolume: settings("rounded-wood"),
+      sellerVolume: settings("rounded-wood"),
+      lower: settings("speaker-organ"),
+      upper: settings("speaker-organ"),
       midline: settings("tuned-wood", quiet),
       breakout: settings("chime"),
       return: settings("wood"),
@@ -131,10 +150,10 @@ export const SONAR_VOLUME_PRESETS: readonly Preset[] = [
     label: "Volume only",
     description: "Only the two drums. Count the high and low hits on each bar to hear who leads.",
     layers: {
-      buyerVolume: settings("drum"),
-      sellerVolume: settings("drum"),
-      lower: settings("organ", quiet),
-      upper: settings("organ", quiet),
+      buyerVolume: settings("rounded-wood"),
+      sellerVolume: settings("rounded-wood"),
+      lower: settings("speaker-organ", quiet),
+      upper: settings("speaker-organ", quiet),
       midline: settings("tuned-wood", quiet),
       breakout: settings("chime", quiet),
       return: settings("wood", quiet),
@@ -146,10 +165,10 @@ export const SONAR_VOLUME_PRESETS: readonly Preset[] = [
     label: "Volume and breakouts",
     description: "Drums plus breakout chimes and return knocks. Since the volume is random here, notice how easy it is to hear a pattern that is not there.",
     layers: {
-      buyerVolume: settings("drum"),
-      sellerVolume: settings("drum"),
-      lower: settings("organ", quiet),
-      upper: settings("organ", quiet),
+      buyerVolume: settings("rounded-wood"),
+      sellerVolume: settings("rounded-wood"),
+      lower: settings("speaker-organ", quiet),
+      upper: settings("speaker-organ", quiet),
       midline: settings("tuned-wood", quiet),
       breakout: settings("chime"),
       return: settings("wood"),
@@ -167,7 +186,7 @@ export const sonarVolumeMode: SonificationMode<SonarVolumeAnalysis> = {
       label: "Buyer volume",
       color: BUYER_COLOR,
       describes: "Quick high drum hits for simulated buyer-initiated volume on each bar.",
-      detail: `${VOLUME_DRUM.buyerHz} Hz, 0 to 5 hits, simulated`,
+      detail: "Higher drum, 0 to 5 hits, simulated",
       previewHz: VOLUME_DRUM.buyerHz,
       kind: "event",
     },
@@ -176,7 +195,7 @@ export const sonarVolumeMode: SonificationMode<SonarVolumeAnalysis> = {
       label: "Seller volume",
       color: SELLER_COLOR,
       describes: "Quick low drum hits for simulated seller-initiated volume, after the buyer hits.",
-      detail: `${VOLUME_DRUM.sellerHz} Hz, 0 to 5 hits, simulated`,
+      detail: "Lower drum, 0 to 5 hits, simulated",
       previewHz: VOLUME_DRUM.sellerHz,
       kind: "event",
     },
@@ -188,4 +207,5 @@ export const sonarVolumeMode: SonificationMode<SonarVolumeAnalysis> = {
   events: sonarVolumeEvents,
   chart: sonarVolumeChart,
   readout: sonarVolumeReadout,
+  ducking: VOLUME_DUCKING,
 };
