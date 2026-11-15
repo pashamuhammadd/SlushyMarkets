@@ -227,6 +227,7 @@ public/images/liquidity-slushy/   Mascot poses cropped from the official charact
 |---|---|---|
 | `SUPABASE_URL` | Server only | Supabase project URL for feedback storage |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server only, secret | Lets the server insert feedback. Never expose to the browser. |
+| `DISCORD_FEEDBACK_WEBHOOK_URL` | Server only, secret, optional | Incoming webhook of the private admin channel. Each saved feedback is posted there (topic, rating, message, page; never the email). Leave unset to turn it off. |
 | `GOOGLE_SITE_VERIFICATION` | Optional, not secret | Search Console HTML tag token. Renders `<meta name="google-site-verification">` |
 
 See `.env.example`.
