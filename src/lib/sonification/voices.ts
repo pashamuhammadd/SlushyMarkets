@@ -4,7 +4,7 @@
  * Partials and envelopes follow the tone function in Slushy's sonar prototypes.
  */
 
-export type VoiceId = "organ" | "speaker-organ" | "flute" | "bell" | "chime" | "tuned-wood" | "wood" | "drum" | "rounded-wood";
+export type VoiceId = "organ" | "speaker-organ" | "flute" | "bell" | "chime" | "tuned-wood" | "wood" | "drum" | "rounded-wood" | "wall-wood";
 
 export type VoiceDefinition = {
   id: VoiceId;
@@ -32,6 +32,16 @@ export type HitShape = { pitchRatio: number; attackSec: number; decaySec: number
  * 110 Hz becomes about 198 Hz (sellers), 220 Hz about 396 Hz (buyers). No pitch drop, no click.
  */
 export const ROUNDED_WOOD: HitShape = { pitchRatio: 1.8, attackSec: 0.004, decaySec: 0.019, lengthSec: 0.115, rms: 0.048 };
+/**
+ * "Wall wood" for Two-wall sonar, measured from Slushy's concept video (15 November 2026):
+ * a fundamental with one partial at 2.7 x (about 0.22 of its level), a 5 ms attack and a decay
+ * of about 40 ms. Same RMS target as Rounded wood so the two sit at a similar level.
+ */
+export const WALL_WOOD: HitShape = { pitchRatio: 1, attackSec: 0.005, decaySec: 0.04, lengthSec: 0.2, rms: 0.048 };
+const WALL_WOOD_PARTIALS: ReadonlyArray<readonly [number, number]> = [
+  [1, 1],
+  [2.7, 0.22],
+];
 const ROUNDED_WOOD_PARTIALS: ReadonlyArray<readonly [number, number]> = [
   [1, 1],
   [2.7, 0.35],
@@ -117,6 +127,14 @@ export const VOICES: Record<VoiceId, VoiceDefinition> = {
     partials: ROUNDED_WOOD_PARTIALS,
     percussive: true,
     hit: ROUNDED_WOOD,
+  },
+  "wall-wood": {
+    id: "wall-wood",
+    label: "Wall wood",
+    wave: "sine",
+    partials: WALL_WOOD_PARTIALS,
+    percussive: true,
+    hit: WALL_WOOD,
   },
 };
 
