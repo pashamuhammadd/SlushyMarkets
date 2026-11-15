@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
 import { Container, SectionHeading } from "@/components/ui/Section";
 import { StatusNotice } from "@/components/ui/StatusNotice";
-import { ER_DRUM, ER_PERIOD, ER_THRESHOLD } from "@/lib/sonification/modes/er-drums";
+import { ER_PERIOD, ER_THRESHOLD } from "@/lib/sonification/modes/er-drums";
 import { BAND_ATR_MULTIPLIER, BAND_ATR_PERIOD, BAND_EMA_PERIOD } from "@/lib/sonification/modes/sonar-bands";
 import { pageMetadata } from "@/lib/site";
 import { learningResourceGraph } from "@/lib/structured-data";
@@ -135,7 +135,7 @@ export default function ErDrumsPage() {
           <ul className="mt-5 grid gap-3 md:grid-cols-3">
             <li className="panel p-4 text-sm text-muted">
               <span className="font-semibold text-ink">Drums: choppy.</span> On every bar where ER({ER_PERIOD}) is below{" "}
-              {ER_THRESHOLD}, three quick drum hits play ({ER_DRUM.hz} Hz). At {ER_THRESHOLD} or above, the drums rest.
+              {ER_THRESHOLD}, three quick hits of a rounded wood drum play. At {ER_THRESHOLD} or above, the drums rest.
             </li>
             <li className="panel p-4 text-sm text-muted">
               <span className="font-semibold text-ink">Organs: the channel.</span> The same channel as Sonar Bands: a{" "}

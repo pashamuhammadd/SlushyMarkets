@@ -56,14 +56,15 @@ describe("Speaker mix from Slushy's comparison", () => {
     }
   });
 
-  it("uses the new voices in the default mixes, and leaves ER drums alone", () => {
+  it("uses the new voices in the default mixes, with ER drums unducked", () => {
     const slushy = sonarVolumeMode.presets[0].layers;
     expect([slushy.buyerVolume.voice, slushy.sellerVolume.voice]).toEqual(["rounded-wood", "rounded-wood"]);
     expect([slushy.lower.voice, slushy.upper.voice]).toEqual(["speaker-organ", "speaker-organ"]);
     for (const mode of [sonarBandsMode, erDrumsMode, emaSonarMode, sonarVolumeMode]) {
       for (const p of mode.presets) for (const s of Object.values(p.layers)) expect(s.voice).not.toBe("organ");
     }
-    expect(erDrumsMode.presets[0].layers.erDrums.voice).toBe("drum");
+    // Rounded wood carries far more energy above 300 Hz than the old 110 Hz drum, so it can be heard on phones.
+    expect(erDrumsMode.presets[0].layers.erDrums.voice).toBe("rounded-wood");
     expect(erDrumsMode.ducking).toBeUndefined();
   });
 });

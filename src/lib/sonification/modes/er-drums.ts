@@ -25,6 +25,11 @@ import {
  * - the organs independently track the same EMA(10) +/- 1.7 x ATR(7) channel as Sonar Bands,
  *   with chimes for breakouts and knocks for returns. Motion pairs are off by default here,
  *   as in the prototype.
+ *
+ * Default drum (15 November 2026): "Rounded wood" instead of the plain drum. The plain 110 Hz
+ * drum falls to about 50 Hz, which phone speakers cannot play. Rounded wood sounds at about
+ * 198 Hz with partials near 535 and 810 Hz. Hits, timing and level rule are unchanged, and the
+ * ER drums are not ducked under the organs.
  */
 
 export const ER_PERIOD = 7;
@@ -117,7 +122,7 @@ export const ER_DRUMS_PRESETS: readonly Preset[] = [
     label: "Slushy's ER drums",
     description: "The prototype mix: drums while the market is choppy, organs for the channel edges, chimes and knocks for breakouts and returns.",
     layers: {
-      erDrums: settings("drum"),
+      erDrums: settings("rounded-wood"),
       lower: settings("speaker-organ"),
       upper: settings("speaker-organ"),
       midline: settings("tuned-wood", quiet),
@@ -131,7 +136,7 @@ export const ER_DRUMS_PRESETS: readonly Preset[] = [
     label: "Drums only",
     description: "Only the efficiency drums. Listen for stretches of silence: those are the straighter, more efficient moves.",
     layers: {
-      erDrums: settings("drum"),
+      erDrums: settings("rounded-wood"),
       lower: settings("speaker-organ", quiet),
       upper: settings("speaker-organ", quiet),
       midline: settings("tuned-wood", quiet),
@@ -145,7 +150,7 @@ export const ER_DRUMS_PRESETS: readonly Preset[] = [
     label: "Drums and breakouts",
     description: "Drums for choppy stretches plus chimes and knocks. Do breakouts tend to happen while the drums are playing or resting?",
     layers: {
-      erDrums: settings("drum"),
+      erDrums: settings("rounded-wood"),
       lower: settings("speaker-organ", quiet),
       upper: settings("speaker-organ", quiet),
       midline: settings("tuned-wood", quiet),
