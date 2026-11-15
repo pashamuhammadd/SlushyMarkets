@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
-import { storeFeedback } from "@/lib/server/feedback-store";
+import { connection } from "next/server";
+import { FLOOD_LIMIT, recentFeedbackCount, storeFeedback } from "@/lib/server/feedback-store";
+import { checkFormToken, formTokensEnabled, issueFormToken, markFormTokenUsed } from "@/lib/server/form-token";
 import { rateLimit } from "@/lib/server/rate-limit";
+import { sameOrigin } from "@/lib/server/same-origin";
 import { validateFeedback } from "@/lib/validation/feedback";
 
 const MAX_BODY_BYTES = 10_000;
@@ -9,13 +12,29 @@ function json(body: Record<string, unknown>, status: number, headers?: HeadersIn
   return NextResponse.json(body, { status, headers: { "Cache-Control": "no-store", ...headers } });
 }
 
+const TOKEN_MESSAGES = {
+  too_fast: "That was quick! Please wait a moment and send again.",
+  expired: "This form was open for a long time. Please reload the page and send again.",
+  reused: "This message was already sent. Reload the page to send another one.",
+  invalid: "We could not accept this submission. Please reload the page and try again.",
+} as const;
+
+/** GET /api/feedback: a signed form token, fetched when someone starts writing. */
+export async function GET() {
+  await connection();
+  return json({ ok: true, token: issueFormToken() }, 200);
+}
+
 /**
  * POST /api/feedback
  * 201 { ok: true } only after the row is really stored.
- * 400 validation errors, 413 too large, 415 wrong type, 429 rate limited,
+ * 400 validation errors or a bad form token, 403 other origin, 413 too large, 415 wrong type, 429 rate limited,
  * 503 storage not configured, 502 storage failed.
  */
 export async function POST(request: Request) {
+  if (!sameOrigin(request)) {
+    return json({ ok: false, error: "forbidden", message: "We could not accept this submission." }, 403);
+  }
   if (!request.headers.get("content-type")?.includes("application/json")) {
     return json({ ok: false, error: "unsupported_type", message: "Send JSON." }, 415);
   }
@@ -63,6 +82,20 @@ export async function POST(request: Request) {
     );
   }
 
+  const token = formTokensEnabled() ? checkFormToken((body as Record<string, unknown>).token) : null;
+  if (token && !token.ok) {
+    return json({ ok: false, error: token.reason === "too_fast" ? "too_fast" : "rejected", message: TOKEN_MESSAGES[token.reason] }, 400);
+  }
+
+  const recent = await recentFeedbackCount();
+  if (recent !== null && recent >= FLOOD_LIMIT) {
+    return json(
+      { ok: false, error: "busy", message: "We are receiving a lot of messages right now. Nothing was saved, please try again in a few minutes." },
+      429,
+      { "Retry-After": "600" },
+    );
+  }
+
   const stored = await storeFeedback(result.data, { userAgent: request.headers.get("user-agent") });
   if (!stored.ok) {
     return stored.reason === "not_configured"
@@ -70,5 +103,6 @@ export async function POST(request: Request) {
       : json({ ok: false, error: "storage_failed", message: "We could not save your feedback right now. Please try again later." }, 502);
   }
 
+  if (token?.ok) markFormTokenUsed(token.id);
   return json({ ok: true }, 201);
 }
