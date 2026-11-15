@@ -107,6 +107,22 @@ export function buildMarket(seed: number, timeframe: TimeframeId): Bar[] {
   const needed = VISIBLE_BARS + WARMUP_BARS;
   const slowest = Math.max(...TIMEFRAME_OPTIONS.map((t) => t.factor));
   // One fixed length walk per seed: every timeframe ends on the same final 15 minute bar.
-  const base = generateBaseBars(seed, needed * slowest);
+  // Lifted on the whole walk, so every timeframe of one seed gets the same shift.
+  const base = liftAboveZero(generateBaseBars(seed, needed * slowest));
   return aggregateBars(base, factor).slice(-needed);
+}
+
+/** Lowest price a chart may show. Below it the whole chart is lifted. */
+export const MIN_PRICE = 20;
+
+/**
+ * The random walk adds and subtracts price units, so a long walk can drift below zero, which a
+ * real price never does. Such a chart is shifted up as a whole. A constant shift changes no
+ * indicator here (EMAs, ATR, channels and efficiency all move with it), only the axis labels.
+ */
+export function liftAboveZero(bars: Bar[]): Bar[] {
+  const low = Math.min(...bars.map((b) => b.low));
+  if (low >= MIN_PRICE) return bars;
+  const shift = MIN_PRICE - low;
+  return bars.map((b) => ({ open: b.open + shift, high: b.high + shift, low: b.low + shift, close: b.close + shift }));
 }
