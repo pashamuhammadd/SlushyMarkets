@@ -11,6 +11,7 @@ import { Container, SectionHeading } from "@/components/ui/Section";
 import { StatusNotice } from "@/components/ui/StatusNotice";
 import { BAND_ATR_MULTIPLIER, BAND_ATR_PERIOD, BAND_EMA_PERIOD } from "@/lib/sonification/modes/sonar-bands";
 import { VOLUME_DRUM } from "@/lib/sonification/modes/sonar-volume";
+import { ROUNDED_WOOD } from "@/lib/sonification/voices";
 import { pageMetadata } from "@/lib/site";
 import { learningResourceGraph } from "@/lib/structured-data";
 
@@ -138,9 +139,11 @@ export default function SonarVolumePage() {
           />
           <ul className="mt-5 grid gap-3 md:grid-cols-3">
             <li className="panel p-4 text-sm text-muted">
-              <span className="font-semibold text-ink">Drums: volume.</span> Buyer hits play first at {VOLUME_DRUM.buyerHz} Hz,
-              then seller hits at {VOLUME_DRUM.sellerHz} Hz, all packed into the first quarter second of the bar. More hits
-              means more volume.
+              <span className="font-semibold text-ink">Drums: volume.</span> Buyer hits play first on a higher rounded
+              wood drum (about {Math.round(VOLUME_DRUM.buyerHz * ROUNDED_WOOD.pitchRatio)} Hz), then seller hits on a lower one
+              (about {Math.round(VOLUME_DRUM.sellerHz * ROUNDED_WOOD.pitchRatio)} Hz), all within the first quarter second of the
+              bar. More hits means more volume. The drums sit below the organs and dip a little more when an organ gets loud, so
+              the channel stays easy to hear.
             </li>
             <li className="panel p-4 text-sm text-muted">
               <span className="font-semibold text-ink">Organs: the channel.</span> The same channel as Sonar Bands: a{" "}

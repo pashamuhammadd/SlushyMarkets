@@ -1,15 +1,18 @@
 "use client";
 
-import { PERCUSSIVE_SECONDS, VOICES, type VoiceId } from "@/lib/sonification/voices";
+import { hitScale, PERCUSSIVE_SECONDS, VOICES, type VoiceId } from "@/lib/sonification/voices";
 
 /** Hard ceiling for the master gain, so even 100% volume stays comfortable. Same cap as the piano. */
 export const SONAR_MAX_MASTER_GAIN = 0.32;
 /** Peak level of one note before layer and master gain (from Slushy's prototype). */
 const NOTE_PEAK = 0.19;
+/** Ducking time constants: fast to reduce (about 30 ms to settle), slow to recover (about 200 ms). */
+const DUCK_DOWN_TAU = 0.01;
+const DUCK_UP_TAU = 0.067;
 
 /**
  * Web Audio engine for the Sound Playground.
- * Signal path: oscillator -> note envelope -> layer bus (mute, solo, volume) -> master -> compressor -> speakers.
+ * Signal path: oscillator -> note envelope -> layer duck (automatic) -> layer bus (mute, solo, volume) -> master -> compressor -> speakers.
  * The compressor keeps several layers from clipping. Everything is mono, so it sounds the same
  * on one speaker as on headphones. The AudioContext is created lazily inside a user gesture.
  */
@@ -17,6 +20,8 @@ export class SonarEngine {
   readonly ctx: AudioContext;
   private readonly master: GainNode;
   private readonly buses = new Map<string, GainNode>();
+  private readonly ducks = new Map<string, GainNode>();
+  private readonly duckLevels = new Map<string, number>();
   private readonly busTargets = new Map<string, number>();
   private readonly voices = new Set<OscillatorNode>();
   private volume = 0.7;
@@ -71,6 +76,31 @@ export class SonarEngine {
     return bus;
   }
 
+  /** Input of a layer: notes go through the duck gain first, then the layer bus. */
+  private input(layerId: string): GainNode {
+    let duck = this.ducks.get(layerId);
+    if (!duck) {
+      duck = this.ctx.createGain();
+      duck.gain.value = this.duckLevels.get(layerId) ?? 1;
+      duck.connect(this.bus(layerId));
+      this.ducks.set(layerId, duck);
+    }
+    return duck;
+  }
+
+  /**
+   * Automatic level for one layer from `when` on (AudioContext time), separate from the user's
+   * layer volume so the two never overwrite each other. Reductions are fast, recoveries slow.
+   */
+  setLayerDuck(layerId: string, level: number, when = this.ctx.currentTime) {
+    const previous = this.duckLevels.get(layerId) ?? 1;
+    this.duckLevels.set(layerId, level);
+    const param = this.input(layerId).gain;
+    const at = Math.max(when, this.ctx.currentTime);
+    param.cancelScheduledValues(at);
+    param.setTargetAtTime(level, at, level < previous ? DUCK_DOWN_TAU : DUCK_UP_TAU);
+  }
+
   /** Effective layer level after mute and solo. Takes effect within a few milliseconds. */
   setLayerGain(layerId: string, gain: number) {
     this.busTargets.set(layerId, gain);
@@ -81,8 +111,26 @@ export class SonarEngine {
   playTone(layerId: string, voiceId: VoiceId, when: number, hz: number, amp: number, durationSec: number) {
     if (!(amp > 0) || !(hz > 0)) return;
     const voice = VOICES[voiceId];
+    const out = this.input(layerId);
+    if (voice.hit) {
+      const shape = voice.hit;
+      const peak = hitScale(voice, hz) * amp;
+      for (const [ratio, weight] of voice.partials) {
+        const osc = this.ctx.createOscillator();
+        const env = this.ctx.createGain();
+        osc.type = voice.wave;
+        osc.frequency.setValueAtTime(hz * shape.pitchRatio * ratio, when);
+        env.gain.setValueAtTime(0, when);
+        env.gain.linearRampToValueAtTime(peak * weight, when + shape.attackSec);
+        env.gain.setTargetAtTime(0, when + shape.attackSec, shape.decaySec);
+        osc.connect(env).connect(out);
+        osc.start(when);
+        osc.stop(when + shape.lengthSec + 0.02);
+        this.track(osc, env);
+      }
+      return;
+    }
     const duration = voice.percussive ? PERCUSSIVE_SECONDS : durationSec;
-    const out = this.bus(layerId);
     for (const [ratio, weight] of voice.partials) {
       const osc = this.ctx.createOscillator();
       const env = this.ctx.createGain();
@@ -95,12 +143,16 @@ export class SonarEngine {
       osc.connect(env).connect(out);
       osc.start(when);
       osc.stop(when + duration + 0.02);
-      this.voices.add(osc);
-      osc.onended = () => {
-        this.voices.delete(osc);
-        env.disconnect();
-      };
+      this.track(osc, env);
     }
+  }
+
+  private track(osc: OscillatorNode, env: GainNode) {
+    this.voices.add(osc);
+    osc.onended = () => {
+      this.voices.delete(osc);
+      env.disconnect();
+    };
   }
 
   /** Silence every scheduled and sounding note with a short fade, then restore the master level. */
@@ -116,6 +168,7 @@ export class SonarEngine {
       }
     }
     this.voices.clear();
+    for (const duck of this.ducks.values()) duck.gain.cancelScheduledValues(now);
     this.master.gain.setTargetAtTime(this.masterTarget(), now + 0.1, 0.02);
   }
 }

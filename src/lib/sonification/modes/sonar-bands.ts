@@ -245,8 +245,8 @@ export const SONAR_BANDS_PRESETS: readonly Preset[] = [
     label: "Slushy's Sonar Bands",
     description: "The prototype mix: two organs for the band edges with motion pairs, chimes for breakouts and knocks for returns.",
     layers: {
-      lower: settings("organ"),
-      upper: settings("organ"),
+      lower: settings("speaker-organ"),
+      upper: settings("speaker-organ"),
       midline: settings("tuned-wood", { mute: true }),
       breakout: settings("chime"),
       return: settings("wood"),
@@ -258,8 +258,8 @@ export const SONAR_BANDS_PRESETS: readonly Preset[] = [
     label: "Edges only",
     description: "Only the two organs, one steady note each. Learn how loudness follows the distance to each band.",
     layers: {
-      lower: settings("organ"),
-      upper: settings("organ"),
+      lower: settings("speaker-organ"),
+      upper: settings("speaker-organ"),
       midline: settings("tuned-wood", { mute: true }),
       breakout: settings("chime", { mute: true }),
       return: settings("wood", { mute: true }),
@@ -271,8 +271,8 @@ export const SONAR_BANDS_PRESETS: readonly Preset[] = [
     label: "Events only",
     description: "Silence until something happens: a chime when price breaks out, a knock when it closes back inside.",
     layers: {
-      lower: settings("organ", { mute: true }),
-      upper: settings("organ", { mute: true }),
+      lower: settings("speaker-organ", { mute: true }),
+      upper: settings("speaker-organ", { mute: true }),
       midline: settings("tuned-wood", { mute: true }),
       breakout: settings("chime"),
       return: settings("wood"),

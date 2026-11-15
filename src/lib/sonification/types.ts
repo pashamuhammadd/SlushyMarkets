@@ -137,6 +137,21 @@ export type SonificationMode<Analysis> = {
   events: (layerId: string, index: number, analysis: Analysis, options: ModeOptions) => SonicEvent[];
   chart: (analysis: Analysis) => ChartModel;
   readout: (index: number, analysis: Analysis, options: ModeOptions) => ReadoutItem[];
+  /** Optional automatic level for some layers, for example drums that make room for the sonar. */
+  ducking?: Ducking<Analysis>;
+};
+
+/**
+ * Automatic gain for `layers`: base x (1 - depth x strength), where strength is the loudest
+ * AUDIBLE source layer at that bar, clamped to 0..1. Muted sources, and sources left out by a
+ * solo, do not count. Applied through its own gain stage, never through the user's layer volume.
+ */
+export type Ducking<Analysis> = {
+  layers: readonly string[];
+  sources: readonly string[];
+  base: number;
+  depth: number;
+  strength: (sourceId: string, index: number, analysis: Analysis) => number;
 };
 
 /** Toggle values from a preset, filling in defaults. */

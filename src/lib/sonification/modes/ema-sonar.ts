@@ -123,8 +123,8 @@ export const EMA_SONAR_PRESETS: readonly Preset[] = [
     description: "The prototype mix: a plucked 7 EMA, a higher organ for the 20 EMA and a deep, fast organ for the 50 EMA.",
     layers: {
       ema7: settings("tuned-wood", 1),
-      ema20: settings("organ", 2),
-      ema50: settings("organ", 4),
+      ema20: settings("speaker-organ", 2),
+      ema50: settings("speaker-organ", 4),
     },
   },
   {
@@ -133,8 +133,8 @@ export const EMA_SONAR_PRESETS: readonly Preset[] = [
     description: "Only the 20 EMA is audible. Learn how loudness follows distance before adding more layers.",
     layers: {
       ema7: settings("tuned-wood", 1, { mute: true }),
-      ema20: settings("organ", 2),
-      ema50: settings("organ", 2, { mute: true }),
+      ema20: settings("speaker-organ", 2),
+      ema50: settings("speaker-organ", 2, { mute: true }),
     },
   },
   {
@@ -144,7 +144,7 @@ export const EMA_SONAR_PRESETS: readonly Preset[] = [
     layers: {
       ema7: settings("chime", 2),
       ema20: settings("flute", 2),
-      ema50: settings("organ", 2),
+      ema50: settings("speaker-organ", 2),
     },
   },
 ];
