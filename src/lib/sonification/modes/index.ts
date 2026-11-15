@@ -3,14 +3,14 @@
  * The others are Slushy's prototype ideas that will be ported one at a time, after each is
  * reviewed and tested.
  */
-export type PlayableModeId = "ema-sonar" | "sonar-bands" | "sonar-er-drums" | "sonar-volume" | "fractals" | "multi-timeframe" | "two-wall";
+export type PlayableModeId = "ema-sonar" | "sonar-bands" | "sonar-er-drums" | "sonar-volume" | "fractals" | "multi-timeframe" | "two-wall" | "price-volume";
 
 export type ModeListing = {
   id: string;
   title: string;
   summary: string;
   status: "live" | "planned";
-  href?: "/audio-lab/playground" | "/audio-lab/playground/sonar-bands" | "/audio-lab/playground/er-drums" | "/audio-lab/playground/sonar-volume" | "/audio-lab/playground/fractals" | "/audio-lab/playground/multi-timeframe" | "/audio-lab/playground/two-wall";
+  href?: "/audio-lab/playground" | "/audio-lab/playground/sonar-bands" | "/audio-lab/playground/er-drums" | "/audio-lab/playground/sonar-volume" | "/audio-lab/playground/fractals" | "/audio-lab/playground/multi-timeframe" | "/audio-lab/playground/two-wall" | "/audio-lab/playground/price-volume";
 };
 
 export const MODE_LISTINGS: readonly ModeListing[] = [
@@ -62,5 +62,12 @@ export const MODE_LISTINGS: readonly ModeListing[] = [
     summary: "A low and a high wood tone for two walls. Their balance tells you where price sits between the last swing low and swing high.",
     status: "live",
     href: "/audio-lab/playground/two-wall",
+  },
+  {
+    id: "price-volume",
+    title: "Price and volume conversation",
+    summary: "A wood note for each candle and quick drums for how busy it was, both from the same simulated trades.",
+    status: "live",
+    href: "/audio-lab/playground/price-volume",
   },
 ];
