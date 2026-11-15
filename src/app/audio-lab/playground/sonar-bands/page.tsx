@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Headphones, Info, SlidersHorizontal } from "lucide-react";
+import { Ear, Headphones, Info, SlidersHorizontal } from "lucide-react";
+import { ListeningQuiz } from "@/components/audio/playground/ListeningQuiz";
 import { PlaygroundModeNav, PlaygroundModesList } from "@/components/audio/playground/PlaygroundModes";
 import { SoundPlayground } from "@/components/audio/playground/SoundPlayground";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -167,6 +168,18 @@ export default function SonarBandsPage() {
               on, then off, on the same chart. Which version helps you guess the next touch?
             </li>
           </ol>
+        </section>
+
+        <section aria-labelledby="bands-quiz-title" className="panel p-4 sm:p-6">
+          <SectionHeading
+            id="bands-quiz-title"
+            icon={<Ear className="size-5" />}
+            title="Listening quiz"
+            description="Six short clips cut from simulated charts. Listen, answer, then see the chart of what you heard. Your score stays in this browser."
+          />
+          <div className="mt-5">
+            <ListeningQuiz />
+          </div>
         </section>
 
         <PlaygroundModesList />
