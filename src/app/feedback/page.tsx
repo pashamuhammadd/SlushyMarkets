@@ -72,6 +72,7 @@ export default function FeedbackPage() {
               <li>We store your topic, rating, message and, only if you add it, your email.</li>
               <li>We also store which page you came from and your browser type, to help fix bugs.</li>
               <li>Only the SlushyMarkets team can read submissions. They are never public.</li>
+              <li>The team gets a notice with your topic, rating and message in a private Discord channel. Your email is not included.</li>
               <li>Your email is used only to reply, never for marketing.</li>
             </ul>
             <p className="mt-4 flex items-center gap-2 text-xs text-subtle">

@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
-import { connection } from "next/server";
+import { after, connection, NextResponse } from "next/server";
+import { notifyFeedback } from "@/lib/server/discord";
 import { FLOOD_LIMIT, recentFeedbackCount, storeFeedback } from "@/lib/server/feedback-store";
 import { checkFormToken, formTokensEnabled, issueFormToken, markFormTokenUsed } from "@/lib/server/form-token";
 import { rateLimit } from "@/lib/server/rate-limit";
@@ -104,5 +104,8 @@ export async function POST(request: Request) {
   }
 
   if (token?.ok) markFormTokenUsed(token.id);
+  // Tell the team on Discord after the response is sent, so the visitor never waits for it.
+  const saved = result.data;
+  after(() => notifyFeedback(saved));
   return json({ ok: true }, 201);
 }
